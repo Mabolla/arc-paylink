@@ -12,11 +12,15 @@ Base Sepolia bridging, CCTP, and Unified Balance remain documented future work a
 
 ## Verified Testnet Milestone
 
-- Successful Arc Testnet USDC payment: `1 USDC`
-- Transaction hash: `0x22f5465cec1aeb9ae0cd8674b02d26524fcd56ece5178326c9f982754c884f1f`
-- ArcScan: https://testnet.arcscan.app/tx/0x22f5465cec1aeb9ae0cd8674b02d26524fcd56ece5178326c9f982754c884f1f
-- Verified amount: `1 USDC` (`1,000,000` USDC base units)
-- This was a manual end-to-end test on Arc Testnet using a browser wallet and testnet funds.
+- Successful Arc Testnet USDC payment: **25 USDC**
+- Transaction hash: `0x4f7a17dd033ea30628b8f3b5a8ec519920277731a7b8382153dc8c36515db379`
+- ArcScan: https://testnet.arcscan.app/tx/0x4f7a17dd033ea30628b8f3b5a8ec519920277731a7b8382153dc8c36515db379
+- Verified result: application reached `PAID` after checking the successful Arc receipt, official USDC transfer log, exact recipient, and exact requested amount.
+- Negative validation: payer == recipient was correctly rejected.
+- Local verification: lint, 14 unit tests, TypeScript, production build, and local runtime all passed in a normal Windows environment.
+- Full evidence and test details: [`ARC_PAYLINK_TEST_REPORT.md`](./ARC_PAYLINK_TEST_REPORT.md)
+
+This was a manual end-to-end test on Arc Testnet using a browser wallet and testnet funds. This milestone does not claim Base Sepolia bridging, Unified Balance, hosted deployment, or mainnet readiness.
 
 ## Run Locally
 
