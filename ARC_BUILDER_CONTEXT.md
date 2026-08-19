@@ -156,6 +156,11 @@ Examples:
 - Repository: Mabolla/arc-paylink
 - Primary network: Arc Testnet
 - Proven flow: Arc → Arc USDC payment
+- Verified payment: **25 USDC** on Arc Testnet
+- Verified transaction: `0x4f7a17dd033ea30628b8f3b5a8ec519920277731a7b8382153dc8c36515db379`
+- Verification report: `ARC_PAYLINK_TEST_REPORT.md`
+- Automated checks: lint, 14 unit tests, TypeScript, and production build **PASS**
+- Local runtime: **PASS**
 - Planned flow: Base Sepolia → Arc through App Kit Bridge/CCTP
 - Shared Builder methodology: **adopted**
 - Context file: **v0.1**
