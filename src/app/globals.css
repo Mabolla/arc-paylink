@@ -1,4 +1,4 @@
-:root { --ink:#15171a; --muted:#676b72; --line:#d9dce1; --paper:#f5f4ef; --white:#fff; --blue:#1557ff; --green:#16794b; --red:#b42318; }
+:root { --ink:#15171a; --muted:#676b72; --line:#d9dce1; --paper:#f5f4ef; --white:#fff; --blue:#1557ff; --green:#16794b; --red:#b42318; --font-geist:Arial,sans-serif; --font-mono:ui-monospace,SFMono-Regular,Consolas,"Liberation Mono",monospace; }
 * { box-sizing:border-box; }
 html, body { margin:0; min-height:100%; }
 body { background:var(--paper); color:var(--ink); font-family:var(--font-geist), Arial, sans-serif; letter-spacing:0; }
