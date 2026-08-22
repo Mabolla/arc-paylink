@@ -6,11 +6,14 @@ import { createViemAdapterFromProvider } from "@circle-fin/adapter-viem-v2";
 import { createPublicClient, http, type Address, type Hash } from "viem";
 import { ARC_EXPLORER_URL, arcTestnet } from "@/lib/arc";
 import { connectWallet, ensureArcTestnet, getBrowserProvider } from "@/lib/browser-wallet";
+import { executeBridgePayment } from "@/lib/bridge-payment";
+import type { PaymentRequest } from "@/lib/payment-request";
+import { settlePaymentRequest } from "@/lib/settle-payment-request";
 import { verifyPaymentReceipt, type VerificationResult } from "@/lib/verify-payment";
 
-type Status = "ready" | "connected" | "pending" | "paid" | "failed";
+type Status = "ready" | "connected" | "pending" | "bridge_processing" | "paid" | "settled" | "failed";
 
-export function PaymentPanel({ title, amount, recipient }: { title: string; amount: string; recipient: Address }) {
+export function PaymentPanel({ title, amount, recipient, route }: PaymentRequest) {
   const [status, setStatus] = useState<Status>("ready");
   const [account, setAccount] = useState<Address>();
   const [message, setMessage] = useState("Connect an Arc wallet to continue.");
@@ -21,10 +24,10 @@ export function PaymentPanel({ title, amount, recipient }: { title: string; amou
     try {
       const provider = getBrowserProvider();
       const address = await connectWallet(provider);
-      await ensureArcTestnet(provider);
+      if (route === "arc") await ensureArcTestnet(provider);
       setAccount(address);
       setStatus("connected");
-      setMessage("Wallet connected on Arc Testnet. Review and submit the payment.");
+      setMessage(route === "arc" ? "Wallet connected on Arc Testnet. Review and submit the payment." : "Wallet connected. Review the Base Sepolia bridge payment.");
     } catch (error) {
       setStatus("failed");
       setMessage(error instanceof Error ? error.message : "Wallet connection failed.");
@@ -33,6 +36,20 @@ export function PaymentPanel({ title, amount, recipient }: { title: string; amou
 
   async function pay() {
     try {
+      if (route === "bridge") {
+        setStatus("bridge_processing");
+        setMessage("Approve the Circle Bridge transactions. Waiting for the destination mint on Arc.");
+        const bridgeResult = await executeBridgePayment({ provider: getBrowserProvider(), recipient, amount });
+        const mint = bridgeResult.steps.find((step) => step.name.toLowerCase() === "mint");
+        if (!mint?.txHash) throw new Error("Circle Bridge completed without a destination mint transaction hash.");
+        setMessage("Destination mint submitted. Verifying the exact Arc settlement.");
+        const destinationReceipt = await client.waitForTransactionReceipt({ hash: mint.txHash as Hash });
+        const settled = settlePaymentRequest({ request: { title, amount, recipient, route }, bridgeResult, destinationReceipt });
+        setResult({ transactionHash: settled.mintTransactionHash, blockNumber: settled.blockNumber, sender: settled.sender, recipient: settled.recipient, amountBaseUnits: settled.amountBaseUnits });
+        setStatus("settled");
+        setMessage("Cross-chain payment settled and verified on Arc Testnet.");
+        return;
+      }
       setStatus("pending");
       setMessage("Approve the USDC transfer in your wallet. Then wait for Arc confirmation.");
       const provider = getBrowserProvider();
@@ -55,18 +72,18 @@ export function PaymentPanel({ title, amount, recipient }: { title: string; amou
 
   return (
     <section className="payment-panel">
-      <div className="receipt-top"><span className={`status-dot ${status}`} /><span>{status === "paid" ? "Paid" : status === "pending" ? "Pending" : status === "failed" ? "Action needed" : "Awaiting payment"}</span></div>
+      <div className="receipt-top"><span className={`status-dot ${status}`} /><span>{status === "paid" ? "Paid" : status === "settled" ? "Settled" : status === "pending" || status === "bridge_processing" ? "Processing" : status === "failed" ? "Action needed" : "Awaiting payment"}</span></div>
       <p className="eyebrow">Payment request</p>
       <h1 className="payment-title">{title}</h1>
       <div className="payment-amount"><strong>{amount}</strong><span>USDC</span></div>
       <dl className="payment-details">
-        <div><dt>Network</dt><dd>Arc Testnet <span className="network-id">5042002</span></dd></div>
+        <div><dt>Route</dt><dd>{route === "bridge" ? "Base Sepolia → Arc Testnet" : "Arc Testnet"}</dd></div>
         <div><dt>Recipient</dt><dd className="mono">{recipient.slice(0, 8)}…{recipient.slice(-6)}</dd></div>
         {account && <div><dt>Paying from</dt><dd className="mono">{account.slice(0, 8)}…{account.slice(-6)}</dd></div>}
       </dl>
-      <div className={`status-box ${status}`} role="status"><b>{message}</b>{status === "pending" && <span className="spinner" />}</div>
+      <div className={`status-box ${status}`} role="status"><b>{message}</b>{(status === "pending" || status === "bridge_processing") && <span className="spinner" />}</div>
       {!account && <button className="primary-button full" onClick={connect}>Connect wallet</button>}
-      {account && status !== "paid" && status !== "pending" && <button className="primary-button full" onClick={pay}>Pay {amount} USDC <span aria-hidden>→</span></button>}
+      {account && status !== "paid" && status !== "settled" && status !== "pending" && status !== "bridge_processing" && <button className="primary-button full" onClick={pay}>Pay {amount} USDC <span aria-hidden>→</span></button>}
       {status === "failed" && !account && <button className="text-button" onClick={connect}>Try connection again</button>}
       {result && <a className="explorer-link" href={`${ARC_EXPLORER_URL}/tx/${result.transactionHash}`} target="_blank" rel="noreferrer">View verified transaction on ArcScan ↗</a>}
       <p className="security-note">Your wallet signs the transaction. Arc PayLink never receives your keys.</p>

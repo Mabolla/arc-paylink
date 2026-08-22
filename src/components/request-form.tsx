@@ -17,6 +17,7 @@ export function RequestForm() {
         title: String(form.get("title") ?? ""),
         amount: String(form.get("amount") ?? ""),
         recipient: String(form.get("recipient") ?? ""),
+        route: String(form.get("route") ?? ""),
       });
       router.push(`/pay?${requestToSearchParams(request).toString()}`);
     } catch (reason) {
@@ -40,6 +41,13 @@ export function RequestForm() {
           <input name="recipient" placeholder="0x..." spellCheck={false} required />
         </label>
       </div>
+      <label>
+        <span>Payment route</span>
+        <select name="route" defaultValue="arc">
+          <option value="arc">Arc Testnet wallet</option>
+          <option value="bridge">Base Sepolia via Circle Bridge</option>
+        </select>
+      </label>
       {error && <p className="form-error" role="alert">{error}</p>}
       <button className="primary-button" type="submit">Create payment link <span aria-hidden>→</span></button>
     </form>

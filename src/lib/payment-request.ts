@@ -5,12 +5,14 @@ export type PaymentRequest = {
   title: string;
   amount: string;
   recipient: `0x${string}`;
+  route: "arc" | "bridge";
 };
 
 export function createPaymentRequest(input: {
   title: string;
   amount: string;
   recipient: string;
+  route?: string;
 }): PaymentRequest {
   const title = input.title.trim();
   if (!title || title.length > 80) throw new Error("Title must be between 1 and 80 characters.");
@@ -20,13 +22,16 @@ export function createPaymentRequest(input: {
     title,
     amount: normalizeUsdcAmount(input.amount),
     recipient: getAddress(input.recipient),
+    route: input.route === "bridge" ? "bridge" : "arc",
   };
 }
 
 export function requestToSearchParams(request: PaymentRequest): URLSearchParams {
-  return new URLSearchParams({
+  const params = new URLSearchParams({
     title: request.title,
     amount: request.amount,
     recipient: request.recipient,
   });
+  if (request.route === "bridge") params.set("route", "bridge");
+  return params;
 }

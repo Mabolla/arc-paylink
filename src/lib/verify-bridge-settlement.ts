@@ -21,7 +21,9 @@ export type BridgeSettlementVerification = {
   sender: Address;
   recipient: Address;
   token: Address;
+  grossAmountBaseUnits: bigint;
   amountBaseUnits: bigint;
+  bridgeFeeBaseUnits: bigint;
   fulfillmentId?: string;
 };
 
@@ -87,16 +89,25 @@ export function verifyBridgeSettlement({
       // Ignore unrelated or non-Transfer logs emitted by the token contract.
     }
   }
-  const exact = matches.filter((event) => event.to.toLowerCase() === expectedRecipient.toLowerCase() && event.value === amount);
-  if (exact.length !== 1) fail(exact.length === 0 ? "no exact Transfer settlement found" : "multiple exact Transfer settlements found");
+  const recipientTransfers = matches.filter(
+    (event) => event.to.toLowerCase() === expectedRecipient.toLowerCase() && event.value > 0n,
+  );
+  if (recipientTransfers.length !== 1) {
+    fail(recipientTransfers.length === 0 ? "no positive Transfer settlement found" : "multiple positive Transfer settlements found");
+  }
+  const mintedTotal = matches.reduce((total, event) => total + event.value, 0n);
+  if (mintedTotal !== amount) fail("destination USDC transfers do not equal the gross bridge amount");
+  const recipientTransfer = recipientTransfers[0];
   return {
     state: "verified",
     mintTransactionHash: mint.txHash as Hash,
     blockNumber: destinationReceipt.blockNumber,
-    sender: exact[0].from,
-    recipient: exact[0].to,
+    sender: recipientTransfer.from,
+    recipient: recipientTransfer.to,
     token: expectedToken as Address,
-    amountBaseUnits: exact[0].value,
+    grossAmountBaseUnits: amount,
+    amountBaseUnits: recipientTransfer.value,
+    bridgeFeeBaseUnits: amount - recipientTransfer.value,
     fulfillmentId,
   };
 }
