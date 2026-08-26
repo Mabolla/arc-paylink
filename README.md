@@ -4,6 +4,26 @@ Arc PayLink v2 is a small hackathon MVP for creating shareable USDC payment requ
 
 This is an Arc project. Base Sepolia is only a supported source network for a payment. This repository must not share files, directories, dependencies, or Git history with any Base builder project.
 
+## Experimental claimable escrow
+
+The repository now includes a tested contract foundation for the next Arc PayLink milestone: cross-chain funded payment links that can be claimed by a recipient wallet created after the link is shared.
+
+- `ArcPayLinkFactory` creates one deterministic minimal-proxy escrow per payment link and is locked to one configured payment token.
+- Each escrow recognizes USDC delivered directly to its address, including a future CCTP destination mint.
+- A recipient authorizes a claim with an address-bound EIP-712 signature. EOA signatures and EIP-1271 smart-account signatures are supported.
+- The link secret alone cannot redirect funds to an attacker because the signed recipient address is part of the claim digest.
+- A link can be claimed once. After expiry, only the original sender can refund it.
+- The implementation contract is locked against direct initialization.
+
+This milestone is contract-only and has not yet been deployed or proven with a live CCTP Forwarding Service transfer. It does not yet include Circle user-controlled wallet onboarding, a relayer, or production persistence. Those integrations remain gated on an Arc Testnet end-to-end proof.
+
+Contract checks:
+
+```bash
+npm run contracts:compile
+npm run contracts:test
+```
+
 ## Current Milestone
 
 The implemented milestone is intentionally limited to same-chain Arc Testnet USDC payments. A seller creates a request in the browser, shares the generated URL, and a payer connects an injected EVM wallet to send USDC through Circle App Kit Send. The application then reads the Arc receipt and accepts payment only when the transaction succeeded and the official USDC contract emitted an exact transfer to the requested recipient for the requested base-unit amount.
