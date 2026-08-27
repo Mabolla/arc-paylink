@@ -1,0 +1,14 @@
+{
+  "network": "Arc Testnet",
+  "chainId": 5042002,
+  "factory": "0x8C377F5Bb508ece6De8090209619122edd4bC453",
+  "sender": "0xE7be265f2301E08a6EaE5Cfd0C1113a7Cd35b3dd",
+  "paymentId": "0xfd05e5bc07a852e550505360ada0990ee30ab2f0aef62109671ff307f191252b",
+  "escrow": "0x5321E75Be8c1814C205eda13c26cDD067dc225BD",
+  "amountUsdc": "1",
+  "amountBaseUnits": "1000000",
+  "expiry": "2026-09-03T16:22:09Z",
+  "secretHash": "0x870b2c9673739e5231aa243f98c5d51bec3cdd0f0ab4a2022ba6b580e6ad2b41",
+  "creationTransaction": "0x83a2a27212622e6aee519458de2c623ddab6dee399fc115122687355bc2a5580",
+  "status": "awaiting-cross-chain-funding"
+}
