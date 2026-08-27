@@ -30,6 +30,16 @@ const erc20Abi = [
   },
   {
     type: "function",
+    name: "allowance",
+    stateMutability: "view",
+    inputs: [
+      { name: "owner", type: "address" },
+      { name: "spender", type: "address" },
+    ],
+    outputs: [{ name: "allowance", type: "uint256" }],
+  },
+  {
+    type: "function",
     name: "approve",
     stateMutability: "nonpayable",
     inputs: [
@@ -81,9 +91,15 @@ async function main() {
     transport: http(process.env.ARC_TESTNET_RPC_URL || "https://rpc.testnet.arc.io"),
   });
 
-  const [ethBalance, usdcBalance, escrowBalanceBefore] = await Promise.all([
+  const [ethBalance, usdcBalance, currentAllowance, escrowBalanceBefore] = await Promise.all([
     source.getBalance({ address: account.address }),
     source.readContract({ address: BASE_SEPOLIA_USDC, abi: erc20Abi, functionName: "balanceOf", args: [account.address] }),
+    source.readContract({
+      address: BASE_SEPOLIA_USDC,
+      abi: erc20Abi,
+      functionName: "allowance",
+      args: [account.address, TOKEN_MESSENGER_WITH_FEES],
+    }),
     destination.readContract({ address: ARC_USDC, abi: erc20Abi, functionName: "balanceOf", args: [ESCROW_ADDRESS] }),
   ]);
 
@@ -111,6 +127,7 @@ async function main() {
   console.log(`Source wallet: ${account.address}`);
   console.log(`Base Sepolia ETH: ${formatEther(ethBalance)}`);
   console.log(`Base Sepolia USDC: ${formatUnits(usdcBalance, 6)}`);
+  console.log(`Current CCTP allowance: ${formatUnits(currentAllowance, 6)} USDC`);
   console.log(`Arc escrow balance before: ${formatUnits(escrowBalanceBefore, 6)} USDC`);
   console.log(`Destination escrow: ${ESCROW_ADDRESS}`);
   console.log(`Transfer: ${formatUnits(TRANSFER_AMOUNT, 6)} USDC`);
@@ -131,8 +148,21 @@ async function main() {
     functionName: "approve",
     args: [TOKEN_MESSENGER_WITH_FEES, approvalAmount],
   });
-  await source.waitForTransactionReceipt({ hash: approvalTx });
+  const approvalReceipt = await source.waitForTransactionReceipt({ hash: approvalTx });
+  if (approvalReceipt.status !== "success") throw new Error("USDC approval transaction reverted");
+  const allowanceAfterApproval = await source.readContract({
+    address: BASE_SEPOLIA_USDC,
+    abi: erc20Abi,
+    functionName: "allowance",
+    args: [account.address, TOKEN_MESSENGER_WITH_FEES],
+  });
+  if (allowanceAfterApproval < approvalAmount) {
+    throw new Error(
+      `USDC allowance is ${formatUnits(allowanceAfterApproval, 6)} after approval; expected ${formatUnits(approvalAmount, 6)}`,
+    );
+  }
   console.log(`Approval transaction: ${approvalTx}`);
+  console.log(`Allowance after approval: ${formatUnits(allowanceAfterApproval, 6)} USDC`);
 
   const burnTx = await wallet.sendTransaction({
     to: TOKEN_MESSENGER_WITH_FEES,
