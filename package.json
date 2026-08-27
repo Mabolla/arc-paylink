@@ -12,7 +12,8 @@
     "contracts:compile": "hardhat compile",
     "contracts:test": "hardhat test",
     "contracts:deploy:arc": "hardhat run scripts/deploy-escrow.cjs --network arcTestnet",
-    "contracts:create-test-escrow": "hardhat run scripts/create-test-escrow.cjs --network arcTestnet"
+    "contracts:create-test-escrow": "hardhat run scripts/create-test-escrow.cjs --network arcTestnet",
+    "contracts:fund-test-escrow": "node scripts/fund-test-escrow.cjs"
   },
   "keywords": [],
   "author": "",
