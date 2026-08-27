@@ -10,5 +10,9 @@
   "expiry": "2026-09-03T16:22:09Z",
   "secretHash": "0x870b2c9673739e5231aa243f98c5d51bec3cdd0f0ab4a2022ba6b580e6ad2b41",
   "creationTransaction": "0x83a2a27212622e6aee519458de2c623ddab6dee399fc115122687355bc2a5580",
-  "status": "awaiting-cross-chain-funding"
+  "status": "cross-chain-funding-verified",
+  "sourceNetwork": "Base Sepolia",
+  "burnTransaction": "0xee5cf435e0b17874ed0b9415763d976ae2e20d4caf11be1b4e0154cef8fe62bf",
+  "mintTransaction": "0x9e1b8d1ff72ed2b4d4d133a14b90ef68875c76b068d0826d96b8aae96f913f31",
+  "verifiedBalanceUsdc": "1"
 }
