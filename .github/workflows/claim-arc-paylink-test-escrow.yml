@@ -1,0 +1,35 @@
+name: Claim Arc PayLink test escrow
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/claim-arc-paylink-test-escrow.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  claim:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out tested feature branch
+        uses: actions/checkout@v4
+        with:
+          ref: feat/claimable-crosschain-escrow
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Claim funded Arc escrow
+        env:
+          ARC_TESTNET_PRIVATE_KEY: ${{ secrets.ARC_TESTNET_PRIVATE_KEY }}
+        run: npm run contracts:claim-test-escrow
