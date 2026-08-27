@@ -12,6 +12,7 @@ export default defineConfig([
     "out/**",
     "build/**",
     "test/contracts/**",
+    "scripts/**/*.cjs",
     "hardhat.config.cjs",
     "next-env.d.ts",
   ]),

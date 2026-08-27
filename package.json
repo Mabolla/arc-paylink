@@ -10,7 +10,8 @@
     "test": "vitest run && hardhat test",
     "test:app": "vitest run",
     "contracts:compile": "hardhat compile",
-    "contracts:test": "hardhat test"
+    "contracts:test": "hardhat test",
+    "contracts:deploy:arc": "hardhat run scripts/deploy-escrow.cjs --network arcTestnet"
   },
   "keywords": [],
   "author": "",

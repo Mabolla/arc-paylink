@@ -29,4 +29,11 @@ module.exports = {
     cache: "./cache",
     artifacts: "./artifacts",
   },
+  networks: {
+    arcTestnet: {
+      url: process.env.ARC_TESTNET_RPC_URL || "https://rpc.testnet.arc.io",
+      chainId: 5042002,
+      accounts: process.env.ARC_TESTNET_PRIVATE_KEY ? [process.env.ARC_TESTNET_PRIVATE_KEY] : [],
+    },
+  },
 };
