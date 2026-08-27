@@ -1,0 +1,45 @@
+name: Fund Arc PayLink escrow through CCTP
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/fund-arc-paylink-cctp.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: arc-paylink-cctp-funding
+  cancel-in-progress: false
+
+jobs:
+  fund:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out tested feature branch
+        uses: actions/checkout@v7
+        with:
+          ref: feat/claimable-crosschain-escrow
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Test contracts
+        run: npm run contracts:test
+
+      - name: Fund and verify test escrow
+        env:
+          ARC_TESTNET_PRIVATE_KEY: ${{ secrets.ARC_TESTNET_PRIVATE_KEY }}
+          ARC_TESTNET_RPC_URL: https://rpc.testnet.arc.io
+          CCTP_EXECUTE_TRANSFER: "true"
+        run: npm run contracts:fund-test-escrow
