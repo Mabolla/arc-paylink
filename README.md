@@ -15,7 +15,7 @@ The repository now includes a tested contract foundation for the next Arc PayLin
 - A link can be claimed once. After expiry, only the original sender can refund it.
 - The implementation contract is locked against direct initialization.
 
-The factory and implementation are deployed on Arc Testnet. A live CCTP Forwarding Service transfer from Base Sepolia into an escrow clone is verified end to end: 1 USDC was burned on Base Sepolia, minted to the intended Arc Testnet escrow, and confirmed by reading its onchain balance. Circle user-controlled wallet onboarding, a relayer, and production persistence are not included yet.
+The factory and implementation are deployed on Arc Testnet. A live payment lifecycle is verified end to end: 1 USDC was burned on Base Sepolia, minted to the intended Arc Testnet escrow, and claimed with an address-bound EIP-712 signature. The escrow reached `Claimed` with a zero balance. Circle user-controlled wallet onboarding, a relayer, and production persistence are not included yet.
 
 Arc Testnet deployment:
 
@@ -29,6 +29,8 @@ Verified cross-chain escrow funding:
 - Base Sepolia burn: `0xee5cf435e0b17874ed0b9415763d976ae2e20d4caf11be1b4e0154cef8fe62bf`
 - Arc Testnet mint: [`0x9e1b8d1ff72ed2b4d4d133a14b90ef68875c76b068d0826d96b8aae96f913f31`](https://testnet.arcscan.app/tx/0x9e1b8d1ff72ed2b4d4d133a14b90ef68875c76b068d0826d96b8aae96f913f31)
 - Verified escrow balance: **1 USDC**
+- Arc Testnet claim: [`0xa2eb1fabb90d317dd187d2cb7d29cf67e39b819c1af2894610fa70b94c2d12a1`](https://testnet.arcscan.app/tx/0xa2eb1fabb90d317dd187d2cb7d29cf67e39b819c1af2894610fa70b94c2d12a1)
+- Final state: **Claimed**, escrow balance **0 USDC**
 
 Contract checks:
 
