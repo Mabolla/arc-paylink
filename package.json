@@ -11,7 +11,8 @@
     "test:app": "vitest run",
     "contracts:compile": "hardhat compile",
     "contracts:test": "hardhat test",
-    "contracts:deploy:arc": "hardhat run scripts/deploy-escrow.cjs --network arcTestnet"
+    "contracts:deploy:arc": "hardhat run scripts/deploy-escrow.cjs --network arcTestnet",
+    "contracts:create-test-escrow": "hardhat run scripts/create-test-escrow.cjs --network arcTestnet"
   },
   "keywords": [],
   "author": "",
