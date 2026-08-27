@@ -6,7 +6,31 @@ const ESCROW_ADDRESS = "0x5321E75Be8c1814C205eda13c26cDD067dc225BD";
 const EXPECTED_USDC = "0x3600000000000000000000000000000000000000";
 const EXPECTED_AMOUNT = 1_000_000n;
 const EXPECTED_SECRET_HASH = "0x870b2c9673739e5231aa243f98c5d51bec3cdd0f0ab4a2022ba6b580e6ad2b41";
+const CREATION_TRANSACTION = "0x83a2a27212622e6aee519458de2c623ddab6dee399fc115122687355bc2a5580";
 const CREATION_NONCE = 0n;
+
+async function verifyClaim(escrow, recipientAddress) {
+  const usdc = await hre.ethers.getContractAt("IERC20", EXPECTED_USDC);
+  const creationReceipt = await hre.ethers.provider.getTransactionReceipt(CREATION_TRANSACTION);
+  if (!creationReceipt) throw new Error("Escrow creation receipt was not found");
+  const events = await escrow.queryFilter(escrow.filters.Claimed(), creationReceipt.blockNumber, "latest");
+  if (events.length !== 1) throw new Error(`Expected one Claimed event; found ${events.length}`);
+
+  const event = events[0];
+  if (event.args.recipient.toLowerCase() !== recipientAddress.toLowerCase()) {
+    throw new Error(`Claim recipient mismatch: ${event.args.recipient}`);
+  }
+  if (event.args.amount !== EXPECTED_AMOUNT) throw new Error(`Claim amount mismatch: ${event.args.amount}`);
+  if ((await escrow.state()) !== 2n) throw new Error("Escrow state is not Claimed");
+  if ((await usdc.balanceOf(ESCROW_ADDRESS)) !== 0n) throw new Error("Claimed escrow balance is not zero");
+
+  console.log(`Recipient: ${event.args.recipient}`);
+  console.log(`Escrow: ${ESCROW_ADDRESS}`);
+  console.log(`Claim transaction: ${event.transactionHash}`);
+  console.log(`Amount claimed: ${hre.ethers.formatUnits(event.args.amount, 6)} USDC`);
+  console.log("Escrow state: Claimed");
+  console.log(`Explorer: https://testnet.arcscan.app/tx/${event.transactionHash}`);
+}
 
 async function main() {
   const privateKeyInput = process.env.ARC_TESTNET_PRIVATE_KEY?.trim();
@@ -45,6 +69,10 @@ async function main() {
   if (tokenAddress.toLowerCase() !== EXPECTED_USDC.toLowerCase()) throw new Error("Escrow token mismatch");
   if (amount !== EXPECTED_AMOUNT) throw new Error(`Escrow amount mismatch: ${amount}`);
   if (onchainSecretHash.toLowerCase() !== EXPECTED_SECRET_HASH.toLowerCase()) throw new Error("Escrow secret hash mismatch");
+  if (stateBefore === 2n) {
+    await verifyClaim(escrow, recipient.address);
+    return;
+  }
   if (stateBefore !== 1n) throw new Error(`Escrow is not funded; state=${stateBefore}`);
 
   const latest = await hre.ethers.provider.getBlock("latest");
@@ -73,26 +101,9 @@ async function main() {
   };
   const signature = await recipient.signTypedData(domain, types, value);
 
-  const usdc = await hre.ethers.getContractAt("IERC20", EXPECTED_USDC);
-  const recipientBalanceBefore = await usdc.balanceOf(recipient.address);
   const tx = await escrow.claim(secret, recipient.address, deadline, signature);
-  const receipt = await tx.wait();
-  const recipientBalanceAfter = await usdc.balanceOf(recipient.address);
-  const escrowBalanceAfter = await usdc.balanceOf(ESCROW_ADDRESS);
-  const stateAfter = await escrow.state();
-
-  if (stateAfter !== 2n) throw new Error(`Escrow did not reach Claimed; state=${stateAfter}`);
-  if (escrowBalanceAfter !== 0n) throw new Error(`Escrow retained ${escrowBalanceAfter} base units`);
-  if (recipientBalanceAfter - recipientBalanceBefore !== EXPECTED_AMOUNT) {
-    throw new Error("Recipient did not receive exactly 1 USDC");
-  }
-
-  console.log(`Recipient: ${recipient.address}`);
-  console.log(`Escrow: ${ESCROW_ADDRESS}`);
-  console.log(`Claim transaction: ${receipt.hash}`);
-  console.log(`Amount claimed: ${hre.ethers.formatUnits(EXPECTED_AMOUNT, 6)} USDC`);
-  console.log("Escrow state: Claimed");
-  console.log(`Explorer: https://testnet.arcscan.app/tx/${receipt.hash}`);
+  await tx.wait();
+  await verifyClaim(escrow, recipient.address);
 }
 
 main().catch((error) => {
