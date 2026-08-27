@@ -1,0 +1,14 @@
+{
+  "network": "Arc Testnet",
+  "chainId": 5042002,
+  "rpc": "https://rpc.testnet.arc.io",
+  "explorer": "https://testnet.arcscan.app",
+  "usdc": "0x3600000000000000000000000000000000000000",
+  "deployer": "0xE7be265f2301E08a6EaE5Cfd0C1113a7Cd35b3dd",
+  "factory": "0x8C377F5Bb508ece6De8090209619122edd4bC453",
+  "implementation": "0x7003489E29F29E21d15200f61AD5C918E4BCE61C",
+  "deploymentTransaction": "0xa805888c85d0d783617ed877228b32591488ef63dd37a7ac682787159a4c9060",
+  "deployedAt": "2026-08-27T16:15:05Z",
+  "sourceCommit": "a3bc386e2c4bcf247fe6c0b1f435e8e66b73642d",
+  "status": "factory-deployed-cross-chain-funding-not-yet-proven"
+}

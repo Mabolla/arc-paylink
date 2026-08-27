@@ -15,7 +15,13 @@ The repository now includes a tested contract foundation for the next Arc PayLin
 - A link can be claimed once. After expiry, only the original sender can refund it.
 - The implementation contract is locked against direct initialization.
 
-This milestone is contract-only and has not yet been deployed or proven with a live CCTP Forwarding Service transfer. It does not yet include Circle user-controlled wallet onboarding, a relayer, or production persistence. Those integrations remain gated on an Arc Testnet end-to-end proof.
+The factory and implementation are deployed on Arc Testnet. A live CCTP Forwarding Service transfer into an escrow clone has not yet been proven. Circle user-controlled wallet onboarding, a relayer, and production persistence are also not included yet; those integrations remain gated on the cross-chain escrow proof.
+
+Arc Testnet deployment:
+
+- Factory: [`0x8C377F5Bb508ece6De8090209619122edd4bC453`](https://testnet.arcscan.app/address/0x8C377F5Bb508ece6De8090209619122edd4bC453)
+- Implementation: [`0x7003489E29F29E21d15200f61AD5C918E4BCE61C`](https://testnet.arcscan.app/address/0x7003489E29F29E21d15200f61AD5C918E4BCE61C)
+- Deployment transaction: [`0xa805888c85d0d783617ed877228b32591488ef63dd37a7ac682787159a4c9060`](https://testnet.arcscan.app/tx/0xa805888c85d0d783617ed877228b32591488ef63dd37a7ac682787159a4c9060)
 
 Contract checks:
 
