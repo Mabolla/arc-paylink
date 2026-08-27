@@ -7,8 +7,12 @@ const TEST_AMOUNT = 1_000_000n;
 const TEST_LIFETIME_SECONDS = 7 * 24 * 60 * 60;
 
 async function main() {
-  const privateKey = process.env.ARC_TESTNET_PRIVATE_KEY;
-  if (!privateKey) throw new Error("ARC_TESTNET_PRIVATE_KEY is not set");
+  const privateKeyInput = process.env.ARC_TESTNET_PRIVATE_KEY?.trim();
+  if (!privateKeyInput) throw new Error("ARC_TESTNET_PRIVATE_KEY is not set");
+  const privateKey = privateKeyInput.startsWith("0x") ? privateKeyInput : `0x${privateKeyInput}`;
+  if (!hre.ethers.isHexString(privateKey, 32)) {
+    throw new Error("ARC_TESTNET_PRIVATE_KEY must contain exactly 32 bytes");
+  }
 
   const network = await hre.ethers.provider.getNetwork();
   if (network.chainId !== ARC_TESTNET_CHAIN_ID) {
