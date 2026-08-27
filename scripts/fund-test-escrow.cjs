@@ -17,6 +17,7 @@ const ESCROW_ADDRESS = "0x5321E75Be8c1814C205eda13c26cDD067dc225BD";
 const BASE_SEPOLIA_DOMAIN = 6;
 const ARC_TESTNET_DOMAIN = 26;
 const TRANSFER_AMOUNT = 1_000_000n;
+const MAX_FEE_AMOUNT = 100_000n;
 const EXECUTE = process.env.CCTP_EXECUTE_TRANSFER === "true";
 
 const erc20Abi = [
@@ -103,6 +104,9 @@ async function main() {
   if (!quote.signedQuote || !quote.feeTotalAmount) throw new Error("Circle returned an incomplete quote");
 
   const feeAmount = BigInt(quote.feeTotalAmount);
+  if (feeAmount > MAX_FEE_AMOUNT) {
+    throw new Error(`Quoted fee exceeds the 0.1 USDC safety cap: ${formatUnits(feeAmount, 6)} USDC`);
+  }
   const approvalAmount = TRANSFER_AMOUNT + feeAmount;
   console.log(`Source wallet: ${account.address}`);
   console.log(`Base Sepolia ETH: ${formatEther(ethBalance)}`);
