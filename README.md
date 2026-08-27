@@ -9,19 +9,26 @@ This is an Arc project. Base Sepolia is only a supported source network for a pa
 The repository now includes a tested contract foundation for the next Arc PayLink milestone: cross-chain funded payment links that can be claimed by a recipient wallet created after the link is shared.
 
 - `ArcPayLinkFactory` creates one deterministic minimal-proxy escrow per payment link and is locked to one configured payment token.
-- Each escrow recognizes USDC delivered directly to its address, including a future CCTP destination mint.
+- Each escrow recognizes USDC delivered directly to its address, including a CCTP destination mint.
 - A recipient authorizes a claim with an address-bound EIP-712 signature. EOA signatures and EIP-1271 smart-account signatures are supported.
 - The link secret alone cannot redirect funds to an attacker because the signed recipient address is part of the claim digest.
 - A link can be claimed once. After expiry, only the original sender can refund it.
 - The implementation contract is locked against direct initialization.
 
-The factory and implementation are deployed on Arc Testnet. A live CCTP Forwarding Service transfer into an escrow clone has not yet been proven. Circle user-controlled wallet onboarding, a relayer, and production persistence are also not included yet; those integrations remain gated on the cross-chain escrow proof.
+The factory and implementation are deployed on Arc Testnet. A live CCTP Forwarding Service transfer from Base Sepolia into an escrow clone is verified end to end: 1 USDC was burned on Base Sepolia, minted to the intended Arc Testnet escrow, and confirmed by reading its onchain balance. Circle user-controlled wallet onboarding, a relayer, and production persistence are not included yet.
 
 Arc Testnet deployment:
 
 - Factory: [`0x8C377F5Bb508ece6De8090209619122edd4bC453`](https://testnet.arcscan.app/address/0x8C377F5Bb508ece6De8090209619122edd4bC453)
 - Implementation: [`0x7003489E29F29E21d15200f61AD5C918E4BCE61C`](https://testnet.arcscan.app/address/0x7003489E29F29E21d15200f61AD5C918E4BCE61C)
 - Deployment transaction: [`0xa805888c85d0d783617ed877228b32591488ef63dd37a7ac682787159a4c9060`](https://testnet.arcscan.app/tx/0xa805888c85d0d783617ed877228b32591488ef63dd37a7ac682787159a4c9060)
+
+Verified cross-chain escrow funding:
+
+- Escrow: [`0x5321E75Be8c1814C205eda13c26cDD067dc225BD`](https://testnet.arcscan.app/address/0x5321E75Be8c1814C205eda13c26cDD067dc225BD)
+- Base Sepolia burn: `0xee5cf435e0b17874ed0b9415763d976ae2e20d4caf11be1b4e0154cef8fe62bf`
+- Arc Testnet mint: [`0x9e1b8d1ff72ed2b4d4d133a14b90ef68875c76b068d0826d96b8aae96f913f31`](https://testnet.arcscan.app/tx/0x9e1b8d1ff72ed2b4d4d133a14b90ef68875c76b068d0826d96b8aae96f913f31)
+- Verified escrow balance: **1 USDC**
 
 Contract checks:
 
