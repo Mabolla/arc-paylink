@@ -7,7 +7,15 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "test": "vitest run"
+    "test": "vitest run && hardhat test",
+    "test:app": "vitest run",
+    "contracts:compile": "hardhat compile",
+    "contracts:test": "hardhat test",
+    "contracts:deploy:arc": "hardhat run scripts/deploy-escrow.cjs --network arcTestnet",
+    "contracts:create-test-escrow": "hardhat run scripts/create-test-escrow.cjs --network arcTestnet",
+    "contracts:fund-test-escrow": "node scripts/fund-test-escrow.cjs",
+    "contracts:verify-test-escrow-funding": "node scripts/verify-test-escrow-funding.cjs",
+    "contracts:claim-test-escrow": "hardhat run scripts/claim-test-escrow.cjs --network arcTestnet"
   },
   "keywords": [],
   "author": "",
@@ -16,17 +24,23 @@
   "dependencies": {
     "@circle-fin/adapter-viem-v2": "^1.15.0",
     "@circle-fin/app-kit": "^1.12.0",
+    "@openzeppelin/contracts": "^5.4.0",
     "next": "^16.3.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "viem": "^2.55.13"
   },
   "devDependencies": {
+    "@nomicfoundation/hardhat-chai-matchers": "^2.1.2",
+    "@nomicfoundation/hardhat-ethers": "^3.1.3",
     "@types/node": "^26.2.0",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.4",
+    "chai": "^4.5.0",
     "eslint": "^9.39.5",
     "eslint-config-next": "^16.3.0",
+    "ethers": "^6.15.0",
+    "hardhat": "^2.29.1",
     "typescript": "^5.9.3",
     "vitest": "^4.1.10"
   }

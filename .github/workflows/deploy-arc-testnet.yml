@@ -1,0 +1,42 @@
+name: Deploy escrow to Arc Testnet
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: arc-testnet-escrow-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Test contracts
+        run: npm run contracts:test
+
+      - name: Require deployer secret
+        env:
+          ARC_TESTNET_PRIVATE_KEY: ${{ secrets.ARC_TESTNET_PRIVATE_KEY }}
+        run: test -n "$ARC_TESTNET_PRIVATE_KEY"
+
+      - name: Deploy escrow factory
+        env:
+          ARC_TESTNET_PRIVATE_KEY: ${{ secrets.ARC_TESTNET_PRIVATE_KEY }}
+          ARC_TESTNET_RPC_URL: https://rpc.testnet.arc.io
+        run: npm run contracts:deploy:arc

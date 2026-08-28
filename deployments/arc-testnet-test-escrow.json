@@ -1,0 +1,21 @@
+{
+  "network": "Arc Testnet",
+  "chainId": 5042002,
+  "factory": "0x8C377F5Bb508ece6De8090209619122edd4bC453",
+  "sender": "0xE7be265f2301E08a6EaE5Cfd0C1113a7Cd35b3dd",
+  "paymentId": "0xfd05e5bc07a852e550505360ada0990ee30ab2f0aef62109671ff307f191252b",
+  "escrow": "0x5321E75Be8c1814C205eda13c26cDD067dc225BD",
+  "amountUsdc": "1",
+  "amountBaseUnits": "1000000",
+  "expiry": "2026-09-03T16:22:09Z",
+  "secretHash": "0x870b2c9673739e5231aa243f98c5d51bec3cdd0f0ab4a2022ba6b580e6ad2b41",
+  "creationTransaction": "0x83a2a27212622e6aee519458de2c623ddab6dee399fc115122687355bc2a5580",
+  "status": "claimed",
+  "sourceNetwork": "Base Sepolia",
+  "burnTransaction": "0xee5cf435e0b17874ed0b9415763d976ae2e20d4caf11be1b4e0154cef8fe62bf",
+  "mintTransaction": "0x9e1b8d1ff72ed2b4d4d133a14b90ef68875c76b068d0826d96b8aae96f913f31",
+  "verifiedBalanceUsdc": "1",
+  "recipient": "0xE7be265f2301E08a6EaE5Cfd0C1113a7Cd35b3dd",
+  "claimTransaction": "0xa2eb1fabb90d317dd187d2cb7d29cf67e39b819c1af2894610fa70b94c2d12a1",
+  "finalEscrowBalanceUsdc": "0"
+}
