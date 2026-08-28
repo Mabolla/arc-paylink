@@ -56,6 +56,12 @@ footer { min-height:58px; padding:0 clamp(20px,4vw,64px); border-top:1px solid v
 .explorer-link, .text-button { display:block; margin-top:16px; color:var(--blue); font-size:13px; text-align:center; background:none; border:0; cursor:pointer; width:100%; }
 .security-note { text-align:center; margin:24px 0 0; }
 .empty-state { margin:auto; width:min(680px,calc(100% - 40px)); text-align:center; }.empty-state h1{font-size:44px}.empty-state .primary-button{margin-top:20px;}
-@media (max-width:900px) { .home-grid{grid-template-columns:1fr}.form-panel{border-left:0;border-top:1px solid var(--line)}.intro{padding-bottom:56px}.intro h1{font-size:56px}.field-row{grid-template-columns:1fr}.recipient-field{min-width:0}.pay-layout{padding:28px 16px}.payment-panel{padding:28px} }
+.claim-layout { flex:1; display:grid; grid-template-columns:minmax(0,1fr) minmax(420px,640px); }
+.claim-intro { padding:clamp(56px,8vw,120px) clamp(28px,7vw,110px); align-self:center; }
+.claim-intro h1 { margin:0; font-size:clamp(48px,6vw,82px); line-height:.98; font-weight:620; }
+.wallet-panel { background:var(--white); border-left:1px solid var(--line); padding:clamp(36px,6vw,88px); display:flex; flex-direction:column; justify-content:center; }
+.wallet-copy { margin:0 0 22px; color:var(--muted); font-size:15px; line-height:1.65; }
+.wallet-details { margin-top:24px; }
+@media (max-width:900px) { .home-grid,.claim-layout{grid-template-columns:1fr}.form-panel,.wallet-panel{border-left:0;border-top:1px solid var(--line)}.intro,.claim-intro{padding-bottom:56px}.intro h1,.claim-intro h1{font-size:56px}.field-row{grid-template-columns:1fr}.recipient-field{min-width:0}.pay-layout{padding:28px 16px}.payment-panel{padding:28px} }
 @media (max-width:520px) { .topbar{height:62px}.network-pill{font-size:0}.intro{padding:48px 22px}.intro h1{font-size:44px}.form-panel{padding:40px 22px}.payment-amount strong{font-size:42px}.payment-details div{align-items:flex-start}.payment-panel{padding:24px}.trust-row{gap:10px 14px}footer{gap:14px} }
 @media (prefers-reduced-motion:reduce) { .spinner{animation:none} }
