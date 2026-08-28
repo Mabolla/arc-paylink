@@ -209,7 +209,7 @@ export function RecipientWallet() {
       {wallet && (
         <dl className="payment-details wallet-details">
           <div><dt>Network</dt><dd>{wallet.blockchain}</dd></div>
-          <div><dt>Recipient wallet</dt><dd className="mono">{wallet.address.slice(0, 8)}…{wallet.address.slice(-6)}</dd></div>
+          <div><dt>Recipient wallet</dt><dd className="mono">{wallet.address}</dd></div>
         </dl>
       )}
       <p className="security-note">Google authenticates you. Circle secures the wallet. The next step will bind this address to the escrow claim.</p>
