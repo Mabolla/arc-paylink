@@ -1,29 +1,29 @@
-name: Create Arc PayLink test escrow
+name: Create and fund Circle recipient escrow
 
 on:
   workflow_dispatch:
   push:
     branches:
-      - main
+      - feat/circle-recipient-onboarding
     paths:
       - .github/workflows/create-arc-paylink-test-escrow.yml
+      - scripts/create-fund-circle-escrow.cjs
+      - package.json
 
 permissions:
   contents: read
 
 concurrency:
-  group: arc-paylink-test-escrow
+  group: arc-paylink-circle-recipient-escrow
   cancel-in-progress: false
 
 jobs:
-  create:
+  create-and-fund:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - name: Check out tested feature branch
+      - name: Check out triggering branch
         uses: actions/checkout@v7
-        with:
-          ref: feat/claimable-crosschain-escrow
 
       - name: Set up Node.js
         uses: actions/setup-node@v6
@@ -42,8 +42,17 @@ jobs:
           ARC_TESTNET_PRIVATE_KEY: ${{ secrets.ARC_TESTNET_PRIVATE_KEY }}
         run: test -n "$ARC_TESTNET_PRIVATE_KEY"
 
-      - name: Create one-USDC test escrow
+      - name: Create and fund one-USDC Circle recipient escrow
         env:
           ARC_TESTNET_PRIVATE_KEY: ${{ secrets.ARC_TESTNET_PRIVATE_KEY }}
           ARC_TESTNET_RPC_URL: https://rpc.testnet.arc.io
-        run: npm run contracts:create-test-escrow
+          ARC_PAYLINK_CLAIM_PUBLIC_KEY: MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqxhTvj71eNkb75lINdAY7v6dtmVhbbjF40bE9oyBPIydiy1+hRDFib30/LCKJCMaPVnW01xWRY6tGi6CC8WkR4uXsS13+qUzXtzPqC3JHtb7/r/u5yE2UU3Iy+Xf8vGqKPcabpT0Y4J9gLhIyb5nFr2OTE+pxNgcV8Gw3eMkD/21cedYlpKyCh2RFUTqoGP/+zPAjPWHrdeuQClytRtBgJfMiWn5vn5hIb/kYdaw9CzkIA1z6xOQlAOD9w8TOeb/1BoAyxeh0xyMQpvpntcFMIheUH1ZuwE9ZVzfGpaRNRnjcdnid/T2CtNsxXpbohAUlpBgfdEJ0S4ylGgzpI1gHwIDAQAB
+        run: npm run contracts:create-fund-circle-escrow
+
+      - name: Preserve encrypted claim package
+        uses: actions/upload-artifact@v6
+        with:
+          name: circle-recipient-escrow
+          path: circle-escrow-package.json
+          if-no-files-found: error
+          retention-days: 7
