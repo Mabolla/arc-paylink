@@ -9,7 +9,7 @@ const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? "";
 
 type LoginResult = { userToken: string; encryptionKey: string };
 type CircleWallet = { id: string; address: string; blockchain: string };
-type Step = "loading" | "ready" | "authenticating" | "initializing" | "creating" | "complete" | "failed";
+type Step = "loading" | "ready" | "authenticating" | "initializing" | "challenge-ready" | "creating" | "complete" | "failed";
 
 const SESSION_KEYS = {
   deviceToken: "arc-paylink.circle.device-token",
@@ -39,6 +39,7 @@ async function circleAction<T>(body: Record<string, unknown>): Promise<T> {
 export function RecipientWallet() {
   const sdkRef = useRef<W3SSdk | null>(null);
   const loginRef = useRef<LoginResult | null>(null);
+  const challengeRef = useRef<string | null>(null);
   const [step, setStep] = useState<Step>("loading");
   const [message, setMessage] = useState("Preparing secure Google sign-in.");
   const [wallet, setWallet] = useState<CircleWallet | null>(null);
@@ -116,21 +117,9 @@ export function RecipientWallet() {
         const result = await circleAction<{ challengeId?: string }>({ action: "initializeUser", userToken: login.userToken });
         if (!result.challengeId) throw new Error("Circle did not return a wallet-creation challenge.");
         if (!active || !sdkRef.current) return;
-        setStep("creating");
-        setMessage("Approve wallet creation in Circle's secure confirmation window.");
-        sdkRef.current.setAuthentication(login);
-        sdkRef.current.execute(result.challengeId, (error: unknown) => {
-          if (!active) return;
-          if (error) {
-            setStep("failed");
-            setMessage(errorMessage(error));
-            return;
-          }
-          window.setTimeout(() => void loadWallet(login.userToken).catch((loadError) => {
-            setStep("failed");
-            setMessage(errorMessage(loadError));
-          }), 1500);
-        });
+        challengeRef.current = result.challengeId;
+        setStep("challenge-ready");
+        setMessage("Google verified. Create your Arc wallet to continue.");
       } catch (error) {
         const code = (error as { code?: number })?.code;
         if (code === 155106) {
@@ -147,6 +136,33 @@ export function RecipientWallet() {
     void initializeUser();
     return () => { active = false; };
   }, [loadWallet, step]);
+
+  function createWallet() {
+    const sdk = sdkRef.current;
+    const login = loginRef.current;
+    const challengeId = challengeRef.current;
+    if (!sdk || !login || !challengeId) {
+      setStep("failed");
+      setMessage("Wallet creation session is incomplete. Please start again.");
+      return;
+    }
+
+    setStep("creating");
+    setMessage("Approve wallet creation in Circle's secure confirmation window.");
+    sdk.setAuthentication(login);
+    sdk.execute(challengeId, (error: unknown) => {
+      if (error) {
+        setStep("failed");
+        setMessage(errorMessage(error));
+        return;
+      }
+      challengeRef.current = null;
+      window.setTimeout(() => void loadWallet(login.userToken).catch((loadError) => {
+        setStep("failed");
+        setMessage(errorMessage(loadError));
+      }), 2000);
+    });
+  }
 
   async function signIn() {
     const sdk = sdkRef.current;
@@ -185,9 +201,10 @@ export function RecipientWallet() {
       <p className="wallet-copy">Sign in with Google. Circle creates a user-controlled Arc wallet for you; Arc PayLink never receives your private keys.</p>
       <div className={`status-box ${step === "failed" ? "failed" : step === "complete" ? "paid" : ""}`} role="status">
         <b>{message}</b>
-        {!["ready", "complete", "failed"].includes(step) && <span className="spinner" />}
+        {!["ready", "challenge-ready", "complete", "failed"].includes(step) && <span className="spinner" />}
       </div>
       {step === "ready" && <button className="primary-button full" onClick={signIn}>Continue with Google <span aria-hidden>→</span></button>}
+      {step === "challenge-ready" && <button className="primary-button full" onClick={createWallet}>Create Arc wallet <span aria-hidden>→</span></button>}
       {step === "failed" && <button className="text-button" onClick={() => window.location.reload()}>Start again</button>}
       {wallet && (
         <dl className="payment-details wallet-details">
