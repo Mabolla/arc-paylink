@@ -2,13 +2,6 @@ name: Create and fund Circle recipient escrow
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - feat/circle-recipient-onboarding
-    paths:
-      - .github/workflows/create-arc-paylink-test-escrow.yml
-      - scripts/create-fund-circle-escrow.cjs
-      - package.json
 
 permissions:
   contents: read

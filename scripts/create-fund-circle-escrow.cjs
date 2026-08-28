@@ -83,7 +83,6 @@ async function main() {
     encryption: "RSA-OAEP-SHA256",
     creationTransaction: createReceipt.hash,
     fundingTransaction: fundReceipt.hash,
-    recipientWallet: "0xecf09f0000000000000000000000000000709608",
     status: "funded",
   };
   fs.writeFileSync("circle-escrow-package.json", JSON.stringify(claimPackage, null, 2));
