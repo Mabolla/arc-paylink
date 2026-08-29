@@ -18,6 +18,8 @@ export function RequestForm() {
         amount: String(form.get("amount") ?? ""),
         recipient: String(form.get("recipient") ?? ""),
         route: String(form.get("route") ?? ""),
+        obligationKind: String(form.get("obligationKind") ?? ""),
+        obligationId: String(form.get("obligationId") ?? ""),
       });
       router.push(`/pay?${requestToSearchParams(request).toString()}`);
     } catch (reason) {
@@ -48,6 +50,20 @@ export function RequestForm() {
           <option value="bridge">Base Sepolia via Circle Bridge</option>
         </select>
       </label>
+      <div className="field-row">
+        <label>
+          <span>Business obligation</span>
+          <select name="obligationKind" defaultValue="invoice" required>
+            <option value="invoice">Invoice</option>
+            <option value="milestone">Milestone</option>
+            <option value="agent-task">Agent task</option>
+          </select>
+        </label>
+        <label>
+          <span>Obligation ID</span>
+          <input name="obligationId" placeholder="INV-2026-001" maxLength={64} required />
+        </label>
+      </div>
       {error && <p className="form-error" role="alert">{error}</p>}
       <button className="primary-button" type="submit">Create payment link <span aria-hidden>→</span></button>
     </form>

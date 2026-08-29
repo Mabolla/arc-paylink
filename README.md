@@ -1,5 +1,11 @@
 # Arc PayLink v2
 
+## Obligation-aware settlement milestone
+
+Arc PayLink is moving beyond a generic payment link. New requests can carry a validated `invoice`, `milestone`, or `agent-task` obligation ID. The cross-chain settlement adapter classifies destination outcomes as `settled`, `fee-adjusted`, `pending`, `partial`, `duplicate`, or `mismatched`, with an explicit next recovery action. Verified bridge receipts now surface gross amount, recipient net amount, and recorded bridge fees in the payment UI.
+
+This first milestone is deliberately deterministic and non-custodial. It does not automatically retry, refund, or top up funds. Persistence, source/destination correlation records, and controlled recovery execution remain the next product milestones.
+
 Arc PayLink v2 is a small hackathon MVP for creating shareable USDC payment requests that always settle and produce a verifiable receipt on Arc Testnet. A payer can pay with USDC already on Arc or bring USDC from Base Sepolia through Circle App Kit.
 
 This is an Arc project. Base Sepolia is only a supported source network for a payment. This repository must not share files, directories, dependencies, or Git history with any Base builder project.

@@ -11,6 +11,8 @@ export default async function PayPage({ searchParams }: { searchParams: Promise<
       amount: String(params.amount ?? ""),
       recipient: String(params.recipient ?? ""),
       route: String(params.route ?? ""),
+      obligationKind: String(params.obligationKind ?? ""),
+      obligationId: String(params.obligationId ?? ""),
     });
   } catch {
     return <main><nav className="topbar"><Link className="brand" href="/"><span className="brand-mark">A</span>Arc PayLink <sup>v2</sup></Link></nav><div className="empty-state"><p className="eyebrow">Invalid link</p><h1>This payment request is incomplete.</h1><Link className="primary-button" href="/">Create a new request</Link></div></main>;

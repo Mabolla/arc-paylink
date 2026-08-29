@@ -3,21 +3,22 @@
 import { useMemo, useState } from "react";
 import { AppKit } from "@circle-fin/app-kit";
 import { createViemAdapterFromProvider } from "@circle-fin/adapter-viem-v2";
-import { createPublicClient, http, type Address, type Hash } from "viem";
+import { createPublicClient, formatUnits, http, type Address, type Hash } from "viem";
 import { ARC_EXPLORER_URL, arcTestnet } from "@/lib/arc";
 import { connectWallet, ensureArcTestnet, getBrowserProvider } from "@/lib/browser-wallet";
 import { executeBridgePayment } from "@/lib/bridge-payment";
 import type { PaymentRequest } from "@/lib/payment-request";
-import { settlePaymentRequest } from "@/lib/settle-payment-request";
+import { settlePaymentRequest, type PaymentSettlementResult } from "@/lib/settle-payment-request";
 import { verifyPaymentReceipt, type VerificationResult } from "@/lib/verify-payment";
 
 type Status = "ready" | "connected" | "pending" | "bridge_processing" | "paid" | "settled" | "failed";
 
-export function PaymentPanel({ title, amount, recipient, route }: PaymentRequest) {
+export function PaymentPanel({ title, amount, recipient, route, obligation }: PaymentRequest) {
   const [status, setStatus] = useState<Status>("ready");
   const [account, setAccount] = useState<Address>();
   const [message, setMessage] = useState("Connect an Arc wallet to continue.");
   const [result, setResult] = useState<VerificationResult>();
+  const [settlement, setSettlement] = useState<PaymentSettlementResult>();
   const client = useMemo(() => createPublicClient({ chain: arcTestnet, transport: http() }), []);
 
   async function connect() {
@@ -44,10 +45,11 @@ export function PaymentPanel({ title, amount, recipient, route }: PaymentRequest
         if (!mint?.txHash) throw new Error("Circle Bridge completed without a destination mint transaction hash.");
         setMessage("Destination mint submitted. Verifying the exact Arc settlement.");
         const destinationReceipt = await client.waitForTransactionReceipt({ hash: mint.txHash as Hash });
-        const settled = settlePaymentRequest({ request: { title, amount, recipient, route }, bridgeResult, destinationReceipt });
+        const settled = settlePaymentRequest({ request: { title, amount, recipient, route, obligation }, bridgeResult, destinationReceipt });
+        setSettlement(settled);
         setResult({ transactionHash: settled.mintTransactionHash, blockNumber: settled.blockNumber, sender: settled.sender, recipient: settled.recipient, amountBaseUnits: settled.amountBaseUnits });
         setStatus("settled");
-        setMessage("Cross-chain payment settled and verified on Arc Testnet.");
+        setMessage(settled.paymentState === "fee-adjusted" ? "Obligation settled on Arc with a recorded bridge fee." : "Obligation settled and verified on Arc Testnet.");
         return;
       }
       setStatus("pending");
@@ -79,7 +81,11 @@ export function PaymentPanel({ title, amount, recipient, route }: PaymentRequest
       <dl className="payment-details">
         <div><dt>Route</dt><dd>{route === "bridge" ? "Base Sepolia → Arc Testnet" : "Arc Testnet"}</dd></div>
         <div><dt>Recipient</dt><dd className="mono">{recipient.slice(0, 8)}…{recipient.slice(-6)}</dd></div>
+        {obligation && <div><dt>{obligation.kind.replace("-", " ")}</dt><dd className="mono">{obligation.id}</dd></div>}
         {account && <div><dt>Paying from</dt><dd className="mono">{account.slice(0, 8)}…{account.slice(-6)}</dd></div>}
+        {settlement && <div><dt>Settlement state</dt><dd>{settlement.paymentState.replace("-", " ")}</dd></div>}
+        {settlement && <div><dt>Gross / recipient net</dt><dd>{formatUnits(settlement.grossAmountBaseUnits, 6)} / {formatUnits(settlement.amountBaseUnits, 6)} USDC</dd></div>}
+        {settlement && settlement.bridgeFeeBaseUnits > 0n && <div><dt>Recorded bridge fee</dt><dd>{formatUnits(settlement.bridgeFeeBaseUnits, 6)} USDC</dd></div>}
       </dl>
       <div className={`status-box ${status}`} role="status"><b>{message}</b>{(status === "pending" || status === "bridge_processing") && <span className="spinner" />}</div>
       {!account && <button className="primary-button full" onClick={connect}>Connect wallet</button>}
