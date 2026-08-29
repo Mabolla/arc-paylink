@@ -11,7 +11,7 @@ const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? "";
 type LoginResult = { userToken: string; encryptionKey: string };
 type CircleWallet = { id: string; address: string; blockchain: string };
 type Step = "loading" | "ready" | "authenticating" | "initializing" | "challenge-ready" | "creating" | "complete" | "failed";
-type ClaimStep = "package-needed" | "ready" | "preparing-signature" | "signature-ready" | "signing" | "signed" | "preparing-claim" | "claim-ready" | "claiming" | "claimed" | "failed";
+type ClaimStep = "package-needed" | "ready" | "deployment-needed" | "preparing-deployment" | "deployment-ready" | "deploying" | "preparing-signature" | "signature-ready" | "signing" | "signed" | "preparing-claim" | "claim-ready" | "claiming" | "claimed" | "failed";
 
 const claimSecretHash = "0xce575f7157960804eb20b1671d66b24ae89ab937173f667771334474759347c0";
 
@@ -250,6 +250,50 @@ export function RecipientWallet() {
     }
   }
 
+  async function prepareDeployment() {
+    const login = loginRef.current;
+    if (!login || !wallet) return;
+    try {
+      setClaimStep("preparing-deployment");
+      setClaimMessage("Preparing the one-time Arc wallet deployment.");
+      const result = await circleAction<{ challengeId?: string }>({
+        action: "deployWallet",
+        userToken: login.userToken,
+        walletId: wallet.id,
+        walletAddress: wallet.address,
+      });
+      if (!result.challengeId) throw new Error("Circle did not return a wallet deployment challenge.");
+      claimChallengeRef.current = result.challengeId;
+      setClaimStep("deployment-ready");
+      setClaimMessage("Wallet deployment is ready. This moves 0 USDC and only activates the SCA on Arc.");
+    } catch (error) {
+      setClaimStep("failed");
+      setClaimMessage(errorMessage(error));
+    }
+  }
+
+  function approveDeployment() {
+    const sdk = sdkRef.current;
+    const login = loginRef.current;
+    const challengeId = claimChallengeRef.current;
+    if (!sdk || !login || !challengeId) return;
+    setClaimStep("deploying");
+    setClaimMessage("Approve the one-time wallet deployment in Circle.");
+    sdk.setAuthentication(login);
+    sdk.execute(challengeId, (error: unknown) => {
+      if (error) {
+        setClaimStep("failed");
+        setClaimMessage(errorMessage(error));
+        return;
+      }
+      claimChallengeRef.current = null;
+      window.setTimeout(() => {
+        setClaimStep("ready");
+        setClaimMessage("Recipient wallet deployed. Prepare the address-bound authorization.");
+      }, 2500);
+    });
+  }
+
   function approveSignature() {
     const sdk = sdkRef.current;
     const login = loginRef.current;
@@ -271,7 +315,12 @@ export function RecipientWallet() {
           });
           const challenge = detail.challenge;
           const suffix = [challenge?.errorCode, challenge?.errorMessage, challenge?.status].filter(Boolean).join(" · ");
-          setClaimMessage(suffix || errorMessage(error));
+          if (challenge?.errorCode === 155517) {
+            setClaimStep("deployment-needed");
+            setClaimMessage("Recipient wallet must be deployed once before it can sign.");
+          } else {
+            setClaimMessage(suffix || errorMessage(error));
+          }
         } catch {
           setClaimMessage(errorMessage(error));
         }
@@ -366,7 +415,7 @@ export function RecipientWallet() {
           </dl>
           <div className={`status-box ${claimStep === "failed" ? "failed" : claimStep === "claimed" ? "paid" : ""}`} role="status">
             <b>{claimMessage}</b>
-            {["preparing-signature", "signing", "preparing-claim", "claiming"].includes(claimStep) && <span className="spinner" />}
+            {["preparing-deployment", "deploying", "preparing-signature", "signing", "preparing-claim", "claiming"].includes(claimStep) && <span className="spinner" />}
           </div>
           {claimStep === "package-needed" && (
             <label className="primary-button full file-button">
@@ -375,6 +424,8 @@ export function RecipientWallet() {
             </label>
           )}
           {claimStep === "ready" && <button className="primary-button full" onClick={prepareSignature}>Prepare authorization <span aria-hidden>→</span></button>}
+          {claimStep === "deployment-needed" && <button className="primary-button full" onClick={prepareDeployment}>Deploy recipient wallet <span aria-hidden>→</span></button>}
+          {claimStep === "deployment-ready" && <button className="primary-button full" onClick={approveDeployment}>Approve wallet deployment <span aria-hidden>→</span></button>}
           {claimStep === "signature-ready" && <button className="primary-button full" onClick={approveSignature}>Approve authorization <span aria-hidden>→</span></button>}
           {claimStep === "signed" && <button className="primary-button full" onClick={prepareClaim}>Prepare 1 USDC claim <span aria-hidden>→</span></button>}
           {claimStep === "claim-ready" && <button className="primary-button full" onClick={approveClaim}>Approve 1 USDC claim <span aria-hidden>→</span></button>}

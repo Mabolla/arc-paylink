@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 const CIRCLE_BASE_URL = "https://api.circle.com";
 const ARC_CHAIN_ID = 5_042_002;
 const ARC_BLOCKCHAIN = "ARC-TESTNET";
+const ARC_USDC = "0x3600000000000000000000000000000000000000";
 const CLAIM_ESCROW = "0xFae2e1ed55aEf5D51fbc5de1fEeC8afAca14410B";
 const CLAIM_RECIPIENT = "0xecf09f594a229a95315f4dcbdbfc26c0a7709608";
 const CLAIM_SECRET_HASH = "0xce575f7157960804eb20b1671d66b24ae89ab937173f667771334474759347c0";
@@ -15,6 +16,7 @@ type CircleAction =
   | "initializeUser"
   | "listWallets"
   | "inspectChallenge"
+  | "deployWallet"
   | "signClaim"
   | "executeClaim";
 
@@ -139,6 +141,22 @@ export async function POST(request: Request) {
     const walletAddress = claimWallet(body.walletAddress);
     const ownershipError = await assertWalletOwnership(userToken, walletId, walletAddress);
     if (ownershipError) return circleResponse(ownershipError);
+
+    if (action === "deployWallet") {
+      return circleResponse(await circleRequest("/v1/w3s/user/transactions/contractExecution", {
+        method: "POST",
+        headers: userHeaders,
+        body: JSON.stringify({
+          idempotencyKey: crypto.randomUUID(),
+          walletId,
+          contractAddress: ARC_USDC,
+          abiFunctionSignature: "transfer(address,uint256)",
+          abiParameters: [walletAddress, "0"],
+          feeLevel: "MEDIUM",
+          refId: "arc-paylink-wallet-deployment",
+        }),
+      }));
+    }
 
     if (action === "signClaim") {
       const now = Math.floor(Date.now() / 1000);
