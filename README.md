@@ -22,6 +22,8 @@ Set `BLOB_READ_WRITE_TOKEN` in Vercel to enable shared settlement persistence. T
 
 The `/audit` page retrieves a private record only when both the full correlation ID and exact obligation type/ID match. The server reads the private Blob, validates the record again, and returns no record data for missing, mismatched, or conflicting references. Blob URLs are never exposed to the browser.
 
+`POST /api/settlements/recover` requires the same exact references plus the source burn transaction hash as the payment reference. It returns a deterministic, non-executable recovery plan: completed settlements are no-ops, pending settlements wait for destination verification, partial settlements describe the exact outstanding top-up, duplicates are rejected, and mismatches require manual review. Every response explicitly sets `fundMovement: false` and `executable: false`.
+
 Arc PayLink v2 is a small hackathon MVP for creating shareable USDC payment requests that always settle and produce a verifiable receipt on Arc Testnet. A payer can pay with USDC already on Arc or bring USDC from Base Sepolia through Circle App Kit.
 
 This is an Arc project. Base Sepolia is only a supported source network for a payment. This repository must not share files, directories, dependencies, or Git history with any Base builder project.
