@@ -217,8 +217,8 @@ export function RecipientWallet() {
         throw new Error("This package belongs to a different PayLink.");
       }
       claimSecretRef.current = secret;
-      setClaimStep("ready");
-      setClaimMessage("Private package verified. Prepare the address-bound authorization.");
+      setClaimStep("deployment-needed");
+      setClaimMessage("Private package verified. Deploy the recipient wallet once before signing.");
     } catch (error) {
       setClaimStep("failed");
       setClaimMessage(errorMessage(error));
