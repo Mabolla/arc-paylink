@@ -27,6 +27,7 @@
     "@circle-fin/app-kit": "^1.12.0",
     "@circle-fin/w3s-pw-web-sdk": "^1.1.11",
     "@openzeppelin/contracts": "^5.4.0",
+    "@vercel/blob": "^2.8.0",
     "next": "^16.3.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
