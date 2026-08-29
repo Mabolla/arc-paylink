@@ -16,7 +16,9 @@ Completed cross-chain obligations now produce a versioned audit record that bind
 - the Arc destination mint transaction and block;
 - gross, recipient-net, fee, outstanding amount, settlement state, and read-only recovery action.
 
-Raw CCTP message and attestation bytes are not retained. The immutable correlation record is saved in browser storage and can be downloaded as JSON for independent audit or later ingestion. A conflicting record for the same correlation ID is preserved rather than overwritten and is surfaced for manual review. Browser persistence is the current MVP boundary; shared server-side persistence remains future work.
+Raw CCTP message and attestation bytes are not retained. The immutable correlation record is saved in browser storage, can be downloaded as JSON, and is also submitted to a server-side validator for private, append-only Vercel Blob persistence. The server recomputes the correlation ID, validates the evidence sequence, and preserves conflicting records for manual review instead of overwriting them. If Blob storage is not configured or is temporarily unavailable, settlement still succeeds and the local/downloadable audit path remains available.
+
+Set `BLOB_READ_WRITE_TOKEN` in Vercel to enable shared settlement persistence. The token is server-only and must never use a `NEXT_PUBLIC_` prefix. This milestone records recovery intent only; it does not automatically retry, refund, or top up funds.
 
 Arc PayLink v2 is a small hackathon MVP for creating shareable USDC payment requests that always settle and produce a verifiable receipt on Arc Testnet. A payer can pay with USDC already on Arc or bring USDC from Base Sepolia through Circle App Kit.
 
