@@ -10,6 +10,7 @@ import { executeBridgePayment } from "@/lib/bridge-payment";
 import type { PaymentRequest } from "@/lib/payment-request";
 import { settlePaymentRequest, type PaymentSettlementResult } from "@/lib/settle-payment-request";
 import { verifyPaymentReceipt, type VerificationResult } from "@/lib/verify-payment";
+import { saveSettlementRecord, settlementRecordJson, type StoreResult } from "@/lib/settlement-record-store";
 
 type Status = "ready" | "connected" | "pending" | "bridge_processing" | "paid" | "settled" | "failed";
 
@@ -19,6 +20,7 @@ export function PaymentPanel({ title, amount, recipient, route, obligation }: Pa
   const [message, setMessage] = useState("Connect an Arc wallet to continue.");
   const [result, setResult] = useState<VerificationResult>();
   const [settlement, setSettlement] = useState<PaymentSettlementResult>();
+  const [auditStatus, setAuditStatus] = useState<StoreResult | "unavailable">();
   const client = useMemo(() => createPublicClient({ chain: arcTestnet, transport: http() }), []);
 
   async function connect() {
@@ -46,10 +48,19 @@ export function PaymentPanel({ title, amount, recipient, route, obligation }: Pa
         setMessage("Destination mint submitted. Verifying the exact Arc settlement.");
         const destinationReceipt = await client.waitForTransactionReceipt({ hash: mint.txHash as Hash });
         const settled = settlePaymentRequest({ request: { title, amount, recipient, route, obligation }, bridgeResult, destinationReceipt });
+        let saved: StoreResult | "unavailable" | undefined;
+        if (settled.correlation) {
+          try {
+            saved = saveSettlementRecord(window.localStorage, settled.correlation);
+          } catch {
+            saved = "unavailable";
+          }
+        }
+        setAuditStatus(saved);
         setSettlement(settled);
         setResult({ transactionHash: settled.mintTransactionHash, blockNumber: settled.blockNumber, sender: settled.sender, recipient: settled.recipient, amountBaseUnits: settled.amountBaseUnits });
         setStatus("settled");
-        setMessage(settled.paymentState === "fee-adjusted" ? "Obligation settled on Arc with a recorded bridge fee." : "Obligation settled and verified on Arc Testnet.");
+        setMessage(saved === "conflict" ? "Payment settled, but a conflicting local audit record requires manual review." : saved === "unavailable" ? "Payment settled; download the audit record because browser persistence is unavailable." : settled.paymentState === "fee-adjusted" ? "Obligation settled on Arc with a recorded bridge fee." : "Obligation settled and verified on Arc Testnet.");
         return;
       }
       setStatus("pending");
@@ -72,6 +83,18 @@ export function PaymentPanel({ title, amount, recipient, route, obligation }: Pa
     }
   }
 
+  function downloadAuditRecord() {
+    if (!settlement?.correlation) return;
+    const blob = new Blob([settlementRecordJson(settlement.correlation)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    const safeId = settlement.correlation.obligation.id.replace(/[^A-Za-z0-9._-]/g, "-");
+    anchor.download = `arc-paylink-${safeId}-settlement.json`;
+    anchor.click();
+    URL.revokeObjectURL(url);
+  }
+
   return (
     <section className="payment-panel">
       <div className="receipt-top"><span className={`status-dot ${status}`} /><span>{status === "paid" ? "Paid" : status === "settled" ? "Settled" : status === "pending" || status === "bridge_processing" ? "Processing" : status === "failed" ? "Action needed" : "Awaiting payment"}</span></div>
@@ -86,12 +109,16 @@ export function PaymentPanel({ title, amount, recipient, route, obligation }: Pa
         {settlement && <div><dt>Settlement state</dt><dd>{settlement.paymentState.replace("-", " ")}</dd></div>}
         {settlement && <div><dt>Gross / recipient net</dt><dd>{formatUnits(settlement.grossAmountBaseUnits, 6)} / {formatUnits(settlement.amountBaseUnits, 6)} USDC</dd></div>}
         {settlement && settlement.bridgeFeeBaseUnits > 0n && <div><dt>Recorded bridge fee</dt><dd>{formatUnits(settlement.bridgeFeeBaseUnits, 6)} USDC</dd></div>}
+        {settlement?.correlation && <div><dt>Correlation ID</dt><dd className="mono">{settlement.correlation.correlationId.slice(0, 10)}…{settlement.correlation.correlationId.slice(-8)}</dd></div>}
+        {settlement?.correlation && <div><dt>Recovery plan</dt><dd>{settlement.correlation.settlement.recoveryAction.replaceAll("-", " ")}</dd></div>}
+        {auditStatus && <div><dt>Audit record</dt><dd>{auditStatus === "created" ? "saved locally" : auditStatus === "unchanged" ? "already verified" : auditStatus === "conflict" ? "conflict · manual review" : "download required"}</dd></div>}
       </dl>
       <div className={`status-box ${status}`} role="status"><b>{message}</b>{(status === "pending" || status === "bridge_processing") && <span className="spinner" />}</div>
       {!account && <button className="primary-button full" onClick={connect}>Connect wallet</button>}
       {account && status !== "paid" && status !== "settled" && status !== "pending" && status !== "bridge_processing" && <button className="primary-button full" onClick={pay}>Pay {amount} USDC <span aria-hidden>→</span></button>}
       {status === "failed" && !account && <button className="text-button" onClick={connect}>Try connection again</button>}
       {result && <a className="explorer-link" href={`${ARC_EXPLORER_URL}/tx/${result.transactionHash}`} target="_blank" rel="noreferrer">View verified transaction on ArcScan ↗</a>}
+      {settlement?.correlation && <button className="text-button" onClick={downloadAuditRecord}>Download settlement audit record</button>}
       <p className="security-note">Your wallet signs the transaction. Arc PayLink never receives your keys.</p>
     </section>
   );
