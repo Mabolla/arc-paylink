@@ -8,9 +8,15 @@ describe("payment requests", () => {
     expect(requestToSearchParams(request).get("amount")).toBe("10.5");
   });
   it("preserves an explicit bridge route", () => {
-    const request = createPaymentRequest({ title: "Work", amount: "1", recipient: "0x0000000000000000000000000000000000000001", route: "bridge" });
+    const request = createPaymentRequest({ title: "Work", amount: "1", recipient: "0x0000000000000000000000000000000000000001", route: "bridge", obligationKind: "milestone", obligationId: "MS-7" });
     expect(request.route).toBe("bridge");
+    expect(request.obligation).toEqual({ kind: "milestone", id: "MS-7" });
     expect(requestToSearchParams(request).get("route")).toBe("bridge");
+    expect(requestToSearchParams(request).get("obligationId")).toBe("MS-7");
   });
   it("rejects invalid recipients", () => expect(() => createPaymentRequest({ title: "Work", amount: "1", recipient: "nope" })).toThrow());
+  it("rejects incomplete or unsafe obligation identifiers", () => {
+    expect(() => createPaymentRequest({ title: "Work", amount: "1", recipient: "0x0000000000000000000000000000000000000001", obligationKind: "invoice" })).toThrow();
+    expect(() => createPaymentRequest({ title: "Work", amount: "1", recipient: "0x0000000000000000000000000000000000000001", obligationKind: "invoice", obligationId: "INV 1" })).toThrow();
+  });
 });
