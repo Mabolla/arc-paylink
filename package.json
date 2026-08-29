@@ -13,6 +13,7 @@
     "contracts:test": "hardhat test",
     "contracts:deploy:arc": "hardhat run scripts/deploy-escrow.cjs --network arcTestnet",
     "contracts:create-test-escrow": "hardhat run scripts/create-test-escrow.cjs --network arcTestnet",
+    "contracts:create-fund-circle-escrow": "hardhat run scripts/create-fund-circle-escrow.cjs --network arcTestnet",
     "contracts:fund-test-escrow": "node scripts/fund-test-escrow.cjs",
     "contracts:verify-test-escrow-funding": "node scripts/verify-test-escrow-funding.cjs",
     "contracts:claim-test-escrow": "hardhat run scripts/claim-test-escrow.cjs --network arcTestnet"
@@ -24,6 +25,7 @@
   "dependencies": {
     "@circle-fin/adapter-viem-v2": "^1.15.0",
     "@circle-fin/app-kit": "^1.12.0",
+    "@circle-fin/w3s-pw-web-sdk": "^1.1.11",
     "@openzeppelin/contracts": "^5.4.0",
     "next": "^16.3.0",
     "react": "^19.2.8",

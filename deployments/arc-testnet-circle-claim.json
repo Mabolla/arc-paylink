@@ -1,0 +1,21 @@
+{
+  "network": "Arc Testnet",
+  "chainId": 5042002,
+  "circleWalletType": "User-Controlled SCA",
+  "authentication": "Google",
+  "recipient": "0xecf09f594a229a95315f4dcbdbfc26c0a7709608",
+  "walletDeploymentTransaction": "0xdf4e98dc6bc5e4a3045dd3982813be20532ece04c5525ab13c66b14b8c6ffed2",
+  "escrow": "0xFae2e1ed55aEf5D51fbc5de1fEeC8afAca14410B",
+  "amountUsdc": "1",
+  "amountBaseUnits": "1000000",
+  "paymentId": "0x057e193b3538938f645f5e34718d2704913cf4802709d8dd90569b5acbe0f849",
+  "secretHash": "0xce575f7157960804eb20b1671d66b24ae89ab937173f667771334474759347c0",
+  "creationTransaction": "0x14860374496c70d7f0ef46643b9291302630052fd7409c96ef727a56900e1bd0",
+  "fundingTransaction": "0x077ab94f0a9f1a416d05333184dab7d266533d0295f35d648be388b6ac6eaa5d",
+  "claimTransaction": "0x8ecb1ad158790512c74abe59138c87fb49af1b3e18b55be8b099dc94fec66102",
+  "finalState": "Claimed",
+  "finalEscrowBalanceBaseUnits": "0",
+  "finalRecipientBalanceBaseUnits": "1000000",
+  "verifiedVia": "Arc Testnet RPC",
+  "status": "circle-recipient-claim-complete"
+}

@@ -15,7 +15,7 @@ The repository now includes a tested contract foundation for the next Arc PayLin
 - A link can be claimed once. After expiry, only the original sender can refund it.
 - The implementation contract is locked against direct initialization.
 
-The factory and implementation are deployed on Arc Testnet. A live payment lifecycle is verified end to end: 1 USDC was burned on Base Sepolia, minted to the intended Arc Testnet escrow, and claimed with an address-bound EIP-712 signature. The escrow reached `Claimed` with a zero balance. Circle user-controlled wallet onboarding, a relayer, and production persistence are not included yet.
+The factory and implementation are deployed on Arc Testnet. Two live payment lifecycles are verified end to end. The latest proof uses Google authentication to recover a Circle user-controlled SCA, deploys the lazy wallet on Arc, signs the address-bound EIP-712 claim, and executes the claim from that wallet. The escrow reached `Claimed` with a zero balance and the recipient SCA received exactly 1 USDC. Production persistence is not included yet.
 
 Arc Testnet deployment:
 
@@ -31,6 +31,15 @@ Verified cross-chain escrow funding:
 - Verified escrow balance: **1 USDC**
 - Arc Testnet claim: [`0xa2eb1fabb90d317dd187d2cb7d29cf67e39b819c1af2894610fa70b94c2d12a1`](https://testnet.arcscan.app/tx/0xa2eb1fabb90d317dd187d2cb7d29cf67e39b819c1af2894610fa70b94c2d12a1)
 - Final state: **Claimed**, escrow balance **0 USDC**
+
+Verified Circle recipient onboarding and claim:
+
+- Escrow: [`0xFae2e1ed55aEf5D51fbc5de1fEeC8afAca14410B`](https://testnet.arcscan.app/address/0xFae2e1ed55aEf5D51fbc5de1fEeC8afAca14410B)
+- Circle recipient SCA: [`0xecf09f594a229a95315f4dcbdbfc26c0a7709608`](https://testnet.arcscan.app/address/0xecf09f594a229a95315f4dcbdbfc26c0a7709608)
+- SCA deployment transaction: [`0xdf4e98dc6bc5e4a3045dd3982813be20532ece04c5525ab13c66b14b8c6ffed2`](https://testnet.arcscan.app/tx/0xdf4e98dc6bc5e4a3045dd3982813be20532ece04c5525ab13c66b14b8c6ffed2)
+- EIP-1271 claim transaction: [`0x8ecb1ad158790512c74abe59138c87fb49af1b3e18b55be8b099dc94fec66102`](https://testnet.arcscan.app/tx/0x8ecb1ad158790512c74abe59138c87fb49af1b3e18b55be8b099dc94fec66102)
+- Final state: **Claimed**, escrow balance **0 USDC**, recipient balance **1 USDC**
+- Non-secret evidence: [`deployments/arc-testnet-circle-claim.json`](./deployments/arc-testnet-circle-claim.json)
 
 Contract checks:
 
