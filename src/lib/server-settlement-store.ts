@@ -9,6 +9,11 @@ export type SettlementBlobStore = {
   put(pathname: string, body: string): Promise<void>;
 };
 
+export type SettlementBlobReader = {
+  list(prefix: string): Promise<string[]>;
+  read(pathname: string): Promise<unknown>;
+};
+
 export async function persistSettlementRecord(record: SettlementCorrelationRecord, store: SettlementBlobStore): Promise<SharedStoreResult> {
   const body = settlementRecordJson(record);
   const digest = keccak256(stringToHex(body)).slice(2);
@@ -26,4 +31,21 @@ export async function persistSettlementRecord(record: SettlementCorrelationRecor
     throw error;
   }
   return "created";
+}
+
+export async function findSettlementRecord(
+  correlationId: string,
+  obligation: SettlementCorrelationRecord["obligation"],
+  store: SettlementBlobReader,
+): Promise<SettlementCorrelationRecord | "not-found" | "conflict"> {
+  const prefix = `settlements/v1/${correlationId.toLowerCase()}/`;
+  const matches = await store.list(prefix);
+  if (matches.length === 0) return "not-found";
+  if (matches.length !== 1) return "conflict";
+  const record = await store.read(matches[0]);
+  if (!record || typeof record !== "object") return "not-found";
+  const candidate = record as SettlementCorrelationRecord;
+  if (candidate.correlationId.toLowerCase() !== correlationId.toLowerCase()) return "not-found";
+  if (candidate.obligation.kind !== obligation.kind || candidate.obligation.id !== obligation.id) return "not-found";
+  return candidate;
 }
