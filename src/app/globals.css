@@ -34,6 +34,8 @@ input:focus { border-color:var(--blue); box-shadow:0 0 0 3px #1557ff18; }
 .primary-button { border:0; border-radius:4px; padding:16px 18px; background:var(--blue); color:#fff; font-weight:700; cursor:pointer; display:inline-flex; justify-content:space-between; align-items:center; }
 .primary-button:hover { background:#0e45d4; }
 .primary-button.full { width:100%; }
+.file-button { position:relative; }
+.file-button input { position:absolute; width:1px; height:1px; opacity:0; pointer-events:none; }
 .fine-print, .security-note { color:var(--muted); font-size:12px; line-height:1.55; }
 .form-error { margin:0; color:var(--red); font-size:13px; }
 footer { min-height:58px; padding:0 clamp(20px,4vw,64px); border-top:1px solid var(--line); display:flex; align-items:center; justify-content:space-between; color:var(--muted); font-size:11px; text-transform:uppercase; }
