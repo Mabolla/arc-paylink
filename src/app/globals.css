@@ -35,6 +35,8 @@ input:focus, select:focus { border-color:var(--blue); box-shadow:0 0 0 3px #1557
 .primary-button { border:0; border-radius:4px; padding:16px 18px; background:var(--blue); color:#fff; font-weight:700; cursor:pointer; display:inline-flex; justify-content:space-between; align-items:center; }
 .primary-button:hover { background:#0e45d4; }
 .primary-button.full { width:100%; }
+.secondary-button { border:1px solid var(--ink); border-radius:4px; padding:15px 18px; background:#fff; color:var(--ink); font-weight:700; cursor:pointer; display:inline-flex; justify-content:space-between; align-items:center; }
+.secondary-button:hover { background:#f4f4f1; }.secondary-button:disabled,.primary-button:disabled{cursor:not-allowed;opacity:.6}.secondary-button.full{width:100%}
 .file-button { position:relative; }
 .file-button input { position:absolute; width:1px; height:1px; opacity:0; pointer-events:none; }
 .fine-print, .security-note { color:var(--muted); font-size:12px; line-height:1.55; }
@@ -65,7 +67,7 @@ footer { min-height:58px; padding:0 clamp(20px,4vw,64px); border-top:1px solid v
 .wallet-panel { background:var(--white); border-left:1px solid var(--line); padding:clamp(36px,6vw,88px); display:flex; flex-direction:column; justify-content:center; }
 .wallet-copy { margin:0 0 22px; color:var(--muted); font-size:15px; line-height:1.65; }
 .wallet-details { margin-top:24px; }
-.audit-layout { flex:1; display:grid; grid-template-columns:minmax(0,1fr) minmax(460px,640px); }.audit-panel{background:var(--white);border-left:1px solid var(--line);padding:clamp(36px,6vw,88px);display:flex;flex-direction:column;justify-content:center}.audit-result{margin-top:18px}
+.audit-layout { flex:1; display:grid; grid-template-columns:minmax(0,1fr) minmax(460px,640px); }.audit-panel{background:var(--white);border-left:1px solid var(--line);padding:clamp(36px,6vw,88px);display:flex;flex-direction:column;justify-content:center}.audit-result{margin-top:18px}.recovery-plan{margin-top:18px;border:1px solid var(--line);padding:18px}.recovery-plan .payment-details{margin-bottom:0}.recovery-guard{display:flex;justify-content:space-between;gap:16px;margin-bottom:16px;padding:12px;background:#e8f5ed;color:var(--green);font-size:12px;text-transform:uppercase}.recovery-guard span{font-family:var(--font-mono)}
 @media (max-width:900px) { .home-grid,.claim-layout,.audit-layout{grid-template-columns:1fr}.form-panel,.wallet-panel,.audit-panel{border-left:0;border-top:1px solid var(--line)}.intro,.claim-intro{padding-bottom:56px}.intro h1,.claim-intro h1{font-size:56px}.field-row{grid-template-columns:1fr}.recipient-field{min-width:0}.pay-layout{padding:28px 16px}.payment-panel{padding:28px} }
 @media (max-width:520px) { .topbar{height:62px}.network-pill{font-size:0}.intro{padding:48px 22px}.intro h1{font-size:44px}.form-panel{padding:40px 22px}.payment-amount strong{font-size:42px}.payment-details div{align-items:flex-start}.payment-panel{padding:24px}.trust-row{gap:10px 14px}footer{gap:14px} }
 @media (prefers-reduced-motion:reduce) { .spinner{animation:none} }

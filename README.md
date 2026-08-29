@@ -1,10 +1,39 @@
-# Arc PayLink v2
+# Arc PayLink v3
+
+Arc PayLink turns an invoice, milestone, or agent task into a verifiable USDC settlement on Arc Testnet. A payer can fund from Arc or Base Sepolia, a recipient without a wallet can authenticate with Google and claim through a Circle user-controlled smart account, and both sides can privately verify the complete source-to-destination audit trail.
+
+V3 adds controlled recovery planning for exceptional settlement states. Recovery plans are deterministic and explicitly non-executable: they never retry, refund, top up, or move funds. Automatic recovery is intentionally reserved for a separately reviewed V4.
+
+## V3 architecture
+
+```mermaid
+flowchart TD
+  A[Business obligation] --> B[Arc payment link]
+  B --> C[Arc payment or Base burn]
+  C --> D[CCTP settlement on Arc]
+  D --> E[Immutable private audit record]
+  E --> F[Controlled recovery plan]
+  B --> G[Google + Circle recipient SCA]
+  G --> D
+```
+
+The server validates obligation data, chain evidence, event order, amounts, and correlation IDs before writing a content-addressed record to private Vercel Blob storage. `/audit` discloses a record only when the exact correlation ID and obligation reference match. Its recovery action also requires the immutable source payment reference and returns only a read-only plan.
+
+### V3 safety boundary
+
+- No custody, private-key handling, or browser-visible server API keys.
+- No raw CCTP message or attestation bytes in shared records.
+- Conflicting immutable records are preserved and sent to manual review.
+- `settled` and `fee-adjusted` produce no action; `pending` waits; `partial` states the exact outstanding top-up; `duplicate` is rejected; `mismatched` requires manual review.
+- Every recovery response has `fundMovement: false` and `executable: false`.
+
+Verified testnet and live-service evidence is recorded in [`docs/v3-demo-evidence.md`](./docs/v3-demo-evidence.md).
 
 ## Obligation-aware settlement milestone
 
 Arc PayLink is moving beyond a generic payment link. New requests can carry a validated `invoice`, `milestone`, or `agent-task` obligation ID. The cross-chain settlement adapter classifies destination outcomes as `settled`, `fee-adjusted`, `pending`, `partial`, `duplicate`, or `mismatched`, with an explicit next recovery action. Verified bridge receipts now surface gross amount, recipient net amount, and recorded bridge fees in the payment UI.
 
-This first milestone is deliberately deterministic and non-custodial. It does not automatically retry, refund, or top up funds. Persistence, source/destination correlation records, and controlled recovery execution remain the next product milestones.
+This milestone is deliberately deterministic and non-custodial. It does not automatically retry, refund, or top up funds. Shared persistence, source/destination correlation, private audit lookup, and controlled recovery planning are implemented in V3.
 
 ### Source-to-destination correlation milestone
 
@@ -24,7 +53,7 @@ The `/audit` page retrieves a private record only when both the full correlation
 
 `POST /api/settlements/recover` requires the same exact references plus the source burn transaction hash as the payment reference. It returns a deterministic, non-executable recovery plan: completed settlements are no-ops, pending settlements wait for destination verification, partial settlements describe the exact outstanding top-up, duplicates are rejected, and mismatches require manual review. Every response explicitly sets `fundMovement: false` and `executable: false`.
 
-Arc PayLink v2 is a small hackathon MVP for creating shareable USDC payment requests that always settle and produce a verifiable receipt on Arc Testnet. A payer can pay with USDC already on Arc or bring USDC from Base Sepolia through Circle App Kit.
+Arc PayLink v3 creates shareable USDC payment requests that settle on Arc Testnet and retain a verifiable obligation-aware receipt. A payer can pay with USDC already on Arc or bring USDC from Base Sepolia through Circle App Kit.
 
 This is an Arc project. Base Sepolia is only a supported source network for a payment. This repository must not share files, directories, dependencies, or Git history with any Base builder project.
 
@@ -39,7 +68,7 @@ The repository now includes a tested contract foundation for the next Arc PayLin
 - A link can be claimed once. After expiry, only the original sender can refund it.
 - The implementation contract is locked against direct initialization.
 
-The factory and implementation are deployed on Arc Testnet. Two live payment lifecycles are verified end to end. The latest proof uses Google authentication to recover a Circle user-controlled SCA, deploys the lazy wallet on Arc, signs the address-bound EIP-712 claim, and executes the claim from that wallet. The escrow reached `Claimed` with a zero balance and the recipient SCA received exactly 1 USDC. Production persistence is not included yet.
+The factory and implementation are deployed on Arc Testnet. Two live payment lifecycles are verified end to end. The latest proof uses Google authentication to recover a Circle user-controlled SCA, deploys the lazy wallet on Arc, signs the address-bound EIP-712 claim, and executes the claim from that wallet. The escrow reached `Claimed` with a zero balance and the recipient SCA received exactly 1 USDC. Private append-only production persistence is enabled through Vercel Blob.
 
 Arc Testnet deployment:
 
@@ -72,7 +101,7 @@ npm run contracts:compile
 npm run contracts:test
 ```
 
-## Current Milestone
+## Historical same-chain milestone
 
 The implemented milestone is intentionally limited to same-chain Arc Testnet USDC payments. A seller creates a request in the browser, shares the generated URL, and a payer connects an injected EVM wallet to send USDC through Circle App Kit Send. The application then reads the Arc receipt and accepts payment only when the transaction succeeded and the official USDC contract emitted an exact transfer to the requested recipient for the requested base-unit amount.
 

@@ -1,7 +1,7 @@
 {
   "name": "arc-builder",
   "version": "1.0.0",
-  "description": "Arc PayLink v2 is a small hackathon MVP for creating shareable USDC payment requests that always settle and produce a verifiable receipt on Arc Testnet. A payer can pay with USDC already on Arc or bring USDC from Base Sepolia through Circle App Kit.",
+  "description": "Arc PayLink v3 creates obligation-aware USDC payment requests with walletless recipient claims, private cross-chain audit records, and controlled non-executable recovery plans on Arc Testnet.",
   "scripts": {
     "dev": "next dev --webpack",
     "build": "next build",
