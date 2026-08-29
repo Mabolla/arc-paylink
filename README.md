@@ -20,6 +20,8 @@ Raw CCTP message and attestation bytes are not retained. The immutable correlati
 
 Set `BLOB_READ_WRITE_TOKEN` in Vercel to enable shared settlement persistence. The token is server-only and must never use a `NEXT_PUBLIC_` prefix. This milestone records recovery intent only; it does not automatically retry, refund, or top up funds.
 
+The `/audit` page retrieves a private record only when both the full correlation ID and exact obligation type/ID match. The server reads the private Blob, validates the record again, and returns no record data for missing, mismatched, or conflicting references. Blob URLs are never exposed to the browser.
+
 Arc PayLink v2 is a small hackathon MVP for creating shareable USDC payment requests that always settle and produce a verifiable receipt on Arc Testnet. A payer can pay with USDC already on Arc or bring USDC from Base Sepolia through Circle App Kit.
 
 This is an Arc project. Base Sepolia is only a supported source network for a payment. This repository must not share files, directories, dependencies, or Git history with any Base builder project.

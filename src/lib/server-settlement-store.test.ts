@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { buildSettlementCorrelationRecord } from "./settlement-correlation";
-import { persistSettlementRecord } from "./server-settlement-store";
+import { findSettlementRecord, persistSettlementRecord } from "./server-settlement-store";
 
 const hash = (digit: string) => `0x${digit.repeat(64)}`;
 
@@ -53,5 +53,21 @@ describe("persistSettlementRecord", () => {
     const pathname = initialPut.mock.calls[0][0];
     const list = vi.fn().mockResolvedValueOnce([]).mockResolvedValueOnce([pathname]);
     expect(await persistSettlementRecord(value, { list, put: vi.fn().mockRejectedValue(new Error("precondition")) })).toBe("unchanged");
+  });
+});
+
+describe("findSettlementRecord", () => {
+  it("requires one immutable record and an exact obligation reference", async () => {
+    const value = record();
+    const pathname = `settlements/v1/${value.correlationId}/digest.json`;
+    const store = { list: vi.fn().mockResolvedValue([pathname]), read: vi.fn().mockResolvedValue(value) };
+    expect(await findSettlementRecord(value.correlationId, value.obligation, store)).toEqual(value);
+    expect(await findSettlementRecord(value.correlationId, { ...value.obligation, id: "WRONG" }, store)).toBe("not-found");
+  });
+
+  it("does not disclose missing or conflicting records", async () => {
+    const value = record();
+    expect(await findSettlementRecord(value.correlationId, value.obligation, { list: vi.fn().mockResolvedValue([]), read: vi.fn() })).toBe("not-found");
+    expect(await findSettlementRecord(value.correlationId, value.obligation, { list: vi.fn().mockResolvedValue(["one", "two"]), read: vi.fn() })).toBe("conflict");
   });
 });

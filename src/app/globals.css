@@ -3,7 +3,7 @@
 html, body { margin:0; min-height:100%; }
 body { background:var(--paper); color:var(--ink); font-family:var(--font-geist), Arial, sans-serif; letter-spacing:0; }
 a { color:inherit; text-decoration:none; }
-button, input { font:inherit; letter-spacing:0; }
+button, input, select { font:inherit; letter-spacing:0; }
 main { min-height:100vh; display:flex; flex-direction:column; }
 .topbar { height:72px; display:flex; align-items:center; justify-content:space-between; padding:0 clamp(20px,4vw,64px); border-bottom:1px solid var(--line); background:rgba(245,244,239,.94); }
 .brand { display:flex; align-items:center; gap:10px; font-weight:720; }
@@ -11,6 +11,7 @@ main { min-height:100vh; display:flex; flex-direction:column; }
 .brand-mark { width:30px; height:30px; display:grid; place-items:center; background:var(--ink); color:white; font-family:var(--font-mono); font-size:14px; }
 .network-pill { display:flex; align-items:center; gap:8px; font-size:13px; color:var(--muted); }
 .network-pill i { width:7px; height:7px; border-radius:50%; background:#31a56b; box-shadow:0 0 0 4px #d9eddf; }
+.top-actions { display:flex; align-items:center; gap:22px; font-size:13px; }.top-actions>a{color:var(--blue);font-weight:650}
 .home-grid { flex:1; display:grid; grid-template-columns:minmax(0,1fr) minmax(420px,640px); }
 .intro { padding:clamp(56px,8vw,120px) clamp(28px,7vw,110px); align-self:center; }
 .eyebrow { margin:0 0 18px; color:var(--blue); font-size:12px; font-weight:750; text-transform:uppercase; letter-spacing:1.5px; }
@@ -24,8 +25,8 @@ main { min-height:100vh; display:flex; flex-direction:column; }
 .step { color:var(--muted); font-size:12px; }
 .request-form { display:grid; gap:24px; }
 label { display:grid; gap:9px; color:#40444a; font-size:13px; font-weight:650; }
-input { width:100%; border:1px solid #cbd0d7; background:#fff; color:var(--ink); border-radius:4px; padding:15px 14px; outline:none; }
-input:focus { border-color:var(--blue); box-shadow:0 0 0 3px #1557ff18; }
+input, select { width:100%; border:1px solid #cbd0d7; background:#fff; color:var(--ink); border-radius:4px; padding:15px 14px; outline:none; }
+input:focus, select:focus { border-color:var(--blue); box-shadow:0 0 0 3px #1557ff18; }
 .field-row { display:grid; grid-template-columns:160px 1fr; gap:14px; }
 .amount-input { display:flex; align-items:center; border:1px solid #cbd0d7; border-radius:4px; }
 .amount-input:focus-within { border-color:var(--blue); box-shadow:0 0 0 3px #1557ff18; }
@@ -64,6 +65,7 @@ footer { min-height:58px; padding:0 clamp(20px,4vw,64px); border-top:1px solid v
 .wallet-panel { background:var(--white); border-left:1px solid var(--line); padding:clamp(36px,6vw,88px); display:flex; flex-direction:column; justify-content:center; }
 .wallet-copy { margin:0 0 22px; color:var(--muted); font-size:15px; line-height:1.65; }
 .wallet-details { margin-top:24px; }
-@media (max-width:900px) { .home-grid,.claim-layout{grid-template-columns:1fr}.form-panel,.wallet-panel{border-left:0;border-top:1px solid var(--line)}.intro,.claim-intro{padding-bottom:56px}.intro h1,.claim-intro h1{font-size:56px}.field-row{grid-template-columns:1fr}.recipient-field{min-width:0}.pay-layout{padding:28px 16px}.payment-panel{padding:28px} }
+.audit-layout { flex:1; display:grid; grid-template-columns:minmax(0,1fr) minmax(460px,640px); }.audit-panel{background:var(--white);border-left:1px solid var(--line);padding:clamp(36px,6vw,88px);display:flex;flex-direction:column;justify-content:center}.audit-result{margin-top:18px}
+@media (max-width:900px) { .home-grid,.claim-layout,.audit-layout{grid-template-columns:1fr}.form-panel,.wallet-panel,.audit-panel{border-left:0;border-top:1px solid var(--line)}.intro,.claim-intro{padding-bottom:56px}.intro h1,.claim-intro h1{font-size:56px}.field-row{grid-template-columns:1fr}.recipient-field{min-width:0}.pay-layout{padding:28px 16px}.payment-panel{padding:28px} }
 @media (max-width:520px) { .topbar{height:62px}.network-pill{font-size:0}.intro{padding:48px 22px}.intro h1{font-size:44px}.form-panel{padding:40px 22px}.payment-amount strong{font-size:42px}.payment-details div{align-items:flex-start}.payment-panel{padding:24px}.trust-row{gap:10px 14px}footer{gap:14px} }
 @media (prefers-reduced-motion:reduce) { .spinner{animation:none} }
