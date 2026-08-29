@@ -14,6 +14,7 @@ type CircleAction =
   | "createDeviceToken"
   | "initializeUser"
   | "listWallets"
+  | "inspectChallenge"
   | "signClaim"
   | "executeClaim";
 
@@ -124,6 +125,14 @@ export async function POST(request: Request) {
 
     if (action === "listWallets") {
       return circleResponse(await circleRequest("/v1/w3s/wallets", { method: "GET", headers: userHeaders }));
+    }
+
+    if (action === "inspectChallenge") {
+      const challengeId = requiredString(body.challengeId, "challengeId");
+      return circleResponse(await circleRequest(`/v1/w3s/user/challenges/${encodeURIComponent(challengeId)}`, {
+        method: "GET",
+        headers: userHeaders,
+      }));
     }
 
     const walletId = requiredString(body.walletId, "walletId");

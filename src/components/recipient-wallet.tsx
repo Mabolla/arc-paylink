@@ -258,10 +258,23 @@ export function RecipientWallet() {
     setClaimStep("signing");
     setClaimMessage("Approve the address-bound claim authorization in Circle.");
     sdk.setAuthentication(login);
-    sdk.execute(challengeId, (error: unknown, result) => {
+    sdk.execute(challengeId, async (error: unknown, result) => {
       if (error) {
         setClaimStep("failed");
-        setClaimMessage(errorMessage(error));
+        try {
+          const detail = await circleAction<{
+            challenge?: { errorCode?: number; errorMessage?: string; status?: string };
+          }>({
+            action: "inspectChallenge",
+            userToken: login.userToken,
+            challengeId,
+          });
+          const challenge = detail.challenge;
+          const suffix = [challenge?.errorCode, challenge?.errorMessage, challenge?.status].filter(Boolean).join(" · ");
+          setClaimMessage(suffix || errorMessage(error));
+        } catch {
+          setClaimMessage(errorMessage(error));
+        }
         return;
       }
       const signature = result && "data" in result ? result.data?.signature : undefined;
