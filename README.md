@@ -6,6 +6,18 @@ Arc PayLink is moving beyond a generic payment link. New requests can carry a va
 
 This first milestone is deliberately deterministic and non-custodial. It does not automatically retry, refund, or top up funds. Persistence, source/destination correlation records, and controlled recovery execution remain the next product milestones.
 
+### Source-to-destination correlation milestone
+
+Completed cross-chain obligations now produce a versioned audit record that binds:
+
+- the obligation type and ID;
+- the source-chain burn transaction;
+- the CCTP event nonce plus hashes of the message and attestation;
+- the Arc destination mint transaction and block;
+- gross, recipient-net, fee, outstanding amount, settlement state, and read-only recovery action.
+
+Raw CCTP message and attestation bytes are not retained. The immutable correlation record is saved in browser storage and can be downloaded as JSON for independent audit or later ingestion. A conflicting record for the same correlation ID is preserved rather than overwritten and is surfaced for manual review. Browser persistence is the current MVP boundary; shared server-side persistence remains future work.
+
 Arc PayLink v2 is a small hackathon MVP for creating shareable USDC payment requests that always settle and produce a verifiable receipt on Arc Testnet. A payer can pay with USDC already on Arc or bring USDC from Base Sepolia through Circle App Kit.
 
 This is an Arc project. Base Sepolia is only a supported source network for a payment. This repository must not share files, directories, dependencies, or Git history with any Base builder project.

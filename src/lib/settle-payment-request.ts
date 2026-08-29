@@ -4,12 +4,14 @@ import { ARC_USDC_ADDRESS, arcTestnet } from "./arc";
 import type { PaymentRequest } from "./payment-request";
 import { verifyBridgeSettlement, type BridgeSettlementVerification } from "./verify-bridge-settlement";
 import { classifySettlement, type SettlementClassification } from "./settlement-state";
+import { buildSettlementCorrelationRecord, type SettlementCorrelationRecord } from "./settlement-correlation";
 
 export type PaymentSettlementResult = BridgeSettlementVerification & {
   paymentState: SettlementClassification["state"];
   recoveryAction: SettlementClassification["recoveryAction"];
   outstandingBaseUnits: bigint;
   obligation: PaymentRequest["obligation"];
+  correlation?: SettlementCorrelationRecord;
 };
 
 export function settlePaymentRequest({
@@ -38,5 +40,9 @@ export function settlePaymentRequest({
     bridgeFeeBaseUnits: verified.bridgeFeeBaseUnits,
     destinationFinalized: true,
   });
-  return { ...verified, paymentState: classification.state, recoveryAction: classification.recoveryAction, outstandingBaseUnits: classification.outstandingBaseUnits, obligation: request.obligation };
+  const result: PaymentSettlementResult = { ...verified, paymentState: classification.state, recoveryAction: classification.recoveryAction, outstandingBaseUnits: classification.outstandingBaseUnits, obligation: request.obligation };
+  if (request.obligation) {
+    result.correlation = buildSettlementCorrelationRecord({ obligation: request.obligation, bridgeResult, settlement: result, observedAt: new Date().toISOString() });
+  }
+  return result;
 }
