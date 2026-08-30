@@ -5,8 +5,17 @@ const hre = require("hardhat");
 const ARC_TESTNET_CHAIN_ID = 5042002n;
 const FACTORY_ADDRESS = "0x8C377F5Bb508ece6De8090209619122edd4bC453";
 const ARC_USDC = "0x3600000000000000000000000000000000000000";
-const TEST_AMOUNT = 1_000_000n;
 const TEST_LIFETIME_SECONDS = 7 * 24 * 60 * 60;
+
+function testAmount() {
+  const value = process.env.ARC_PAYLINK_TEST_AMOUNT_USDC?.trim() || "0.01";
+  if (!/^\d+(\.\d{1,6})?$/.test(value)) {
+    throw new Error("ARC_PAYLINK_TEST_AMOUNT_USDC must be a positive USDC amount with at most 6 decimals");
+  }
+  const units = hre.ethers.parseUnits(value, 6);
+  if (units <= 0n) throw new Error("ARC_PAYLINK_TEST_AMOUNT_USDC must be positive");
+  return { value, units };
+}
 
 function claimPublicKey() {
   const encoded = process.env.ARC_PAYLINK_CLAIM_PUBLIC_KEY?.trim();
@@ -22,6 +31,7 @@ async function main() {
 
   const [sender] = await hre.ethers.getSigners();
   if (!sender) throw new Error("No Arc Testnet signer is configured");
+  const amount = testAmount();
 
   const factoryCode = await hre.ethers.provider.getCode(FACTORY_ADDRESS);
   if (factoryCode === "0x") throw new Error(`No factory found at ${FACTORY_ADDRESS}`);
@@ -34,7 +44,7 @@ async function main() {
   }
 
   const senderBalance = await usdc.balanceOf(sender.address);
-  if (senderBalance < TEST_AMOUNT) {
+  if (senderBalance < amount.units) {
     throw new Error(`Insufficient Arc Testnet USDC: ${hre.ethers.formatUnits(senderBalance, 6)}`);
   }
 
@@ -48,7 +58,7 @@ async function main() {
 
   const latest = await hre.ethers.provider.getBlock("latest");
   const expiry = latest.timestamp + TEST_LIFETIME_SECONDS;
-  const createTx = await factory.createPayLink(TEST_AMOUNT, expiry, secretHash);
+  const createTx = await factory.createPayLink(amount.units, expiry, secretHash);
   const createReceipt = await createTx.wait();
   const created = createReceipt.logs
     .map((log) => {
@@ -58,10 +68,10 @@ async function main() {
   if (!created) throw new Error("PayLinkCreated event was not found");
 
   const escrow = created.args.escrow;
-  const fundTx = await usdc.transfer(escrow, TEST_AMOUNT);
+  const fundTx = await usdc.transfer(escrow, amount.units);
   const fundReceipt = await fundTx.wait();
   const fundedBalance = await usdc.balanceOf(escrow);
-  if (fundedBalance !== TEST_AMOUNT) {
+  if (fundedBalance !== amount.units) {
     throw new Error(`Escrow funding mismatch: ${fundedBalance}`);
   }
 
@@ -75,8 +85,8 @@ async function main() {
     sender: sender.address,
     paymentId: created.args.paymentId,
     escrow,
-    amountUsdc: "1",
-    amountBaseUnits: TEST_AMOUNT.toString(),
+    amountUsdc: amount.value,
+    amountBaseUnits: amount.units.toString(),
     expiry: new Date(expiry * 1000).toISOString(),
     secretHash,
     encryptedSecret,
@@ -87,12 +97,19 @@ async function main() {
   };
   fs.writeFileSync("circle-escrow-package.json", JSON.stringify(claimPackage, null, 2));
 
+  const privateClaimPackage = { ...claimPackage, secret };
+  delete privateClaimPackage.encryptedSecret;
+  delete privateClaimPackage.encryption;
+  const privatePackageName = `arc-paylink-${created.args.paymentId.slice(2, 10)}.private-claim.json`;
+  fs.writeFileSync(privatePackageName, JSON.stringify(privateClaimPackage, null, 2), { mode: 0o600 });
+
   console.log(`Escrow: ${escrow}`);
-  console.log(`Amount: 1 USDC`);
+  console.log(`Amount: ${amount.value} USDC`);
   console.log(`Secret hash: ${secretHash}`);
   console.log(`Create transaction: ${createReceipt.hash}`);
   console.log(`Funding transaction: ${fundReceipt.hash}`);
   console.log(`Encrypted claim secret: ${encryptedSecret}`);
+  console.log(`Private recipient package: ${privatePackageName}`);
   console.log("Escrow state: Funded");
 }
 

@@ -94,6 +94,18 @@ Verified Circle recipient onboarding and claim:
 - Final state: **Claimed**, escrow balance **0 USDC**, recipient balance **1 USDC**
 - Non-secret evidence: [`deployments/arc-testnet-circle-claim.json`](./deployments/arc-testnet-circle-claim.json)
 
+### External recipient testing
+
+The hosted `/claim` flow accepts a portable, private JSON package for any funded escrow created by the deployed Arc PayLink factory. Before Circle prepares a signature or contract execution, the server verifies the package against Arc Testnet: the payment ID must map to the escrow in the trusted factory, the token must be official Arc Testnet USDC, and the amount, expiry, secret hash, and funded state must all match onchain. The Circle session must also own the selected recipient wallet.
+
+Create a small, isolated test escrow for one invited tester:
+
+```bash
+ARC_PAYLINK_TEST_AMOUNT_USDC=0.01 npm run contracts:create-fund-circle-escrow
+```
+
+The command writes a gitignored `*.private-claim.json` recipient package alongside a non-secret encrypted evidence package. Share each private package with exactly one intended tester; never commit or post it publicly. A package is single-use because its escrow can be claimed only once. This flow enables controlled 3–5 person product testing without exposing API keys, a funded sender key, or a reusable public reward pool.
+
 Contract checks:
 
 ```bash
