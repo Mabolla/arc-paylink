@@ -1,14 +1,11 @@
 import { isAddress, isHex, keccak256 } from "viem";
 import { NextResponse } from "next/server";
+import { verifyClaimContext, type VerifiedClaimContext } from "@/lib/claim-validation";
 
 const CIRCLE_BASE_URL = "https://api.circle.com";
 const ARC_CHAIN_ID = 5_042_002;
 const ARC_BLOCKCHAIN = "ARC-TESTNET";
 const ARC_USDC = "0x3600000000000000000000000000000000000000";
-const CLAIM_ESCROW = "0xFae2e1ed55aEf5D51fbc5de1fEeC8afAca14410B";
-const CLAIM_RECIPIENT = "0xecf09f594a229a95315f4dcbdbfc26c0a7709608";
-const CLAIM_SECRET_HASH = "0xce575f7157960804eb20b1671d66b24ae89ab937173f667771334474759347c0";
-const CLAIM_EXPIRY = 1_788_560_389;
 const CLAIM_WINDOW_SECONDS = 15 * 60;
 
 type CircleAction =
@@ -39,16 +36,14 @@ function requiredString(value: unknown, name: string) {
 
 function claimWallet(value: unknown) {
   const address = requiredString(value, "walletAddress");
-  if (!isAddress(address) || address.toLowerCase() !== CLAIM_RECIPIENT.toLowerCase()) {
-    throw new Error("This PayLink is bound to a different recipient wallet.");
-  }
+  if (!isAddress(address)) throw new Error("Recipient wallet address is invalid.");
   return address;
 }
 
-function claimDeadline(value: unknown) {
+function claimDeadline(value: unknown, claim: VerifiedClaimContext) {
   const deadline = Number(value);
   const now = Math.floor(Date.now() / 1000);
-  if (!Number.isSafeInteger(deadline) || deadline < now || deadline > CLAIM_EXPIRY) {
+  if (!Number.isSafeInteger(deadline) || deadline < now || deadline >= claim.expiry) {
     throw new Error("The claim authorization has expired.");
   }
   return deadline;
@@ -142,6 +137,8 @@ export async function POST(request: Request) {
     const ownershipError = await assertWalletOwnership(userToken, walletId, walletAddress);
     if (ownershipError) return circleResponse(ownershipError);
 
+    const claim = await verifyClaimContext(body);
+
     if (action === "deployWallet") {
       return circleResponse(await circleRequest("/v1/w3s/user/transactions/contractExecution", {
         method: "POST",
@@ -160,7 +157,7 @@ export async function POST(request: Request) {
 
     if (action === "signClaim") {
       const now = Math.floor(Date.now() / 1000);
-      const deadline = Math.min(now + CLAIM_WINDOW_SECONDS, CLAIM_EXPIRY - 1);
+      const deadline = Math.min(now + CLAIM_WINDOW_SECONDS, claim.expiry - 1);
       if (deadline <= now) throw new Error("This PayLink has expired.");
       const typedData = {
         types: {
@@ -177,12 +174,12 @@ export async function POST(request: Request) {
             { name: "deadline", type: "uint256" },
           ],
         },
-        domain: { name: "Arc PayLink", version: "1", chainId: ARC_CHAIN_ID, verifyingContract: CLAIM_ESCROW },
+        domain: { name: "Arc PayLink", version: "1", chainId: ARC_CHAIN_ID, verifyingContract: claim.escrow },
         primaryType: "Claim",
         message: {
-          escrow: CLAIM_ESCROW,
+          escrow: claim.escrow,
           recipient: walletAddress,
-          secretHash: CLAIM_SECRET_HASH,
+          secretHash: claim.secretHash,
           deadline,
         },
       };
@@ -199,10 +196,10 @@ export async function POST(request: Request) {
     }
 
     if (action === "executeClaim") {
-      const deadline = claimDeadline(body.deadline);
+      const deadline = claimDeadline(body.deadline, claim);
       const secret = requiredString(body.secret, "secret");
       const signature = requiredString(body.signature, "signature");
-      if (!isHex(secret) || secret.length !== 66 || keccak256(secret) !== CLAIM_SECRET_HASH) {
+      if (!isHex(secret) || secret.length !== 66 || keccak256(secret) !== claim.secretHash) {
         throw new Error("Claim package secret does not match this PayLink.");
       }
       if (!isHex(signature)) throw new Error("Circle returned an invalid claim signature.");
@@ -212,7 +209,7 @@ export async function POST(request: Request) {
         body: JSON.stringify({
           idempotencyKey: crypto.randomUUID(),
           walletId,
-          contractAddress: CLAIM_ESCROW,
+          contractAddress: claim.escrow,
           abiFunctionSignature: "claim(bytes32,address,uint256,bytes)",
           abiParameters: [secret, walletAddress, String(deadline), signature],
           feeLevel: "MEDIUM",

@@ -3,7 +3,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { SocialLoginProvider } from "@circle-fin/w3s-pw-web-sdk/dist/src/types";
 import type { W3SSdk } from "@circle-fin/w3s-pw-web-sdk";
-import { bytesToHex, isHex, keccak256 } from "viem";
+import {
+  parsePrivateClaimPackage,
+  publicClaimContext,
+  type PrivateClaimPackage,
+} from "@/lib/claim-package";
 
 const appId = process.env.NEXT_PUBLIC_CIRCLE_APP_ID ?? "";
 const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? "";
@@ -12,8 +16,6 @@ type LoginResult = { userToken: string; encryptionKey: string };
 type CircleWallet = { id: string; address: string; blockchain: string };
 type Step = "loading" | "ready" | "authenticating" | "initializing" | "challenge-ready" | "creating" | "complete" | "failed";
 type ClaimStep = "package-needed" | "ready" | "deployment-needed" | "preparing-deployment" | "deployment-ready" | "deploying" | "preparing-signature" | "signature-ready" | "signing" | "signed" | "preparing-claim" | "claim-ready" | "claiming" | "claimed" | "failed";
-
-const claimSecretHash = "0xce575f7157960804eb20b1671d66b24ae89ab937173f667771334474759347c0";
 
 const SESSION_KEYS = {
   deviceToken: "arc-paylink.circle.device-token",
@@ -45,7 +47,7 @@ export function RecipientWallet() {
   const loginRef = useRef<LoginResult | null>(null);
   const challengeRef = useRef<string | null>(null);
   const claimChallengeRef = useRef<string | null>(null);
-  const claimSecretRef = useRef<`0x${string}` | null>(null);
+  const claimPackageRef = useRef<PrivateClaimPackage | null>(null);
   const claimSignatureRef = useRef<string | null>(null);
   const claimDeadlineRef = useRef<number | null>(null);
   const [step, setStep] = useState<Step>("loading");
@@ -54,6 +56,7 @@ export function RecipientWallet() {
   const [claimStep, setClaimStep] = useState<ClaimStep>("package-needed");
   const [claimMessage, setClaimMessage] = useState("Load the private PayLink package to unlock this claim.");
   const [claimTxHash, setClaimTxHash] = useState("");
+  const [claimPackage, setClaimPackage] = useState<PrivateClaimPackage | null>(null);
 
   const loadWallet = useCallback(async (userToken: string) => {
     const result = await circleAction<{ wallets?: CircleWallet[] }>({ action: "listWallets", userToken });
@@ -207,18 +210,11 @@ export function RecipientWallet() {
     const file = event.target.files?.[0];
     if (!file) return;
     try {
-      const secret = file.name.toLowerCase().endsWith(".bin")
-        ? bytesToHex(new Uint8Array(await file.arrayBuffer()))
-        : (JSON.parse(await file.text()) as { secret?: unknown }).secret;
-      if (typeof secret !== "string" || !isHex(secret) || secret.length !== 66) {
-        throw new Error("This is not a valid Arc PayLink claim package.");
-      }
-      if (keccak256(secret) !== claimSecretHash) {
-        throw new Error("This package belongs to a different PayLink.");
-      }
-      claimSecretRef.current = secret;
+      const parsed = parsePrivateClaimPackage(JSON.parse(await file.text()));
+      claimPackageRef.current = parsed;
+      setClaimPackage(parsed);
       setClaimStep("deployment-needed");
-      setClaimMessage("Private package verified. Deploy the recipient wallet once before signing.");
+      setClaimMessage(`Private package verified for ${parsed.amountUsdc} USDC. Deploy the recipient wallet once before signing.`);
     } catch (error) {
       setClaimStep("failed");
       setClaimMessage(errorMessage(error));
@@ -229,7 +225,8 @@ export function RecipientWallet() {
 
   async function prepareSignature() {
     const login = loginRef.current;
-    if (!login || !wallet || !claimSecretRef.current) return;
+    const activeClaim = claimPackageRef.current;
+    if (!login || !wallet || !activeClaim) return;
     try {
       setClaimStep("preparing-signature");
       setClaimMessage("Preparing the exact escrow authorization.");
@@ -238,6 +235,7 @@ export function RecipientWallet() {
         userToken: login.userToken,
         walletId: wallet.id,
         walletAddress: wallet.address,
+        ...publicClaimContext(activeClaim),
       });
       if (!result.challengeId || !result.deadline) throw new Error("Circle did not return a signing challenge.");
       claimChallengeRef.current = result.challengeId;
@@ -252,7 +250,8 @@ export function RecipientWallet() {
 
   async function prepareDeployment() {
     const login = loginRef.current;
-    if (!login || !wallet) return;
+    const activeClaim = claimPackageRef.current;
+    if (!login || !wallet || !activeClaim) return;
     try {
       setClaimStep("preparing-deployment");
       setClaimMessage("Preparing the one-time Arc wallet deployment.");
@@ -261,6 +260,7 @@ export function RecipientWallet() {
         userToken: login.userToken,
         walletId: wallet.id,
         walletAddress: wallet.address,
+        ...publicClaimContext(activeClaim),
       });
       if (!result.challengeId) throw new Error("Circle did not return a wallet deployment challenge.");
       claimChallengeRef.current = result.challengeId;
@@ -341,10 +341,10 @@ export function RecipientWallet() {
 
   async function prepareClaim() {
     const login = loginRef.current;
-    const secret = claimSecretRef.current;
+    const activeClaim = claimPackageRef.current;
     const signature = claimSignatureRef.current;
     const deadline = claimDeadlineRef.current;
-    if (!login || !wallet || !secret || !signature || !deadline) return;
+    if (!login || !wallet || !activeClaim || !signature || !deadline) return;
     try {
       setClaimStep("preparing-claim");
       setClaimMessage("Preparing the final Arc Testnet transaction.");
@@ -353,14 +353,15 @@ export function RecipientWallet() {
         userToken: login.userToken,
         walletId: wallet.id,
         walletAddress: wallet.address,
-        secret,
+        ...publicClaimContext(activeClaim),
+        secret: activeClaim.secret,
         signature,
         deadline,
       });
       if (!result.challengeId) throw new Error("Circle did not return a claim transaction challenge.");
       claimChallengeRef.current = result.challengeId;
       setClaimStep("claim-ready");
-      setClaimMessage("Final transaction is ready. Approving it will claim 1 USDC.");
+      setClaimMessage(`Final transaction is ready. Approving it will claim ${activeClaim.amountUsdc} USDC.`);
     } catch (error) {
       setClaimStep("failed");
       setClaimMessage(errorMessage(error));
@@ -373,7 +374,7 @@ export function RecipientWallet() {
     const challengeId = claimChallengeRef.current;
     if (!sdk || !login || !challengeId) return;
     setClaimStep("claiming");
-    setClaimMessage("Approve the final 1 USDC claim in Circle.");
+    setClaimMessage(`Approve the final ${claimPackageRef.current?.amountUsdc ?? "USDC"} claim in Circle.`);
     sdk.setAuthentication(login);
     sdk.execute(challengeId, (error: unknown, result) => {
       if (error) {
@@ -385,11 +386,11 @@ export function RecipientWallet() {
         ? result.data.txHash
         : undefined;
       claimChallengeRef.current = null;
-      claimSecretRef.current = null;
+      claimPackageRef.current = null;
       claimSignatureRef.current = null;
       if (txHash) setClaimTxHash(txHash);
       setClaimStep("claimed");
-      setClaimMessage("Claim submitted on Arc Testnet. Your 1 USDC is on the way.");
+      setClaimMessage(`Claim submitted on Arc Testnet. Your ${claimPackage?.amountUsdc ?? "USDC"} is on the way.`);
     });
   }
 
@@ -412,6 +413,8 @@ export function RecipientWallet() {
           <dl className="payment-details wallet-details">
             <div><dt>Network</dt><dd>{wallet.blockchain}</dd></div>
             <div><dt>Recipient wallet</dt><dd className="mono">{wallet.address}</dd></div>
+            {claimPackage && <div><dt>Claim amount</dt><dd>{claimPackage.amountUsdc} USDC</dd></div>}
+            {claimPackage && <div><dt>Escrow</dt><dd className="mono">{claimPackage.escrow.slice(0, 8)}…{claimPackage.escrow.slice(-6)}</dd></div>}
           </dl>
           <div className={`status-box ${claimStep === "failed" ? "failed" : claimStep === "claimed" ? "paid" : ""}`} role="status">
             <b>{claimMessage}</b>
@@ -420,15 +423,15 @@ export function RecipientWallet() {
           {claimStep === "package-needed" && (
             <label className="primary-button full file-button">
               Load private claim package
-              <input type="file" accept="application/octet-stream,.bin,application/json,.json" onChange={loadClaimPackage} />
+              <input type="file" accept="application/json,.json" onChange={loadClaimPackage} />
             </label>
           )}
           {claimStep === "ready" && <button className="primary-button full" onClick={prepareSignature}>Prepare authorization <span aria-hidden>→</span></button>}
           {claimStep === "deployment-needed" && <button className="primary-button full" onClick={prepareDeployment}>Deploy recipient wallet <span aria-hidden>→</span></button>}
           {claimStep === "deployment-ready" && <button className="primary-button full" onClick={approveDeployment}>Approve wallet deployment <span aria-hidden>→</span></button>}
           {claimStep === "signature-ready" && <button className="primary-button full" onClick={approveSignature}>Approve authorization <span aria-hidden>→</span></button>}
-          {claimStep === "signed" && <button className="primary-button full" onClick={prepareClaim}>Prepare 1 USDC claim <span aria-hidden>→</span></button>}
-          {claimStep === "claim-ready" && <button className="primary-button full" onClick={approveClaim}>Approve 1 USDC claim <span aria-hidden>→</span></button>}
+          {claimStep === "signed" && <button className="primary-button full" onClick={prepareClaim}>Prepare {claimPackage?.amountUsdc ?? "USDC"} claim <span aria-hidden>→</span></button>}
+          {claimStep === "claim-ready" && <button className="primary-button full" onClick={approveClaim}>Approve {claimPackage?.amountUsdc ?? "USDC"} claim <span aria-hidden>→</span></button>}
           {claimStep === "failed" && <button className="text-button" onClick={() => window.location.reload()}>Start again</button>}
           {claimTxHash && <p className="security-note mono">Transaction: {claimTxHash}</p>}
         </>
