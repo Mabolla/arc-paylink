@@ -335,7 +335,7 @@ export function RecipientWallet() {
       claimChallengeRef.current = null;
       claimSignatureRef.current = signature;
       setClaimStep("signed");
-      setClaimMessage("Authorization signed. Prepare the final 1 USDC claim transaction.");
+      setClaimMessage(`Authorization signed. Prepare the final ${claimPackageRef.current?.amountUsdc ?? "payment"} USDC claim transaction.`);
     });
   }
 
