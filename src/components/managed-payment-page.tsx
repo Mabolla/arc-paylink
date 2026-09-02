@@ -1,0 +1,6 @@
+"use client";
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { PaymentPanel } from "./payment-panel";
+import type { RequestView } from "@/lib/request-lifecycle";
+export function ManagedPaymentPage({ requestId }: { requestId: string }) { const [view,setView]=useState<RequestView>(); const [failed,setFailed]=useState(false); useEffect(()=>{void fetch(`/api/requests/${requestId}`,{cache:"no-store"}).then(async r=>{if(!r.ok)throw new Error();setView((await r.json()).view)}).catch(()=>setFailed(true))},[requestId]); if(failed)return <div className="empty-state"><p className="eyebrow">Unavailable</p><h1>This request could not be found.</h1></div>; if(!view)return <div className="empty-state"><p className="eyebrow">Loading</p><h1>Checking request status.</h1></div>; if(view.status!=="pending")return <div className="empty-state"><p className="eyebrow">{view.status}</p><h1>{view.status==="settled"?"This request is settled.":"This request can no longer be paid."}</h1>{view.replacementRequestId&&<Link className="primary-button" href={`/pay/${view.replacementRequestId}`}>Open replacement</Link>}</div>; return <div className="pay-layout"><PaymentPanel {...view.request} requestId={requestId}/></div>; }

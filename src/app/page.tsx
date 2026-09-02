@@ -5,8 +5,8 @@ export default function Home() {
   return (
     <main>
       <nav className="topbar">
-        <Link className="brand" href="/"><span className="brand-mark">A</span>Arc PayLink <sup>v3</sup></Link>
-        <div className="top-actions"><Link href="/test-recipient">Prepare tester PayLink</Link><Link href="/audit">Verify settlement</Link><span className="network-pill"><i /> Arc Testnet</span></div>
+        <Link className="brand" href="/"><span className="brand-mark">A</span>Arc PayLink <sup>v3.1</sup></Link>
+        <div className="top-actions"><Link href="/requests">My Requests</Link><Link href="/test-recipient">Prepare tester PayLink</Link><Link href="/audit">Verify settlement</Link><span className="network-pill"><i /> Arc Testnet</span></div>
       </nav>
       <section className="home-grid">
         <div className="intro">
@@ -18,7 +18,7 @@ export default function Home() {
         <section className="form-panel">
           <div className="panel-heading"><div><p className="eyebrow">New request</p><h2>Payment details</h2></div><span className="step">Step 1 of 1</span></div>
           <RequestForm />
-          <p className="fine-print">Request data is stored in the share link. Arc PayLink never asks for a private key or seed phrase.</p>
+          <p className="fine-print">Request status is stored privately while the creator capability stays in this browser. Arc PayLink never asks for a private key or seed phrase.</p>
         </section>
       </section>
       <footer><span>Built for Arc</span><span>USDC · Testnet only</span></footer>
