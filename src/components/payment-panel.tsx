@@ -14,7 +14,7 @@ import { saveSettlementRecord, saveSettlementRecordOnServer, settlementRecordJso
 
 type Status = "ready" | "connected" | "pending" | "bridge_processing" | "paid" | "settled" | "failed";
 
-export function PaymentPanel({ title, amount, recipient, route, obligation }: PaymentRequest) {
+export function PaymentPanel({ title, amount, recipient, route, obligation, requestId }: PaymentRequest & { requestId?: string }) {
   const [status, setStatus] = useState<Status>("ready");
   const [account, setAccount] = useState<Address>();
   const [message, setMessage] = useState("Connect an Arc wallet to continue.");
@@ -40,6 +40,7 @@ export function PaymentPanel({ title, amount, recipient, route, obligation }: Pa
 
   async function pay() {
     try {
+      if (requestId) await assertManagedPayable(requestId);
       if (route === "bridge") {
         setStatus("bridge_processing");
         setMessage("Approve the Circle Bridge transactions. Waiting for the destination mint on Arc.");
@@ -66,6 +67,7 @@ export function PaymentPanel({ title, amount, recipient, route, obligation }: Pa
           setSharedAuditStatus(undefined);
           void saveSettlementRecordOnServer(settled.correlation).then(setSharedAuditStatus);
         }
+        if (requestId) await recordManagedSettlement(requestId, settled.mintTransactionHash, settled.correlation?.correlationId);
         return;
       }
       setStatus("pending");
@@ -79,6 +81,7 @@ export function PaymentPanel({ title, amount, recipient, route, obligation }: Pa
       if (!hash) throw new Error("Circle App Kit completed without returning a transaction hash.");
       setMessage("Transaction submitted. Verifying the Arc receipt and exact USDC transfer.");
       const verified = await verifyPaymentReceipt(client, hash, { recipient, amount });
+      if (requestId) await recordManagedSettlement(requestId, hash);
       setResult(verified);
       setStatus("paid");
       setMessage("Payment verified on Arc Testnet.");
@@ -87,6 +90,10 @@ export function PaymentPanel({ title, amount, recipient, route, obligation }: Pa
       setMessage(error instanceof Error ? error.message : "Payment failed.");
     }
   }
+
+  async function assertManagedPayable(id: string) { const response = await fetch(`/api/requests/${id}`, { cache: "no-store" }); const result = await response.json() as { view?: { status?: string } }; if (!response.ok || result.view?.status !== "pending") throw new Error("This request is no longer pending and cannot be paid."); }
+
+  async function recordManagedSettlement(id: string, transactionHash: Hash, correlationId?: Hash) { const response = await fetch(`/api/requests/${id}/settle`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ transactionHash, correlationId }) }); if (!response.ok) { const result = await response.json() as { error?: string }; throw new Error(result.error ?? "The payment succeeded but request settlement visibility could not be updated."); } }
 
   function downloadAuditRecord() {
     if (!settlement?.correlation) return;

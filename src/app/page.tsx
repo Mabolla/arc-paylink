@@ -6,7 +6,7 @@ export default function Home() {
     <main>
       <nav className="topbar">
         <Link className="brand" href="/"><span className="brand-mark">A</span>Arc PayLink <sup>v3</sup></Link>
-        <div className="top-actions"><Link href="/test-recipient">Prepare tester PayLink</Link><Link href="/audit">Verify settlement</Link><span className="network-pill"><i /> Arc Testnet</span></div>
+        <div className="top-actions"><Link href="/requests">My Requests</Link><Link href="/test-recipient">Prepare tester PayLink</Link><Link href="/audit">Verify settlement</Link><span className="network-pill"><i /> Arc Testnet</span></div>
       </nav>
       <section className="home-grid">
         <div className="intro">
