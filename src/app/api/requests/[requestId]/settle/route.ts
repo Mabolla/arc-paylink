@@ -3,7 +3,7 @@ import { createPublicClient, http, isHash } from "viem";
 import { NextResponse } from "next/server";
 import { arcChain } from "@/lib/arc";
 import { requestView } from "@/lib/request-lifecycle";
-import { appendRequestEvent, loadRequestRecord } from "@/lib/server-request-store";
+import { appendRequestEvent, claimSettlementTransaction, loadRequestRecord } from "@/lib/server-request-store";
 import { vercelRequestStore } from "@/lib/vercel-request-store";
 import { verifyPaymentReceipt } from "@/lib/verify-payment";
 import { findSettlementRecord } from "@/lib/server-settlement-store";
@@ -41,6 +41,7 @@ export async function POST(request: Request, context: { params: Promise<{ reques
         if (!terminalAt || Number(block.timestamp) * 1000 >= Date.parse(terminalAt)) throw new Error("A revoked or replaced request cannot accept a later settlement.");
       }
     }
+    await claimSettlementTransaction(requestId, input.transactionHash, store);
     await appendRequestEvent(requestId, { type: "settled", createdAt: new Date().toISOString(), transactionHash: input.transactionHash }, `settled-${input.transactionHash.slice(2)}`, store);
     const updated = await loadRequestRecord(requestId, store);
     return NextResponse.json({ view: requestView(updated!.record, updated!.events) });
