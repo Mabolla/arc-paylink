@@ -1,6 +1,6 @@
 import type { BridgeResult } from "@circle-fin/bridge-kit";
 import type { TransactionReceipt } from "viem";
-import { ARC_USDC_ADDRESS, arcTestnet } from "./arc";
+import { ARC_USDC_ADDRESS, arcChain } from "./arc";
 import type { PaymentRequest } from "./payment-request";
 import { verifyBridgeSettlement, type BridgeSettlementVerification } from "./verify-bridge-settlement";
 import { classifySettlement, type SettlementClassification } from "./settlement-state";
@@ -30,7 +30,7 @@ export function settlePaymentRequest({
     expectedRecipient: request.recipient,
     expectedAmount: request.amount,
     expectedToken: ARC_USDC_ADDRESS,
-    chain: arcTestnet,
+    chain: arcChain,
   });
   const classification = classifySettlement({
     expectedRecipient: request.recipient,

@@ -1,12 +1,17 @@
 import { isAddress, isHex, keccak256 } from "viem";
 import { NextResponse } from "next/server";
 import { verifyClaimContext, type VerifiedClaimContext } from "@/lib/claim-validation";
+import { ARC_CHAIN_ID, ARC_USDC_ADDRESS, IS_ARC_MAINNET } from "@/lib/arc";
 
 const CIRCLE_BASE_URL = "https://api.circle.com";
-const ARC_CHAIN_ID = 5_042_002;
-const ARC_BLOCKCHAIN = "ARC-TESTNET";
-const ARC_USDC = "0x3600000000000000000000000000000000000000";
 const CLAIM_WINDOW_SECONDS = 15 * 60;
+
+function circleArcBlockchain() {
+  const configured = process.env.CIRCLE_ARC_BLOCKCHAIN?.trim();
+  if (configured) return configured;
+  if (IS_ARC_MAINNET) throw new Error("Circle Arc mainnet blockchain identifier is not configured.");
+  return "ARC-TESTNET";
+}
 
 type CircleAction =
   | "createDeviceToken"
@@ -86,7 +91,7 @@ async function assertWalletOwnership(userToken: string, walletId: string, wallet
     return wallet.id === walletId
       && typeof wallet.address === "string"
       && wallet.address.toLowerCase() === walletAddress.toLowerCase()
-      && wallet.blockchain === ARC_BLOCKCHAIN;
+      && wallet.blockchain === circleArcBlockchain();
   });
   if (!ownsWallet) throw new Error("Circle session does not own the recipient wallet.");
   return null;
@@ -115,7 +120,7 @@ export async function POST(request: Request) {
         body: JSON.stringify({
           idempotencyKey: crypto.randomUUID(),
           accountType: "SCA",
-          blockchains: [ARC_BLOCKCHAIN],
+          blockchains: [circleArcBlockchain()],
         }),
       }));
     }
@@ -146,7 +151,7 @@ export async function POST(request: Request) {
         body: JSON.stringify({
           idempotencyKey: crypto.randomUUID(),
           walletId,
-          contractAddress: ARC_USDC,
+          contractAddress: ARC_USDC_ADDRESS,
           abiFunctionSignature: "transfer(address,uint256)",
           abiParameters: [walletAddress, "0"],
           feeLevel: "MEDIUM",

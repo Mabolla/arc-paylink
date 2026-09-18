@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { PaymentPanel } from "@/components/payment-panel";
 import { createPaymentRequest } from "@/lib/payment-request";
+import { ARC_NETWORK_NAME, IS_ARC_MAINNET } from "@/lib/arc";
 
 export default async function PayPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const params = await searchParams;
@@ -19,9 +20,9 @@ export default async function PayPage({ searchParams }: { searchParams: Promise<
   }
   return (
     <main>
-      <nav className="topbar"><Link className="brand" href="/"><span className="brand-mark">A</span>Arc PayLink <sup>v3</sup></Link><span className="network-pill"><i /> Arc Testnet</span></nav>
+      <nav className="topbar"><Link className="brand" href="/"><span className="brand-mark">A</span>Arc PayLink <sup>v3</sup></Link><span className="network-pill"><i /> {ARC_NETWORK_NAME}</span></nav>
       <div className="pay-layout"><PaymentPanel {...request} /></div>
-      <footer><span>Verified settlement on Arc</span><span>USDC · Testnet only</span></footer>
+      <footer><span>Verified settlement on Arc</span><span>USDC · {IS_ARC_MAINNET ? "Mainnet pilot" : "Testnet only"}</span></footer>
     </main>
   );
 }

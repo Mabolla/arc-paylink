@@ -1,12 +1,13 @@
 import Link from "next/link";
 import { TesterPayLinkCreator } from "@/components/tester-paylink-creator";
+import { ARC_NETWORK_NAME, IS_ARC_MAINNET } from "@/lib/arc";
 
 export default function TestRecipientPage() {
   return (
     <main>
       <nav className="topbar">
         <Link className="brand" href="/"><span className="brand-mark">A</span>Arc PayLink <sup>v3</sup></Link>
-        <span className="network-pill"><i /> Arc Testnet</span>
+        <span className="network-pill"><i /> {ARC_NETWORK_NAME}</span>
       </nav>
       <div className="claim-layout">
         <section className="claim-intro">
@@ -17,7 +18,7 @@ export default function TestRecipientPage() {
         </section>
         <TesterPayLinkCreator />
       </div>
-      <footer><span>Controlled external testing</span><span>USDC · Testnet only</span></footer>
+      <footer><span>Controlled external testing</span><span>USDC · {IS_ARC_MAINNET ? "Mainnet pilot" : "Testnet only"}</span></footer>
     </main>
   );
 }

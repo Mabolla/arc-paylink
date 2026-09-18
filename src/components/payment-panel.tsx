@@ -3,9 +3,9 @@
 import { useMemo, useState } from "react";
 import { AppKit } from "@circle-fin/app-kit";
 import { createViemAdapterFromProvider } from "@circle-fin/adapter-viem-v2";
-import { createPublicClient, formatUnits, http, type Address, type Hash } from "viem";
-import { ARC_EXPLORER_URL, arcTestnet } from "@/lib/arc";
-import { connectWallet, ensureArcTestnet, getBrowserProvider } from "@/lib/browser-wallet";
+import { createPublicClient, createWalletClient, custom, erc20Abi, formatUnits, http, parseUnits, type Address, type Hash } from "viem";
+import { ARC_EXPLORER_URL, ARC_NETWORK_NAME, ARC_USDC_ADDRESS, IS_ARC_MAINNET, arcChain } from "@/lib/arc";
+import { connectWallet, ensureArcNetwork, getBrowserProvider } from "@/lib/browser-wallet";
 import { executeBridgePayment } from "@/lib/bridge-payment";
 import type { PaymentRequest } from "@/lib/payment-request";
 import { settlePaymentRequest, type PaymentSettlementResult } from "@/lib/settle-payment-request";
@@ -22,16 +22,16 @@ export function PaymentPanel({ title, amount, recipient, route, obligation, requ
   const [settlement, setSettlement] = useState<PaymentSettlementResult>();
   const [auditStatus, setAuditStatus] = useState<StoreResult | "unavailable">();
   const [sharedAuditStatus, setSharedAuditStatus] = useState<SharedStoreResult>();
-  const client = useMemo(() => createPublicClient({ chain: arcTestnet, transport: http() }), []);
+  const client = useMemo(() => createPublicClient({ chain: arcChain, transport: http() }), []);
 
   async function connect() {
     try {
       const provider = getBrowserProvider();
       const address = await connectWallet(provider);
-      if (route === "arc") await ensureArcTestnet(provider);
+      if (route === "arc") await ensureArcNetwork(provider);
       setAccount(address);
       setStatus("connected");
-      setMessage(route === "arc" ? "Wallet connected on Arc Testnet. Review and submit the payment." : "Wallet connected. Review the Base Sepolia bridge payment.");
+      setMessage(route === "arc" ? `Wallet connected on ${ARC_NETWORK_NAME}. Review and submit the payment.` : "Wallet connected. Review the Base Sepolia bridge payment.");
     } catch (error) {
       setStatus("failed");
       setMessage(error instanceof Error ? error.message : "Wallet connection failed.");
@@ -49,7 +49,7 @@ export function PaymentPanel({ title, amount, recipient, route, obligation, requ
         if (!mint?.txHash) throw new Error("Circle Bridge completed without a destination mint transaction hash.");
         setMessage("Destination mint submitted. Verifying the exact Arc settlement.");
         const destinationReceipt = await client.waitForTransactionReceipt({ hash: mint.txHash as Hash });
-        const settled = settlePaymentRequest({ request: { title, amount, recipient, route, obligation }, bridgeResult, destinationReceipt });
+        const settled = settlePaymentRequest({ request: { title, amount, recipient, route, obligation, chainId: arcChain.id }, bridgeResult, destinationReceipt });
         let saved: StoreResult | "unavailable" | undefined;
         if (settled.correlation) {
           try {
@@ -62,7 +62,7 @@ export function PaymentPanel({ title, amount, recipient, route, obligation, requ
         setSettlement(settled);
         setResult({ transactionHash: settled.mintTransactionHash, blockNumber: settled.blockNumber, sender: settled.sender, recipient: settled.recipient, amountBaseUnits: settled.amountBaseUnits });
         setStatus("settled");
-        setMessage(saved === "conflict" ? "Payment settled, but a conflicting local audit record requires manual review." : saved === "unavailable" ? "Payment settled; download the audit record because browser persistence is unavailable." : settled.paymentState === "fee-adjusted" ? "Obligation settled on Arc with a recorded bridge fee." : "Obligation settled and verified on Arc Testnet.");
+        setMessage(saved === "conflict" ? "Payment settled, but a conflicting local audit record requires manual review." : saved === "unavailable" ? "Payment settled; download the audit record because browser persistence is unavailable." : settled.paymentState === "fee-adjusted" ? "Obligation settled on Arc with a recorded bridge fee." : `Obligation settled and verified on ${ARC_NETWORK_NAME}.`);
         if (settled.correlation) {
           setSharedAuditStatus(undefined);
           void saveSettlementRecordOnServer(settled.correlation).then(setSharedAuditStatus);
@@ -73,18 +73,30 @@ export function PaymentPanel({ title, amount, recipient, route, obligation, requ
       setStatus("pending");
       setMessage("Approve the USDC transfer in your wallet. Then wait for Arc confirmation.");
       const provider = getBrowserProvider();
-      await ensureArcTestnet(provider);
-      const adapter = await createViemAdapterFromProvider({ provider });
-      const kit = new AppKit();
-      const send = await kit.send({ from: { adapter, chain: "Arc_Testnet" }, to: recipient, amount, token: "USDC" });
-      const hash = send.txHash as Hash | undefined;
+      await ensureArcNetwork(provider);
+      let hash: Hash | undefined;
+      if (IS_ARC_MAINNET) {
+        if (!account) throw new Error("Connect an Arc mainnet wallet before paying.");
+        const wallet = createWalletClient({ account, chain: arcChain, transport: custom(provider) });
+        hash = await wallet.writeContract({
+          address: ARC_USDC_ADDRESS,
+          abi: erc20Abi,
+          functionName: "transfer",
+          args: [recipient, parseUnits(amount, 6)],
+        });
+      } else {
+        const adapter = await createViemAdapterFromProvider({ provider });
+        const kit = new AppKit();
+        const send = await kit.send({ from: { adapter, chain: "Arc_Testnet" }, to: recipient, amount, token: "USDC" });
+        hash = send.txHash as Hash | undefined;
+      }
       if (!hash) throw new Error("Circle App Kit completed without returning a transaction hash.");
       setMessage("Transaction submitted. Verifying the Arc receipt and exact USDC transfer.");
       const verified = await verifyPaymentReceipt(client, hash, { recipient, amount });
       if (requestId) await recordManagedSettlement(requestId, hash);
       setResult(verified);
       setStatus("paid");
-      setMessage("Payment verified on Arc Testnet.");
+      setMessage(`Payment verified on ${ARC_NETWORK_NAME}.`);
     } catch (error) {
       setStatus("failed");
       setMessage(error instanceof Error ? error.message : "Payment failed.");
@@ -114,7 +126,7 @@ export function PaymentPanel({ title, amount, recipient, route, obligation, requ
       <h1 className="payment-title">{title}</h1>
       <div className="payment-amount"><strong>{amount}</strong><span>USDC</span></div>
       <dl className="payment-details">
-        <div><dt>Route</dt><dd>{route === "bridge" ? "Base Sepolia → Arc Testnet" : "Arc Testnet"}</dd></div>
+        <div><dt>Route</dt><dd>{route === "bridge" ? "Base Sepolia → Arc Testnet" : ARC_NETWORK_NAME}</dd></div>
         <div><dt>Recipient</dt><dd className="mono">{recipient.slice(0, 8)}…{recipient.slice(-6)}</dd></div>
         {obligation && <div><dt>{obligation.kind.replace("-", " ")}</dt><dd className="mono">{obligation.id}</dd></div>}
         {account && <div><dt>Paying from</dt><dd className="mono">{account.slice(0, 8)}…{account.slice(-6)}</dd></div>}

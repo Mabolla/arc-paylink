@@ -1,7 +1,7 @@
 import { get, list } from "@vercel/blob";
 import { createPublicClient, http, isHash } from "viem";
 import { NextResponse } from "next/server";
-import { arcTestnet } from "@/lib/arc";
+import { arcChain } from "@/lib/arc";
 import { requestView } from "@/lib/request-lifecycle";
 import { appendRequestEvent, loadRequestRecord } from "@/lib/server-request-store";
 import { vercelRequestStore } from "@/lib/vercel-request-store";
@@ -33,7 +33,7 @@ export async function POST(request: Request, context: { params: Promise<{ reques
       const correlation = validateSettlementCorrelationRecord(shared);
       if (!['settled', 'fee-adjusted'].includes(correlation.settlement.state) || correlation.destination.mintTransactionHash.toLowerCase() !== input.transactionHash.toLowerCase()) throw new Error("Bridge settlement does not match this request.");
     } else {
-      const client = createPublicClient({ chain: arcTestnet, transport: http() });
+      const client = createPublicClient({ chain: arcChain, transport: http() });
       const verified = await verifyPaymentReceipt(client, input.transactionHash, { recipient: result.record.request.recipient, amount: result.record.request.amount });
       if (current.status !== "pending") {
         const terminalAt = result.events.find((event) => event.type === "revoked" || event.type === "replaced")?.createdAt;

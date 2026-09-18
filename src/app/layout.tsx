@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Arc PayLink v3.1",
-  description: "Create, manage, settle, audit, and safely recover obligation-aware USDC payments on Arc Testnet.",
+  description: "Create, manage, settle, audit, and safely recover obligation-aware USDC payments on Arc.",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

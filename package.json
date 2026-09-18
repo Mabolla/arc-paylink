@@ -1,7 +1,7 @@
 {
   "name": "arc-builder",
   "version": "1.0.0",
-  "description": "Arc PayLink v3 creates obligation-aware USDC payment requests with walletless recipient claims, private cross-chain audit records, and controlled non-executable recovery plans on Arc Testnet.",
+  "description": "Arc PayLink creates obligation-aware USDC payment requests with verifiable settlement, walletless claims, and controlled non-executable recovery on Arc.",
   "scripts": {
     "dev": "next dev --webpack",
     "build": "next build",
@@ -12,6 +12,7 @@
     "contracts:compile": "hardhat compile",
     "contracts:test": "hardhat test",
     "contracts:deploy:arc": "hardhat run scripts/deploy-escrow.cjs --network arcTestnet",
+    "contracts:deploy:arc-mainnet": "hardhat run scripts/deploy-mainnet-escrow.cjs --network arcMainnet",
     "contracts:create-test-escrow": "hardhat run scripts/create-test-escrow.cjs --network arcTestnet",
     "contracts:create-fund-circle-escrow": "hardhat run scripts/create-fund-circle-escrow.cjs --network arcTestnet",
     "contracts:fund-test-escrow": "node scripts/fund-test-escrow.cjs",

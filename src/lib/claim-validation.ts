@@ -9,7 +9,7 @@ import {
   type Hex,
 } from "viem";
 import { ARC_PAYLINK_FACTORY } from "@/lib/claim-package";
-import { ARC_RPC_URL, ARC_USDC_ADDRESS, arcTestnet } from "@/lib/arc";
+import { ARC_NETWORK_NAME, ARC_RPC_URL, ARC_USDC_ADDRESS, arcChain } from "@/lib/arc";
 
 const factoryAbi = parseAbi(["function escrows(bytes32 paymentId) view returns (address)"]);
 const escrowAbi = parseAbi([
@@ -30,7 +30,7 @@ type ContractReader = {
 };
 
 const defaultReader = createPublicClient({
-  chain: arcTestnet,
+  chain: arcChain,
   transport: http(ARC_RPC_URL),
 }) as unknown as ContractReader;
 
@@ -97,7 +97,7 @@ export async function verifyClaimContext(
   ]);
 
   if (typeof token !== "string" || token.toLowerCase() !== ARC_USDC_ADDRESS.toLowerCase()) {
-    throw new Error("Escrow payment token is not Arc Testnet USDC.");
+    throw new Error(`Escrow payment token is not ${ARC_NETWORK_NAME} USDC.`);
   }
   if (amount !== amountBaseUnits) throw new Error("Claim amount does not match the escrow.");
   if (typeof expiry !== "bigint" || expiry !== BigInt(packageExpiry)) throw new Error("Claim expiry does not match the escrow.");

@@ -3,6 +3,7 @@
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { createPaymentRequest } from "@/lib/payment-request";
+import { ARC_NETWORK_NAME, IS_ARC_MAINNET } from "@/lib/arc";
 
 export function RequestForm() {
   const router = useRouter();
@@ -51,8 +52,8 @@ export function RequestForm() {
       <label>
         <span>Payment route</span>
         <select name="route" defaultValue="arc">
-          <option value="arc">Arc Testnet wallet</option>
-          <option value="bridge">Base Sepolia via Circle Bridge</option>
+          <option value="arc">{ARC_NETWORK_NAME} wallet</option>
+          {!IS_ARC_MAINNET && <option value="bridge">Base Sepolia via Circle Bridge</option>}
         </select>
       </label>
       <div className="field-row">
@@ -60,8 +61,8 @@ export function RequestForm() {
           <span>Business obligation</span>
           <select name="obligationKind" defaultValue="invoice" required>
             <option value="invoice">Invoice</option>
-            <option value="milestone">Milestone</option>
-            <option value="agent-task">Agent task</option>
+            {!IS_ARC_MAINNET && <option value="milestone">Milestone</option>}
+            {!IS_ARC_MAINNET && <option value="agent-task">Agent task</option>}
           </select>
         </label>
         <label>

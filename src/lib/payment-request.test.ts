@@ -1,10 +1,11 @@
 import { describe, expect, it } from "vitest";
 import { createPaymentRequest, requestToSearchParams } from "./payment-request";
+import { ARC_CHAIN_ID } from "./arc";
 
 describe("payment requests", () => {
   it("creates a normalized shareable request", () => {
     const request = createPaymentRequest({ title: "  Design work ", amount: "10.500000", recipient: "0x0000000000000000000000000000000000000001" });
-    expect(request).toEqual({ title: "Design work", amount: "10.5", recipient: "0x0000000000000000000000000000000000000001", route: "arc" });
+    expect(request).toEqual({ title: "Design work", amount: "10.5", recipient: "0x0000000000000000000000000000000000000001", route: "arc", chainId: ARC_CHAIN_ID, obligation: undefined });
     expect(requestToSearchParams(request).get("amount")).toBe("10.5");
   });
   it("preserves an explicit bridge route", () => {

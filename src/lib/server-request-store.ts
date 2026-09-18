@@ -1,4 +1,5 @@
 import type { ManagedRequest, RequestEvent } from "./request-lifecycle";
+import { ARC_CHAIN_ID } from "./arc";
 
 export type RequestStore = {
   list(prefix: string): Promise<string[]>;
@@ -6,7 +7,7 @@ export type RequestStore = {
   put(pathname: string, body: string): Promise<void>;
 };
 
-const root = (id: string) => `requests/v1/${id}/`;
+const root = (id: string) => `requests/v1/chain-${ARC_CHAIN_ID}/${id}/`;
 
 export async function createRequestRecord(record: ManagedRequest, store: RequestStore): Promise<void> {
   const path = `${root(record.requestId)}request.json`;

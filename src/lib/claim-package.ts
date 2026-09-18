@@ -1,10 +1,17 @@
-import { getAddress, isAddress, isHex, keccak256, type Address, type Hex } from "viem";
-import { ARC_CHAIN_ID } from "@/lib/arc";
+import { getAddress, isAddress, isHex, keccak256, zeroAddress, type Address, type Hex } from "viem";
+import { ARC_CHAIN_ID, ARC_NETWORK_NAME, IS_ARC_MAINNET } from "@/lib/arc";
 
-export const ARC_PAYLINK_FACTORY = "0x8C377F5Bb508ece6De8090209619122edd4bC453" as const;
+const configuredFactory = process.env.NEXT_PUBLIC_ARC_PAYLINK_FACTORY_ADDRESS;
+export const ARC_PAYLINK_FACTORY = getAddress(
+  configuredFactory && isAddress(configuredFactory)
+    ? configuredFactory
+    : IS_ARC_MAINNET
+      ? zeroAddress
+      : "0x8C377F5Bb508ece6De8090209619122edd4bC453",
+);
 
 export type PrivateClaimPackage = {
-  network: "Arc Testnet";
+  network: string;
   chainId: typeof ARC_CHAIN_ID;
   factory: Address;
   paymentId: Hex;
@@ -37,7 +44,9 @@ export function parsePrivateClaimPackage(value: unknown): PrivateClaimPackage {
   if (!value || typeof value !== "object") throw new Error("This is not a valid Arc PayLink claim package.");
   const input = value as Record<string, unknown>;
   const chainId = Number(input.chainId);
-  if (chainId !== ARC_CHAIN_ID) throw new Error("This package is not for Arc Testnet.");
+  if (chainId !== ARC_CHAIN_ID) throw new Error(`This package is not for ${ARC_NETWORK_NAME}.`);
+
+  if (ARC_PAYLINK_FACTORY === zeroAddress) throw new Error("Arc PayLink mainnet factory is not configured.");
 
   const factory = address(input.factory, "factory");
   if (factory.toLowerCase() !== ARC_PAYLINK_FACTORY.toLowerCase()) {
@@ -57,7 +66,7 @@ export function parsePrivateClaimPackage(value: unknown): PrivateClaimPackage {
   if (!Number.isFinite(Date.parse(expiry))) throw new Error("Claim package expiry is invalid.");
 
   return {
-    network: "Arc Testnet",
+    network: ARC_NETWORK_NAME,
     chainId: ARC_CHAIN_ID,
     factory,
     paymentId: bytes32(input.paymentId, "paymentId"),

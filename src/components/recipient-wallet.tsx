@@ -8,6 +8,7 @@ import {
   publicClaimContext,
   type PrivateClaimPackage,
 } from "@/lib/claim-package";
+import { ARC_NETWORK_NAME } from "@/lib/arc";
 
 const appId = process.env.NEXT_PUBLIC_CIRCLE_APP_ID ?? "";
 const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? "";
@@ -61,7 +62,7 @@ export function RecipientWallet() {
   const loadWallet = useCallback(async (userToken: string) => {
     const result = await circleAction<{ wallets?: CircleWallet[] }>({ action: "listWallets", userToken });
     const arcWallet = result.wallets?.find((item) => item.blockchain === "ARC-TESTNET") ?? result.wallets?.[0];
-    if (!arcWallet) throw new Error("Circle did not return an Arc Testnet wallet.");
+    if (!arcWallet) throw new Error(`Circle did not return an ${ARC_NETWORK_NAME} wallet.`);
     setWallet(arcWallet);
     setStep("complete");
     setMessage("Your recipient wallet is ready for this PayLink.");
@@ -347,7 +348,7 @@ export function RecipientWallet() {
     if (!login || !wallet || !activeClaim || !signature || !deadline) return;
     try {
       setClaimStep("preparing-claim");
-      setClaimMessage("Preparing the final Arc Testnet transaction.");
+      setClaimMessage(`Preparing the final ${ARC_NETWORK_NAME} transaction.`);
       const result = await circleAction<{ challengeId?: string }>({
         action: "executeClaim",
         userToken: login.userToken,
@@ -390,7 +391,7 @@ export function RecipientWallet() {
       claimSignatureRef.current = null;
       if (txHash) setClaimTxHash(txHash);
       setClaimStep("claimed");
-      setClaimMessage(`Claim submitted on Arc Testnet. Your ${claimPackage?.amountUsdc ?? "USDC"} is on the way.`);
+      setClaimMessage(`Claim submitted on ${ARC_NETWORK_NAME}. Your ${claimPackage?.amountUsdc ?? "USDC"} is on the way.`);
     });
   }
 

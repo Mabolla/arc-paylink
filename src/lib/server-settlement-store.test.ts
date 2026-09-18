@@ -34,7 +34,7 @@ describe("persistSettlementRecord", () => {
     const put = vi.fn().mockResolvedValue(undefined);
     expect(await persistSettlementRecord(record(), { list: vi.fn().mockResolvedValue([]), put })).toBe("created");
     expect(put).toHaveBeenCalledOnce();
-    expect(put.mock.calls[0][0]).toMatch(/^settlements\/v1\/0x[0-9a-f]{64}\/[0-9a-f]{64}\.json$/);
+    expect(put.mock.calls[0][0]).toMatch(/^settlements\/v1\/chain-5042002\/0x[0-9a-f]{64}\/[0-9a-f]{64}\.json$/);
   });
 
   it("is idempotent for identical content and preserves conflicts", async () => {

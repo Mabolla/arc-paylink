@@ -15,8 +15,8 @@ import {
   type Hex,
 } from "viem";
 import { ARC_PAYLINK_FACTORY, type PrivateClaimPackage } from "@/lib/claim-package";
-import { ARC_CHAIN_ID, ARC_EXPLORER_URL, ARC_USDC_ADDRESS, arcTestnet } from "@/lib/arc";
-import { connectWallet, ensureArcTestnet, getBrowserProvider } from "@/lib/browser-wallet";
+import { ARC_CHAIN_ID, ARC_EXPLORER_URL, ARC_NETWORK_NAME, ARC_USDC_ADDRESS, arcChain } from "@/lib/arc";
+import { connectWallet, ensureArcNetwork, getBrowserProvider } from "@/lib/browser-wallet";
 
 const TEST_AMOUNT_BASE_UNITS = 10_000n;
 const TEST_AMOUNT_USDC = "0.01";
@@ -37,17 +37,17 @@ function errorMessage(value: unknown) {
 export function TesterPayLinkCreator() {
   const [stage, setStage] = useState<Stage>("ready");
   const [account, setAccount] = useState<Address>();
-  const [message, setMessage] = useState("Connect a funded Arc Testnet wallet to prepare one private tester package.");
+  const [message, setMessage] = useState(`Connect a funded ${ARC_NETWORK_NAME} wallet to prepare one private tester package.`);
   const [claimPackage, setClaimPackage] = useState<PrivateClaimPackage>();
   const [creationHash, setCreationHash] = useState<Hash>();
   const [fundingHash, setFundingHash] = useState<Hash>();
-  const publicClient = useMemo(() => createPublicClient({ chain: arcTestnet, transport: http() }), []);
+  const publicClient = useMemo(() => createPublicClient({ chain: arcChain, transport: http() }), []);
 
   async function connect() {
     try {
       const provider = getBrowserProvider();
       const address = await connectWallet(provider);
-      await ensureArcTestnet(provider);
+      await ensureArcNetwork(provider);
       setAccount(address);
       setStage("connected");
       setMessage("Wallet connected. Creating this package will fund an isolated escrow with 0.01 testnet USDC.");
@@ -61,8 +61,8 @@ export function TesterPayLinkCreator() {
     if (!account) return;
     try {
       const provider = getBrowserProvider();
-      await ensureArcTestnet(provider);
-      const walletClient = createWalletClient({ account, chain: arcTestnet, transport: custom(provider) });
+      await ensureArcNetwork(provider);
+      const walletClient = createWalletClient({ account, chain: arcChain, transport: custom(provider) });
       const secret = bytesToHex(crypto.getRandomValues(new Uint8Array(32)));
       const secretHash = keccak256(secret);
       const latestBlock = await publicClient.getBlock();
@@ -108,7 +108,7 @@ export function TesterPayLinkCreator() {
       if (fundReceipt.status !== "success") throw new Error("Arc PayLink escrow funding failed.");
 
       const portablePackage: PrivateClaimPackage = {
-        network: "Arc Testnet",
+        network: ARC_NETWORK_NAME,
         chainId: ARC_CHAIN_ID,
         factory: ARC_PAYLINK_FACTORY,
         paymentId: created.paymentId,
@@ -145,7 +145,7 @@ export function TesterPayLinkCreator() {
         <div><p className="eyebrow">Controlled testing</p><h2 id="tester-heading">Prepare one tester PayLink</h2></div>
         <span className="step">0.01 USDC</span>
       </div>
-      <p className="wallet-copy">Create and fund one isolated Arc Testnet escrow, then download its single-use private recipient package. Your browser wallet signs both transactions; Arc PayLink never receives its key.</p>
+      <p className="wallet-copy">Create and fund one isolated {ARC_NETWORK_NAME} escrow, then download its single-use private recipient package. Your browser wallet signs both transactions; Arc PayLink never receives its key.</p>
       {account && <dl className="payment-details wallet-details">
         <div><dt>Sender</dt><dd className="mono">{account.slice(0, 8)}…{account.slice(-6)}</dd></div>
         <div><dt>Test amount</dt><dd>{TEST_AMOUNT_USDC} USDC</dd></div>
@@ -160,7 +160,7 @@ export function TesterPayLinkCreator() {
       {claimPackage && <button className="primary-button full" onClick={downloadPackage}>Download private tester package <span aria-hidden>↓</span></button>}
       {creationHash && <a className="explorer-link" href={`${ARC_EXPLORER_URL}/tx/${creationHash}`} target="_blank" rel="noreferrer">View escrow creation on ArcScan ↗</a>}
       {fundingHash && <a className="explorer-link" href={`${ARC_EXPLORER_URL}/tx/${fundingHash}`} target="_blank" rel="noreferrer">View escrow funding on ArcScan ↗</a>}
-      <p className="security-note">Testnet only. Never post the downloaded package publicly; whoever holds it can claim that one escrow.</p>
+      <p className="security-note">Controlled pilot only. Never post the downloaded package publicly; whoever holds it can claim that one escrow.</p>
     </section>
   );
 }
