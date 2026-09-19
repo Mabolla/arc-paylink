@@ -92,6 +92,21 @@ function parseStoredReceipt(value: string | null): ConfirmedClaimReceipt | null 
   }
 }
 
+function receiptFromUrl() {
+  const url = new URL(window.location.href);
+  const encoded = url.searchParams.get("receipt");
+  if (!encoded) return null;
+  try {
+    const base64 = encoded.replace(/-/g, "+").replace(/_/g, "/");
+    const padded = base64.padEnd(Math.ceil(base64.length / 4) * 4, "=");
+    return parseStoredReceipt(atob(padded));
+  } catch {
+    return null;
+  } finally {
+    window.history.replaceState({}, "", url.pathname);
+  }
+}
+
 async function circleAction<T>(body: Record<string, unknown>): Promise<T> {
   const response = await fetch("/api/circle", {
     method: "POST",
@@ -125,7 +140,9 @@ export function RecipientWallet() {
     let active = true;
 
     async function restoreReceipt() {
-      const saved = parseStoredReceipt(localStorage.getItem(CLAIM_RECEIPT_KEY));
+      const recovered = receiptFromUrl();
+      if (recovered) localStorage.setItem(CLAIM_RECEIPT_KEY, JSON.stringify(recovered));
+      const saved = recovered ?? parseStoredReceipt(localStorage.getItem(CLAIM_RECEIPT_KEY));
       if (!saved) {
         localStorage.removeItem(CLAIM_RECEIPT_KEY);
         if (active) setRestoringReceipt(false);
