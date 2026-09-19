@@ -1,6 +1,6 @@
 # Arc PayLink Mainnet Microgrants Evidence
 
-Status: **CONDITIONAL — mainnet pilot implementation in progress**
+Status: **CONDITIONAL — contracts deployed; application and pilot evidence in progress**
 
 This document tracks the isolated Arc mainnet pilot. It does not replace or modify the preserved V3 and V3.1 testnet evidence.
 
@@ -44,8 +44,8 @@ The mainnet application must not be described as live until every required gate 
 | Testnet regression suite | PASS | 80 Vitest tests and 8 Hardhat tests |
 | Mainnet production build | PASS | `NEXT_PUBLIC_ARC_NETWORK=mainnet npm run build` |
 | Mainnet deployment safety latch | PASS | Deployment refuses without the explicit confirmation value |
-| Factory and implementation deployment | PENDING | Explorer links and deployment JSON |
-| Source/bytecode verification | PENDING | Explorer verification links and bytecode match |
+| Factory and implementation deployment | PASS | Factory `0x19fbf0B85e66d68D312cD18D04A1a789107387FF`; transaction `0x737e467a112113d987ca0f845f256d73a1aa9f82c76655f87450898866cf4c7f`; block `21697256`; `deployments/arc-mainnet-escrow.json` |
+| Source/bytecode verification | PASS | `npm run contracts:verify:arc-mainnet` matches the implementation exactly and the factory outside compiler-linked immutable slots; getters confirm the implementation and Arc USDC addresses |
 | Exact direct-USDC settlement | PENDING | Transaction hash and managed request status |
 | Pending revoke | PENDING | Request ID and lifecycle evidence |
 | Revoke-and-replace | PENDING | Old and replacement obligation IDs |
@@ -72,4 +72,3 @@ The mainnet application must not be described as live until every required gate 
 6. Revoke and revoke-and-replace lifecycle exports.
 7. Walletless claim transaction and redacted Circle SCA evidence.
 8. Test output and mainnet smoke-test record.
-

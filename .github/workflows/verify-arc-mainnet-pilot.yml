@@ -16,7 +16,7 @@ jobs:
     timeout-minutes: 15
     env:
       NEXT_PUBLIC_ARC_NETWORK: mainnet
-      NEXT_PUBLIC_ARC_PAYLINK_FACTORY_ADDRESS: "0x1111111111111111111111111111111111111111"
+      NEXT_PUBLIC_ARC_PAYLINK_FACTORY_ADDRESS: "0x19fbf0B85e66d68D312cD18D04A1a789107387FF"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -29,6 +29,7 @@ jobs:
         env:
           NEXT_PUBLIC_ARC_NETWORK: testnet
       - run: npm run build
+      - run: npm run contracts:verify:arc-mainnet
       - name: Read-only Arc mainnet preflight
         run: >-
           node -e 'const {createPublicClient,http}=require("viem"); const {arc}=require("viem/chains");
