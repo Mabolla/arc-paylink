@@ -8,10 +8,11 @@ import {
   publicClaimContext,
   type PrivateClaimPackage,
 } from "@/lib/claim-package";
-import { ARC_NETWORK_NAME } from "@/lib/arc";
+import { ARC_NETWORK_NAME, IS_ARC_MAINNET } from "@/lib/arc";
 
 const appId = process.env.NEXT_PUBLIC_CIRCLE_APP_ID ?? "";
 const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? "";
+const circleArcBlockchain = IS_ARC_MAINNET ? "ARC" : "ARC-TESTNET";
 
 type LoginResult = { userToken: string; encryptionKey: string };
 type CircleWallet = { id: string; address: string; blockchain: string };
@@ -61,7 +62,7 @@ export function RecipientWallet() {
 
   const loadWallet = useCallback(async (userToken: string) => {
     const result = await circleAction<{ wallets?: CircleWallet[] }>({ action: "listWallets", userToken });
-    const arcWallet = result.wallets?.find((item) => item.blockchain === "ARC-TESTNET") ?? result.wallets?.[0];
+    const arcWallet = result.wallets?.find((item) => item.blockchain === circleArcBlockchain);
     if (!arcWallet) throw new Error(`Circle did not return an ${ARC_NETWORK_NAME} wallet.`);
     setWallet(arcWallet);
     setStep("complete");
