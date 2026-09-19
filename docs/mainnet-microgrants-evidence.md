@@ -46,6 +46,7 @@ The mainnet application must not be described as live until every required gate 
 | Mainnet deployment safety latch | PASS | Deployment refuses without the explicit confirmation value |
 | Factory and implementation deployment | PASS | Factory `0x19fbf0B85e66d68D312cD18D04A1a789107387FF`; transaction `0x737e467a112113d987ca0f845f256d73a1aa9f82c76655f87450898866cf4c7f`; block `21697256`; `deployments/arc-mainnet-escrow.json` |
 | Source/bytecode verification | PASS | `npm run contracts:verify:arc-mainnet` matches the implementation exactly and the factory outside compiler-linked immutable slots; getters confirm the implementation and Arc USDC addresses |
+| Isolated live mainnet application | PASS | `https://arc-paylink-git-feat-mainnet-microgrants-mabolla1.vercel.app`; public HTTP 200; branch-scoped `mainnet` network, Arc RPC, and factory configuration; production V3.1 remains on testnet |
 | Exact direct-USDC settlement | PENDING | Transaction hash and managed request status |
 | Pending revoke | PENDING | Request ID and lifecycle evidence |
 | Revoke-and-replace | PENDING | Old and replacement obligation IDs |
