@@ -4,11 +4,24 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { SocialLoginProvider } from "@circle-fin/w3s-pw-web-sdk/dist/src/types";
 import type { W3SSdk } from "@circle-fin/w3s-pw-web-sdk";
 import {
+  createPublicClient,
+  getAddress,
+  http,
+  parseAbi,
+  type Hash,
+} from "viem";
+import {
   parsePrivateClaimPackage,
   publicClaimContext,
   type PrivateClaimPackage,
 } from "@/lib/claim-package";
-import { ARC_NETWORK_NAME, IS_ARC_MAINNET } from "@/lib/arc";
+import {
+  ARC_EXPLORER_URL,
+  ARC_NETWORK_NAME,
+  ARC_RPC_URL,
+  IS_ARC_MAINNET,
+  arcChain,
+} from "@/lib/arc";
 
 const appId = process.env.NEXT_PUBLIC_CIRCLE_APP_ID ?? "";
 const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? "";
@@ -17,7 +30,15 @@ const circleArcBlockchain = IS_ARC_MAINNET ? "ARC" : "ARC-TESTNET";
 type LoginResult = { userToken: string; encryptionKey: string };
 type CircleWallet = { id: string; address: string; blockchain: string };
 type Step = "loading" | "ready" | "authenticating" | "initializing" | "challenge-ready" | "creating" | "complete" | "failed";
-type ClaimStep = "package-needed" | "ready" | "deployment-needed" | "preparing-deployment" | "deployment-ready" | "deploying" | "preparing-signature" | "signature-ready" | "signing" | "signed" | "preparing-claim" | "claim-ready" | "claiming" | "claimed" | "failed";
+type ClaimStep = "package-needed" | "ready" | "deployment-needed" | "preparing-deployment" | "deployment-ready" | "deploying" | "preparing-signature" | "signature-ready" | "signing" | "signed" | "preparing-claim" | "claim-ready" | "claiming" | "confirming" | "claimed" | "failed";
+
+const escrowAbi = parseAbi([
+  "function state() view returns (uint8)",
+  "event Claimed(address indexed recipient, uint256 amount)",
+]);
+const confirmationClient = createPublicClient({ chain: arcChain, transport: http(ARC_RPC_URL) });
+const CONFIRMATION_TIMEOUT_MS = 120_000;
+const CONFIRMATION_INTERVAL_MS = 2_000;
 
 const SESSION_KEYS = {
   deviceToken: "arc-paylink.circle.device-token",
@@ -31,6 +52,10 @@ function errorMessage(value: unknown) {
     if (typeof candidate.error === "string") return candidate.error;
   }
   return "Circle wallet onboarding failed.";
+}
+
+function delay(milliseconds: number) {
+  return new Promise((resolve) => window.setTimeout(resolve, milliseconds));
 }
 
 async function circleAction<T>(body: Record<string, unknown>): Promise<T> {
@@ -59,6 +84,43 @@ export function RecipientWallet() {
   const [claimMessage, setClaimMessage] = useState("Load the private PayLink package to unlock this claim.");
   const [claimTxHash, setClaimTxHash] = useState("");
   const [claimPackage, setClaimPackage] = useState<PrivateClaimPackage | null>(null);
+
+  async function confirmClaim(activeClaim: PrivateClaimPackage, recipient: string, submittedHash?: string) {
+    const startedAt = Date.now();
+    const transactionHash = submittedHash as Hash | undefined;
+
+    while (Date.now() - startedAt < CONFIRMATION_TIMEOUT_MS) {
+      if (transactionHash) {
+        const receipt = await confirmationClient.getTransactionReceipt({ hash: transactionHash }).catch(() => null);
+        if (receipt?.status === "reverted") throw new Error("The Arc claim transaction reverted.");
+        if (receipt?.status === "success") return transactionHash;
+      }
+
+      const state = await confirmationClient.readContract({
+        address: activeClaim.escrow,
+        abi: escrowAbi,
+        functionName: "state",
+      }).catch(() => null);
+
+      if (state === 2) {
+        const latestBlock = await confirmationClient.getBlockNumber();
+        const fromBlock = latestBlock > 2_000n ? latestBlock - 2_000n : 0n;
+        const logs = await confirmationClient.getLogs({
+          address: activeClaim.escrow,
+          event: escrowAbi[1],
+          args: { recipient: getAddress(recipient) },
+          fromBlock,
+          toBlock: "latest",
+        });
+        const matchingLog = logs.find((log) => log.args.amount === BigInt(activeClaim.amountBaseUnits));
+        if (matchingLog?.transactionHash) return matchingLog.transactionHash;
+      }
+
+      await delay(CONFIRMATION_INTERVAL_MS);
+    }
+
+    throw new Error("The claim was submitted, but Arc confirmation is taking longer than expected. Check the explorer before retrying.");
+  }
 
   const loadWallet = useCallback(async (userToken: string) => {
     const result = await circleAction<{ wallets?: CircleWallet[] }>({ action: "listWallets", userToken });
@@ -378,7 +440,7 @@ export function RecipientWallet() {
     setClaimStep("claiming");
     setClaimMessage(`Approve the final ${claimPackageRef.current?.amountUsdc ?? "USDC"} claim in Circle.`);
     sdk.setAuthentication(login);
-    sdk.execute(challengeId, (error: unknown, result) => {
+    sdk.execute(challengeId, async (error: unknown, result) => {
       if (error) {
         setClaimStep("failed");
         setClaimMessage(errorMessage(error));
@@ -388,11 +450,25 @@ export function RecipientWallet() {
         ? result.data.txHash
         : undefined;
       claimChallengeRef.current = null;
-      claimPackageRef.current = null;
-      claimSignatureRef.current = null;
-      if (txHash) setClaimTxHash(txHash);
-      setClaimStep("claimed");
-      setClaimMessage(`Claim submitted on ${ARC_NETWORK_NAME}. Your ${claimPackage?.amountUsdc ?? "USDC"} is on the way.`);
+      const activeClaim = claimPackageRef.current;
+      if (!activeClaim || !wallet) {
+        setClaimStep("failed");
+        setClaimMessage("The claim was submitted, but its confirmation context was lost.");
+        return;
+      }
+      setClaimStep("confirming");
+      setClaimMessage(`Claim submitted on ${ARC_NETWORK_NAME}. Waiting for on-chain confirmation.`);
+      try {
+        const confirmedHash = await confirmClaim(activeClaim, wallet.address, txHash);
+        setClaimTxHash(confirmedHash);
+        claimPackageRef.current = null;
+        claimSignatureRef.current = null;
+        setClaimStep("claimed");
+        setClaimMessage(`${activeClaim.amountUsdc} USDC claimed and confirmed on ${ARC_NETWORK_NAME}.`);
+      } catch (confirmationError) {
+        setClaimStep("failed");
+        setClaimMessage(errorMessage(confirmationError));
+      }
     });
   }
 
@@ -420,7 +496,7 @@ export function RecipientWallet() {
           </dl>
           <div className={`status-box ${claimStep === "failed" ? "failed" : claimStep === "claimed" ? "paid" : ""}`} role="status">
             <b>{claimMessage}</b>
-            {["preparing-deployment", "deploying", "preparing-signature", "signing", "preparing-claim", "claiming"].includes(claimStep) && <span className="spinner" />}
+            {["preparing-deployment", "deploying", "preparing-signature", "signing", "preparing-claim", "claiming", "confirming"].includes(claimStep) && <span className="spinner" />}
           </div>
           {claimStep === "package-needed" && (
             <label className="primary-button full file-button">
@@ -435,7 +511,11 @@ export function RecipientWallet() {
           {claimStep === "signed" && <button className="primary-button full" onClick={prepareClaim}>Prepare {claimPackage?.amountUsdc ?? "USDC"} claim <span aria-hidden>→</span></button>}
           {claimStep === "claim-ready" && <button className="primary-button full" onClick={approveClaim}>Approve {claimPackage?.amountUsdc ?? "USDC"} claim <span aria-hidden>→</span></button>}
           {claimStep === "failed" && <button className="text-button" onClick={() => window.location.reload()}>Start again</button>}
-          {claimTxHash && <p className="security-note mono">Transaction: {claimTxHash}</p>}
+          {claimTxHash && (
+            <a className="explorer-link mono" href={`${ARC_EXPLORER_URL}/tx/${claimTxHash}`} target="_blank" rel="noreferrer">
+              Confirmed · View transaction ↗
+            </a>
+          )}
         </>
       )}
       <p className="security-note">Google authenticates you. Circle secures the wallet. The next step will bind this address to the escrow claim.</p>
