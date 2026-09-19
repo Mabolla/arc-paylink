@@ -1,6 +1,11 @@
 name: Deploy Arc PayLink to Arc Mainnet
 
 on:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/mainnet-deploy-trigger
   workflow_dispatch:
     inputs:
       confirmation:
@@ -18,7 +23,7 @@ permissions:
 
 jobs:
   deploy:
-    if: ${{ inputs.confirmation == 'DEPLOY_ARC_PAYLINK_MAINNET' }}
+    if: ${{ github.event_name == 'push' || inputs.confirmation == 'DEPLOY_ARC_PAYLINK_MAINNET' }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     environment: arc-mainnet
@@ -30,7 +35,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.source_ref }}
+          ref: ${{ inputs.source_ref || 'feat/mainnet-microgrants' }}
       - uses: actions/setup-node@v4
         with:
           node-version: 22
