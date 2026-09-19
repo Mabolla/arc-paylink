@@ -7,6 +7,11 @@ on:
         description: Type DEPLOY_ARC_PAYLINK_MAINNET
         required: true
         type: string
+      source_ref:
+        description: Audited source branch or commit
+        required: true
+        default: feat/mainnet-microgrants
+        type: string
 
 permissions:
   contents: read
@@ -22,9 +27,10 @@ jobs:
       ARC_MAINNET_RPC_URL: https://rpc.mainnet.arc.io
       CONFIRM_ARC_MAINNET_DEPLOY: ARC_PAYLINK_MAINNET
       EXPECTED_ARC_MAINNET_DEPLOYER: "0xE7be265f2301E08a6EaE5Cfd0C1113a7Cd35b3dd"
-      SOURCE_COMMIT: ${{ github.sha }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.source_ref }}
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -32,11 +38,11 @@ jobs:
       - run: npm ci
       - run: npm run contracts:compile
       - name: Deploy verified source build
-        run: npm run contracts:deploy:arc-mainnet
+        run: SOURCE_COMMIT=$(git rev-parse HEAD) npm run contracts:deploy:arc-mainnet
       - name: Preserve deployment evidence
         uses: actions/upload-artifact@v4
         with:
-          name: arc-mainnet-deployment-${{ github.sha }}
+          name: arc-mainnet-deployment-${{ github.run_id }}
           path: deployments/arc-mainnet-escrow.json
           if-no-files-found: error
           retention-days: 90
