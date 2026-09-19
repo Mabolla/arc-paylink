@@ -1,0 +1,42 @@
+name: Create Arc PayLink walletless mainnet escrow
+
+on:
+  push:
+    branches: [feat/mainnet-microgrants]
+    paths: [.github/mainnet-walletless-escrow-trigger]
+
+permissions:
+  contents: read
+
+jobs:
+  create-and-fund:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: arc-mainnet
+    env:
+      ARC_MAINNET_PRIVATE_KEY: ${{ secrets.ARC_TESTNET_PRIVATE_KEY }}
+      ARC_MAINNET_RPC_URL: https://rpc.mainnet.arc.io
+      CONFIRM_ARC_MAINNET_WALLETLESS_ESCROW: ARC_PAYLINK_WALLETLESS_0_01_USDC
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Create and fund exact 0.01 USDC walletless escrow
+        run: npx hardhat run scripts/create-fund-mainnet-circle-escrow.cjs --network arcMainnet
+      - name: Preserve public escrow evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: arc-mainnet-walletless-public-${{ github.run_id }}
+          path: arc-mainnet-walletless-escrow.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: Preserve private claim package
+        uses: actions/upload-artifact@v4
+        with:
+          name: arc-mainnet-walletless-private-${{ github.run_id }}
+          path: arc-mainnet-walletless.private-claim.json
+          if-no-files-found: error
+          retention-days: 1
