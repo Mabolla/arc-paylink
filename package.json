@@ -13,6 +13,8 @@
     "contracts:test": "hardhat test",
     "contracts:deploy:arc": "hardhat run scripts/deploy-escrow.cjs --network arcTestnet",
     "contracts:deploy:arc-mainnet": "hardhat run scripts/deploy-mainnet-escrow.cjs --network arcMainnet",
+    "contracts:settle:arc-mainnet-pilot": "hardhat run scripts/send-mainnet-settlement.cjs --network arcMainnet",
+    "contracts:create-mainnet-walletless-escrow": "hardhat run scripts/create-fund-mainnet-circle-escrow.cjs --network arcMainnet",
     "contracts:verify:arc-mainnet": "hardhat compile && node scripts/verify-mainnet-deployment.cjs",
     "contracts:create-test-escrow": "hardhat run scripts/create-test-escrow.cjs --network arcTestnet",
     "contracts:create-fund-circle-escrow": "hardhat run scripts/create-fund-circle-escrow.cjs --network arcTestnet",
