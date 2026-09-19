@@ -32,6 +32,7 @@ Verified on 2026-09-18 without a funded wallet or transaction:
 | Arc RPC | `https://rpc.mainnet.arc.io` | PASS |
 | Arc USDC ERC-20 interface | `0x3600000000000000000000000000000000000000` | PASS — bytecode present |
 | Arc USDC ERC-20 decimals | `6` | PASS |
+| Circle Wallets chain code | `ARC` | PASS — Circle lists Arc mainnet user-controlled EOA and SCA support |
 
 Native Arc USDC uses 18 decimals for gas accounting. Arc PayLink payment obligations use only the 6-decimal ERC-20 interface.
 
