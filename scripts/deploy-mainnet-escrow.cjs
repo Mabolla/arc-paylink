@@ -17,6 +17,10 @@ async function main() {
 
   const [deployer] = await hre.ethers.getSigners();
   if (!deployer) throw new Error("ARC_MAINNET_PRIVATE_KEY is not set");
+  const expectedDeployer = process.env.EXPECTED_ARC_MAINNET_DEPLOYER;
+  if (!expectedDeployer || deployer.address.toLowerCase() !== expectedDeployer.toLowerCase()) {
+    throw new Error(`Refusing unexpected mainnet deployer ${deployer.address}`);
+  }
 
   const tokenCode = await hre.ethers.provider.getCode(ARC_USDC);
   if (tokenCode === "0x") throw new Error(`No USDC interface found at ${ARC_USDC}`);
