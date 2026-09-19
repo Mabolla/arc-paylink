@@ -1,5 +1,3 @@
-[feat/mainnet-microgrants fc43842] docs: record mainnet lifecycle pilot
- 1 file changed, 2 insertions(+), 2 deletions(-)
 # Arc PayLink Mainnet Microgrants Evidence
 
 Status: **CONDITIONAL — contracts deployed; application and pilot evidence in progress**
@@ -49,7 +47,7 @@ The mainnet application must not be described as live until every required gate 
 | Factory and implementation deployment | PASS | Factory `0x19fbf0B85e66d68D312cD18D04A1a789107387FF`; transaction `0x737e467a112113d987ca0f845f256d73a1aa9f82c76655f87450898866cf4c7f`; block `21697256`; `deployments/arc-mainnet-escrow.json` |
 | Source/bytecode verification | PASS | `npm run contracts:verify:arc-mainnet` matches the implementation exactly and the factory outside compiler-linked immutable slots; getters confirm the implementation and Arc USDC addresses |
 | Isolated live mainnet application | PASS | `https://arc-paylink-git-feat-mainnet-microgrants-mabolla1.vercel.app`; public HTTP 200; branch-scoped `mainnet` network, Arc RPC, and factory configuration; production V3.1 remains on testnet |
-| Exact direct-USDC settlement | PENDING | Transaction hash and managed request status |
+| Exact direct-USDC settlement | PASS | Request `fea1571a-17ef-42f4-aae2-875916552165`, obligation `MICROGRANT-PILOT-SETTLE-001`; exact `0.01 USDC` transfer `0xed753a04b8fc731599d636bf1be0f750917c362f110fa61acb06d4481b542c61`; block `21700478`; managed request status `settled` |
 | Pending revoke | PASS | Replacement request `0cd59ec5-f2f2-4442-a7af-a0c0c6da42f2` (`MICROGRANT-PILOT-REV-002`) moved from `pending` to `revoked` without a transaction |
 | Revoke-and-replace | PASS | Original request `3f03485a-f4b4-44f2-91cf-63e38370ca98` (`MICROGRANT-PILOT-REV-001`) is `replaced`; replacement has a new request ID and new obligation ID `MICROGRANT-PILOT-REV-002` |
 | 0.01 USDC walletless claim | PENDING | Escrow, EIP-1271 claim, and recipient balance evidence |
