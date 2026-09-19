@@ -1,35 +1,14 @@
-name: Run Arc PayLink exact mainnet settlement
+name: Run Arc PayLink exact mainnet settlement (completed)
 
 on:
-  push:
-    branches: [feat/mainnet-microgrants]
-    paths: [.github/mainnet-settlement-trigger]
+  workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
-  settle:
+  completed:
+    if: ${{ false }}
     runs-on: ubuntu-latest
-    timeout-minutes: 10
-    environment: arc-mainnet
-    env:
-      ARC_MAINNET_PRIVATE_KEY: ${{ secrets.ARC_TESTNET_PRIVATE_KEY }}
-      ARC_MAINNET_RPC_URL: https://rpc.mainnet.arc.io
-      CONFIRM_ARC_MAINNET_SETTLEMENT: ARC_PAYLINK_EXACT_0_01_USDC
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-      - run: npm ci
-      - name: Send exact 0.01 USDC pilot settlement
-        run: npx hardhat run scripts/send-mainnet-settlement.cjs --network arcMainnet
-      - name: Preserve settlement evidence
-        uses: actions/upload-artifact@v4
-        with:
-          name: arc-mainnet-settlement-${{ github.run_id }}
-          path: deployments/arc-mainnet-settlement.json
-          if-no-files-found: error
-          retention-days: 90
+      - run: echo "The one-time 0.01 USDC settlement pilot is complete and disabled."
