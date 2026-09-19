@@ -7,6 +7,7 @@ import {
   createPublicClient,
   getAddress,
   http,
+  isAddress,
   parseAbi,
   type Hash,
 } from "viem";
@@ -29,6 +30,14 @@ const circleArcBlockchain = IS_ARC_MAINNET ? "ARC" : "ARC-TESTNET";
 
 type LoginResult = { userToken: string; encryptionKey: string };
 type CircleWallet = { id: string; address: string; blockchain: string };
+type ConfirmedClaimReceipt = {
+  transactionHash: Hash;
+  recipient: string;
+  escrow: string;
+  amountUsdc: string;
+  amountBaseUnits: string;
+  confirmedAt: string;
+};
 type Step = "loading" | "ready" | "authenticating" | "initializing" | "challenge-ready" | "creating" | "complete" | "failed";
 type ClaimStep = "package-needed" | "ready" | "deployment-needed" | "preparing-deployment" | "deployment-ready" | "deploying" | "preparing-signature" | "signature-ready" | "signing" | "signed" | "preparing-claim" | "claim-ready" | "claiming" | "confirming" | "claimed" | "failed";
 
@@ -39,6 +48,7 @@ const escrowAbi = parseAbi([
 const confirmationClient = createPublicClient({ chain: arcChain, transport: http(ARC_RPC_URL) });
 const CONFIRMATION_TIMEOUT_MS = 120_000;
 const CONFIRMATION_INTERVAL_MS = 2_000;
+const CLAIM_RECEIPT_KEY = `arc-paylink.${IS_ARC_MAINNET ? "mainnet" : "testnet"}.last-confirmed-claim`;
 
 const SESSION_KEYS = {
   deviceToken: "arc-paylink.circle.device-token",
@@ -56,6 +66,30 @@ function errorMessage(value: unknown) {
 
 function delay(milliseconds: number) {
   return new Promise((resolve) => window.setTimeout(resolve, milliseconds));
+}
+
+function parseStoredReceipt(value: string | null): ConfirmedClaimReceipt | null {
+  if (!value) return null;
+  try {
+    const receipt = JSON.parse(value) as Partial<ConfirmedClaimReceipt>;
+    if (
+      typeof receipt.transactionHash !== "string"
+      || !/^0x[0-9a-fA-F]{64}$/.test(receipt.transactionHash)
+      || typeof receipt.recipient !== "string"
+      || !isAddress(receipt.recipient)
+      || typeof receipt.escrow !== "string"
+      || !isAddress(receipt.escrow)
+      || typeof receipt.amountUsdc !== "string"
+      || !receipt.amountUsdc
+      || typeof receipt.amountBaseUnits !== "string"
+      || !/^\d+$/.test(receipt.amountBaseUnits)
+      || typeof receipt.confirmedAt !== "string"
+      || !Number.isFinite(Date.parse(receipt.confirmedAt))
+    ) return null;
+    return receipt as ConfirmedClaimReceipt;
+  } catch {
+    return null;
+  }
 }
 
 async function circleAction<T>(body: Record<string, unknown>): Promise<T> {
@@ -84,6 +118,40 @@ export function RecipientWallet() {
   const [claimMessage, setClaimMessage] = useState("Load the private PayLink package to unlock this claim.");
   const [claimTxHash, setClaimTxHash] = useState("");
   const [claimPackage, setClaimPackage] = useState<PrivateClaimPackage | null>(null);
+  const [storedReceipt, setStoredReceipt] = useState<ConfirmedClaimReceipt | null>(null);
+  const [restoringReceipt, setRestoringReceipt] = useState(true);
+
+  useEffect(() => {
+    let active = true;
+
+    async function restoreReceipt() {
+      const saved = parseStoredReceipt(localStorage.getItem(CLAIM_RECEIPT_KEY));
+      if (!saved) {
+        localStorage.removeItem(CLAIM_RECEIPT_KEY);
+        if (active) setRestoringReceipt(false);
+        return;
+      }
+
+      const [transaction, escrowState] = await Promise.all([
+        confirmationClient.getTransactionReceipt({ hash: saved.transactionHash }).catch(() => null),
+        confirmationClient.readContract({
+          address: getAddress(saved.escrow),
+          abi: escrowAbi,
+          functionName: "state",
+        }).catch(() => null),
+      ]);
+      if (!active) return;
+      if (transaction?.status === "success" && escrowState === 2) {
+        setStoredReceipt(saved);
+      } else {
+        localStorage.removeItem(CLAIM_RECEIPT_KEY);
+      }
+      setRestoringReceipt(false);
+    }
+
+    void restoreReceipt();
+    return () => { active = false; };
+  }, []);
 
   async function confirmClaim(activeClaim: PrivateClaimPackage, recipient: string, submittedHash?: string) {
     const startedAt = Date.now();
@@ -460,6 +528,16 @@ export function RecipientWallet() {
       setClaimMessage(`Claim submitted on ${ARC_NETWORK_NAME}. Waiting for on-chain confirmation.`);
       try {
         const confirmedHash = await confirmClaim(activeClaim, wallet.address, txHash);
+        const receipt: ConfirmedClaimReceipt = {
+          transactionHash: confirmedHash,
+          recipient: wallet.address,
+          escrow: activeClaim.escrow,
+          amountUsdc: activeClaim.amountUsdc,
+          amountBaseUnits: activeClaim.amountBaseUnits,
+          confirmedAt: new Date().toISOString(),
+        };
+        localStorage.setItem(CLAIM_RECEIPT_KEY, JSON.stringify(receipt));
+        setStoredReceipt(receipt);
         setClaimTxHash(confirmedHash);
         claimPackageRef.current = null;
         claimSignatureRef.current = null;
@@ -479,6 +557,33 @@ export function RecipientWallet() {
         <span className="step">Circle · Google</span>
       </div>
       <p className="wallet-copy">Sign in with Google. Circle creates a user-controlled Arc wallet for you; Arc PayLink never receives your private keys.</p>
+      {restoringReceipt && (
+        <div className="status-box" role="status">
+          <b>Checking for a previous confirmed claim.</b><span className="spinner" />
+        </div>
+      )}
+      {!restoringReceipt && storedReceipt && (
+        <>
+          <div className="status-box paid" role="status">
+            <b>{storedReceipt.amountUsdc} USDC claimed and confirmed on {ARC_NETWORK_NAME}.</b>
+          </div>
+          <dl className="payment-details wallet-details">
+            <div><dt>Network</dt><dd>{ARC_NETWORK_NAME}</dd></div>
+            <div><dt>Recipient wallet</dt><dd className="mono">{storedReceipt.recipient}</dd></div>
+            <div><dt>Claim amount</dt><dd>{storedReceipt.amountUsdc} USDC</dd></div>
+            <div><dt>Escrow</dt><dd className="mono">{storedReceipt.escrow.slice(0, 8)}…{storedReceipt.escrow.slice(-6)}</dd></div>
+          </dl>
+          <a className="explorer-link mono" href={`${ARC_EXPLORER_URL}/tx/${storedReceipt.transactionHash}`} target="_blank" rel="noreferrer">
+            Confirmed · View transaction ↗
+          </a>
+          <button className="text-button" onClick={() => {
+            localStorage.removeItem(CLAIM_RECEIPT_KEY);
+            setStoredReceipt(null);
+          }}>Claim a different PayLink</button>
+        </>
+      )}
+      {!restoringReceipt && !storedReceipt && (
+        <>
       <div className={`status-box ${step === "failed" ? "failed" : step === "complete" ? "paid" : ""}`} role="status">
         <b>{message}</b>
         {!["ready", "challenge-ready", "complete", "failed"].includes(step) && <span className="spinner" />}
@@ -516,6 +621,8 @@ export function RecipientWallet() {
               Confirmed · View transaction ↗
             </a>
           )}
+        </>
+      )}
         </>
       )}
       <p className="security-note">Google authenticates you. Circle secures the wallet. The next step will bind this address to the escrow claim.</p>
