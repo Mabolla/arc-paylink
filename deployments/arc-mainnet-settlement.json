@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "network": "Arc Mainnet",
+  "chainId": 5042,
+  "requestId": "fea1571a-17ef-42f4-aae2-875916552165",
+  "obligationId": "MICROGRANT-PILOT-SETTLE-001",
+  "token": "0x3600000000000000000000000000000000000000",
+  "payer": "0xE7be265f2301E08a6EaE5Cfd0C1113a7Cd35b3dd",
+  "recipient": "0x94705A9d675daa924F9190Eca4c05ED6B12d5345",
+  "amount": "0.01",
+  "amountBaseUnits": "10000",
+  "transactionHash": "0xed753a04b8fc731599d636bf1be0f750917c362f110fa61acb06d4481b542c61",
+  "blockNumber": 21700478,
+  "confirmedAt": "2026-09-19T16:59:45.541Z",
+  "explorer": "https://explorer.arc.io/tx/0xed753a04b8fc731599d636bf1be0f750917c362f110fa61acb06d4481b542c61"
+}
