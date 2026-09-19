@@ -43,6 +43,7 @@ type ClaimStep = "package-needed" | "ready" | "deployment-needed" | "preparing-d
 
 const escrowAbi = parseAbi([
   "function state() view returns (uint8)",
+  "function amount() view returns (uint256)",
   "event Claimed(address indexed recipient, uint256 amount)",
 ]);
 const confirmationClient = createPublicClient({ chain: arcChain, transport: http(ARC_RPC_URL) });
@@ -149,16 +150,22 @@ export function RecipientWallet() {
         return;
       }
 
-      const [transaction, escrowState] = await Promise.all([
+      const [transaction, escrowState, escrowAmount] = await Promise.all([
         confirmationClient.getTransactionReceipt({ hash: saved.transactionHash }).catch(() => null),
         confirmationClient.readContract({
           address: getAddress(saved.escrow),
           abi: escrowAbi,
           functionName: "state",
         }).catch(() => null),
+        confirmationClient.readContract({
+          address: getAddress(saved.escrow),
+          abi: escrowAbi,
+          functionName: "amount",
+        }).catch(() => null),
       ]);
       if (!active) return;
-      if (transaction?.status === "success" && escrowState === 2) {
+      const receiptConfirmed = !transaction || transaction.status === "success";
+      if (receiptConfirmed && escrowState === 2 && escrowAmount === BigInt(saved.amountBaseUnits)) {
         setStoredReceipt(saved);
       } else {
         localStorage.removeItem(CLAIM_RECEIPT_KEY);
@@ -192,7 +199,7 @@ export function RecipientWallet() {
         const fromBlock = latestBlock > 2_000n ? latestBlock - 2_000n : 0n;
         const logs = await confirmationClient.getLogs({
           address: activeClaim.escrow,
-          event: escrowAbi[1],
+          event: escrowAbi[2],
           args: { recipient: getAddress(recipient) },
           fromBlock,
           toBlock: "latest",
