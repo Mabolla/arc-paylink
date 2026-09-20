@@ -32,8 +32,7 @@ export function parseClaimFragment(fragment: string): PrivateClaimPackage | null
   if (!encoded) return null;
   try {
     return parsePrivateClaimPackage(JSON.parse(fromBase64Url(encoded)));
-  } catch (error) {
-    if (error instanceof Error && error.message !== "This Arc PayLink is invalid.") throw error;
+  } catch {
     throw new Error("This Arc PayLink is invalid.");
   }
 }

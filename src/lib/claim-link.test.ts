@@ -31,6 +31,8 @@ describe("private claim links", () => {
   it("rejects malformed and tampered claim fragments", () => {
     expect(() => parseClaimFragment("#claim=not+base64"))
       .toThrow("This Arc PayLink is invalid.");
+    expect(() => parseClaimFragment("#claim=not-valid"))
+      .toThrow("This Arc PayLink is invalid.");
     const encoded = encodeClaimFragment(packageFixture).replace(/.$/, "A");
     expect(() => parseClaimFragment(encoded)).toThrow();
   });
