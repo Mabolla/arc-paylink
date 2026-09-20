@@ -1,0 +1,52 @@
+name: Deploy Arc PayLink surplus-safe V2
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirmation:
+        description: Type DEPLOY_SURPLUS_SAFE_V2 to authorize the Arc Mainnet transaction
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: arc-paylink-mainnet-contract-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: inputs.confirmation == 'DEPLOY_SURPLUS_SAFE_V2'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: arc-mainnet
+    env:
+      # This existing repository secret controls the previously verified deployer on both Arc networks.
+      ARC_MAINNET_PRIVATE_KEY: ${{ secrets.ARC_TESTNET_PRIVATE_KEY }}
+      ARC_MAINNET_RPC_URL: https://rpc.mainnet.arc.io
+      EXPECTED_ARC_MAINNET_DEPLOYER: '0xE7be265f2301E08a6EaE5Cfd0C1113a7Cd35b3dd'
+      CONFIRM_ARC_MAINNET_DEPLOY: ARC_PAYLINK_MAINNET
+      SOURCE_COMMIT: ${{ github.sha }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Verify application and contract suite
+        run: npm test
+      - name: Verify production build
+        run: npm run build
+      - name: Deploy surplus-safe V2 factory
+        run: npm run contracts:deploy:arc-mainnet
+      - name: Verify deployed bytecode and immutable configuration
+        run: npm run contracts:verify:arc-mainnet
+      - name: Preserve deployment evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: arc-paylink-mainnet-surplus-safe-v2-${{ github.run_id }}
+          path: deployments/arc-mainnet-escrow-v2.json
+          if-no-files-found: error
+          retention-days: 90
