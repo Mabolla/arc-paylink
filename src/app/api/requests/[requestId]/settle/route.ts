@@ -8,6 +8,7 @@ import { vercelRequestStore } from "@/lib/vercel-request-store";
 import { verifyPaymentReceipt } from "@/lib/verify-payment";
 import { findSettlementRecord } from "@/lib/server-settlement-store";
 import { validateSettlementCorrelationRecord } from "@/lib/validate-settlement-record";
+import { readJsonObject } from "@/lib/api-request";
 
 export const runtime = "nodejs";
 
@@ -16,7 +17,7 @@ export async function POST(request: Request, context: { params: Promise<{ reques
   if (!blobToken) return NextResponse.json({ state: "not-configured" }, { status: 503 });
   try {
     const { requestId } = await context.params;
-    const input = await request.json() as { transactionHash?: unknown; correlationId?: unknown };
+    const input = await readJsonObject(request);
     if (typeof input.transactionHash !== "string" || !isHash(input.transactionHash)) throw new Error("Invalid settlement transaction hash.");
     const store = vercelRequestStore(blobToken);
     const result = await loadRequestRecord(requestId, store);

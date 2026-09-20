@@ -11,14 +11,14 @@ export default function TestRecipientPage() {
       </nav>
       <div className="claim-layout">
         <section className="claim-intro">
-          <p className="eyebrow">Merchant test setup</p>
-          <h1>One tester.<br />One escrow.</h1>
-          <p className="lede">Prepare a fresh, single-use recipient test without sharing a funded key or opening a reusable public reward pool.</p>
-          <div className="trust-row"><span>01</span> Isolated escrow <span>02</span> Private package <span>03</span> Onchain verified</div>
+          <p className="eyebrow">Send on Arc</p>
+          <h1>One payment.<br />One private link.</h1>
+          <p className="lede">Fund a single-use escrow for someone who does not already have a crypto wallet. They claim through a user-controlled Circle wallet.</p>
+          <div className="trust-row"><span>01</span> Isolated escrow <span>02</span> One private link <span>03</span> Onchain verified</div>
         </section>
         <TesterPayLinkCreator />
       </div>
-      <footer><span>Controlled external testing</span><span>USDC · {IS_ARC_MAINNET ? "Mainnet pilot" : "Testnet only"}</span></footer>
+      <footer><span>Non-custodial escrow payment</span><span>USDC · {IS_ARC_MAINNET ? "Mainnet pilot" : "Testnet only"}</span></footer>
     </main>
   );
 }

@@ -2,6 +2,7 @@ import { isAddress, isHex, keccak256 } from "viem";
 import { NextResponse } from "next/server";
 import { verifyClaimContext, type VerifiedClaimContext } from "@/lib/claim-validation";
 import { ARC_CHAIN_ID, ARC_USDC_ADDRESS, IS_ARC_MAINNET } from "@/lib/arc";
+import { readJsonObject } from "@/lib/api-request";
 
 const CIRCLE_BASE_URL = "https://api.circle.com";
 const CLAIM_WINDOW_SECONDS = 15 * 60;
@@ -37,6 +38,15 @@ function apiKey() {
 function requiredString(value: unknown, name: string) {
   if (typeof value !== "string" || !value.trim()) throw new Error(`Missing ${name}.`);
   return value.trim();
+}
+
+function idempotencyKey(value: unknown) {
+  if (value === undefined) return crypto.randomUUID();
+  const key = requiredString(value, "idempotencyKey");
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(key)) {
+    throw new Error("Idempotency key is invalid.");
+  }
+  return key;
 }
 
 function claimWallet(value: unknown) {
@@ -99,7 +109,7 @@ async function assertWalletOwnership(userToken: string, walletId: string, wallet
 
 export async function POST(request: Request) {
   try {
-    const body = (await request.json()) as Record<string, unknown>;
+    const body = await readJsonObject(request);
     const action = requiredString(body.action, "action") as CircleAction;
 
     if (action === "createDeviceToken") {
@@ -118,7 +128,7 @@ export async function POST(request: Request) {
         method: "POST",
         headers: userHeaders,
         body: JSON.stringify({
-          idempotencyKey: crypto.randomUUID(),
+          idempotencyKey: idempotencyKey(body.idempotencyKey),
           accountType: "SCA",
           blockchains: [circleArcBlockchain()],
         }),
@@ -149,7 +159,7 @@ export async function POST(request: Request) {
         method: "POST",
         headers: userHeaders,
         body: JSON.stringify({
-          idempotencyKey: crypto.randomUUID(),
+          idempotencyKey: idempotencyKey(body.idempotencyKey),
           walletId,
           contractAddress: ARC_USDC_ADDRESS,
           abiFunctionSignature: "transfer(address,uint256)",
@@ -192,7 +202,7 @@ export async function POST(request: Request) {
         method: "POST",
         headers: userHeaders,
         body: JSON.stringify({
-          idempotencyKey: crypto.randomUUID(),
+          idempotencyKey: idempotencyKey(body.idempotencyKey),
           walletId,
           data: JSON.stringify(typedData),
         }),
@@ -212,7 +222,7 @@ export async function POST(request: Request) {
         method: "POST",
         headers: userHeaders,
         body: JSON.stringify({
-          idempotencyKey: crypto.randomUUID(),
+          idempotencyKey: idempotencyKey(body.idempotencyKey),
           walletId,
           contractAddress: claim.escrow,
           abiFunctionSignature: "claim(bytes32,address,uint256,bytes)",

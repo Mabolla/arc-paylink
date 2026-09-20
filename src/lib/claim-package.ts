@@ -10,6 +10,43 @@ export const ARC_PAYLINK_FACTORY = getAddress(
       : "0x8C377F5Bb508ece6De8090209619122edd4bC453",
 );
 
+const configuredLegacyFactories = (process.env.NEXT_PUBLIC_ARC_PAYLINK_LEGACY_FACTORY_ADDRESSES ?? "")
+  .split(",")
+  .map((value) => value.trim())
+  .filter(Boolean);
+
+function configuredAddresses(values: string[], name: string) {
+  return values.map((value) => {
+    if (!isAddress(value)) throw new Error(`${name} contains an invalid address.`);
+    return getAddress(value);
+  });
+}
+
+export const ARC_PAYLINK_LEGACY_FACTORIES = configuredAddresses(configuredLegacyFactories, "NEXT_PUBLIC_ARC_PAYLINK_LEGACY_FACTORY_ADDRESSES");
+
+export const ARC_PAYLINK_TRUSTED_FACTORIES = [
+  ARC_PAYLINK_FACTORY,
+  ...ARC_PAYLINK_LEGACY_FACTORIES,
+].filter((factory, index, factories) => factories.findIndex((candidate) => candidate.toLowerCase() === factory.toLowerCase()) === index);
+
+export function isTrustedArcPayLinkFactory(factory: Address) {
+  return ARC_PAYLINK_TRUSTED_FACTORIES.some((candidate) => candidate.toLowerCase() === factory.toLowerCase());
+}
+
+const configuredSurplusSafeFactories = (process.env.NEXT_PUBLIC_ARC_PAYLINK_SURPLUS_SAFE_FACTORY_ADDRESSES ?? "")
+  .split(",")
+  .map((value) => value.trim())
+  .filter(Boolean);
+
+export const ARC_PAYLINK_SURPLUS_SAFE_FACTORIES = configuredAddresses(
+  configuredSurplusSafeFactories,
+  "NEXT_PUBLIC_ARC_PAYLINK_SURPLUS_SAFE_FACTORY_ADDRESSES",
+);
+
+export function isSurplusSafeArcPayLinkFactory(factory: Address) {
+  return ARC_PAYLINK_SURPLUS_SAFE_FACTORIES.some((candidate) => candidate.toLowerCase() === factory.toLowerCase());
+}
+
 export type PrivateClaimPackage = {
   network: string;
   chainId: typeof ARC_CHAIN_ID;
@@ -21,6 +58,9 @@ export type PrivateClaimPackage = {
   expiry: string;
   secretHash: Hex;
   secret: Hex;
+  title?: string;
+  reference?: string;
+  recipientEmail?: string;
 };
 
 function requiredString(value: unknown, name: string) {
@@ -49,7 +89,7 @@ export function parsePrivateClaimPackage(value: unknown): PrivateClaimPackage {
   if (ARC_PAYLINK_FACTORY === zeroAddress) throw new Error("Arc PayLink mainnet factory is not configured.");
 
   const factory = address(input.factory, "factory");
-  if (factory.toLowerCase() !== ARC_PAYLINK_FACTORY.toLowerCase()) {
+  if (!isTrustedArcPayLinkFactory(factory)) {
     throw new Error("This package was not created by the Arc PayLink factory.");
   }
 
@@ -64,6 +104,12 @@ export function parsePrivateClaimPackage(value: unknown): PrivateClaimPackage {
   const amountUsdc = requiredString(input.amountUsdc, "amountUsdc");
   const expiry = requiredString(input.expiry, "expiry");
   if (!Number.isFinite(Date.parse(expiry))) throw new Error("Claim package expiry is invalid.");
+  const title = typeof input.title === "string" ? input.title.trim() : "";
+  if (title.length > 80) throw new Error("Payment title is too long.");
+  const reference = typeof input.reference === "string" ? input.reference.trim() : "";
+  if (reference.length > 64) throw new Error("Payment reference is too long.");
+  const recipientEmail = typeof input.recipientEmail === "string" ? input.recipientEmail.trim().toLowerCase() : "";
+  if (recipientEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(recipientEmail)) throw new Error("Recipient email is invalid.");
 
   return {
     network: ARC_NETWORK_NAME,
@@ -76,6 +122,9 @@ export function parsePrivateClaimPackage(value: unknown): PrivateClaimPackage {
     expiry,
     secretHash,
     secret,
+    ...(title ? { title } : {}),
+    ...(reference ? { reference } : {}),
+    ...(recipientEmail ? { recipientEmail } : {}),
   };
 }
 

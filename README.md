@@ -4,6 +4,8 @@ V3.1 adds creator-managed request lifecycles based on real Arc House feedback: *
 
 The Builder-submitted V3 baseline is preserved on `release/v3.0.0` at commit `215d3476afe26882b8575cfa26bf90ee56ba9452`. The original V3 evidence remains unchanged. See [V3.1 lifecycle evidence](./docs/v3.1-lifecycle-evidence.md) for the public feedback trace, live browser verification, Arc transaction proof, and security boundary.
 
+The current walletless mainnet pilot is under product-hardening. Its exact authorization, secret-handling, encrypted creator-recovery, PII, and remaining release boundaries are documented in [the security and privacy threat model](./docs/security-privacy-threat-model.md). A private claim link is a bearer secret; the current escrow is not cryptographically bound to an email address.
+
 ## V3 foundation
 
 Arc PayLink turns an invoice, milestone, or agent task into a verifiable USDC settlement on Arc Testnet. A payer can fund from Arc or Base Sepolia, a recipient without a wallet can authenticate with Google and claim through a Circle user-controlled smart account, and both sides can privately verify the complete source-to-destination audit trail.

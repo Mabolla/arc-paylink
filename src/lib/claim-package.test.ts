@@ -16,12 +16,15 @@ function validPackage() {
     expiry: "2026-09-04T22:19:49.000Z",
     secretHash: keccak256(secret),
     secret,
+    title: "Logo delivery",
+    reference: "INV-2026-014",
+    recipientEmail: "Recipient@Example.com",
   };
 }
 
 describe("parsePrivateClaimPackage", () => {
   it("accepts a portable Arc PayLink package", () => {
-    expect(parsePrivateClaimPackage(validPackage())).toMatchObject({ amountBaseUnits: "10000", amountUsdc: "0.01" });
+    expect(parsePrivateClaimPackage(validPackage())).toMatchObject({ amountBaseUnits: "10000", amountUsdc: "0.01", title: "Logo delivery", reference: "INV-2026-014", recipientEmail: "recipient@example.com" });
   });
 
   it("rejects a secret that does not match the package hash", () => {

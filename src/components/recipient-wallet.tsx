@@ -7,7 +7,6 @@ import {
   createPublicClient,
   getAddress,
   http,
-  isAddress,
   parseAbi,
   type Hash,
 } from "viem";
@@ -16,6 +15,8 @@ import {
   publicClaimContext,
   type PrivateClaimPackage,
 } from "@/lib/claim-package";
+import { parseClaimFragment } from "@/lib/claim-link";
+import { clearClientIdempotencyKey, clientIdempotencyKey } from "@/lib/client-idempotency";
 import {
   ARC_EXPLORER_URL,
   ARC_NETWORK_NAME,
@@ -23,21 +24,21 @@ import {
   IS_ARC_MAINNET,
   arcChain,
 } from "@/lib/arc";
+import {
+  loadConfirmedClaimReceipt,
+  parseConfirmedClaimReceipt,
+  removeConfirmedClaimReceipt,
+  saveConfirmedClaimReceipt,
+  type ConfirmedClaimReceipt,
+} from "@/lib/claim-receipt-store";
 
 const appId = process.env.NEXT_PUBLIC_CIRCLE_APP_ID ?? "";
 const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? "";
 const circleArcBlockchain = IS_ARC_MAINNET ? "ARC" : "ARC-TESTNET";
 
 type LoginResult = { userToken: string; encryptionKey: string };
+type SocialLoginResult = LoginResult & { oAuthInfo?: { socialUserInfo?: { email?: string } } };
 type CircleWallet = { id: string; address: string; blockchain: string };
-type ConfirmedClaimReceipt = {
-  transactionHash: Hash;
-  recipient: string;
-  escrow: string;
-  amountUsdc: string;
-  amountBaseUnits: string;
-  confirmedAt: string;
-};
 type Step = "loading" | "ready" | "authenticating" | "initializing" | "challenge-ready" | "creating" | "complete" | "failed";
 type ClaimStep = "package-needed" | "ready" | "deployment-needed" | "preparing-deployment" | "deployment-ready" | "deploying" | "preparing-signature" | "signature-ready" | "signing" | "signed" | "preparing-claim" | "claim-ready" | "claiming" | "confirming" | "claimed" | "failed";
 
@@ -49,7 +50,12 @@ const escrowAbi = parseAbi([
 const confirmationClient = createPublicClient({ chain: arcChain, transport: http(ARC_RPC_URL) });
 const CONFIRMATION_TIMEOUT_MS = 120_000;
 const CONFIRMATION_INTERVAL_MS = 2_000;
-const CLAIM_RECEIPT_KEY = `arc-paylink.${IS_ARC_MAINNET ? "mainnet" : "testnet"}.last-confirmed-claim`;
+const RECEIPT_NETWORK = IS_ARC_MAINNET ? "mainnet" : "testnet";
+const CLAIM_CONTEXT_KEY = `arc-paylink.${IS_ARC_MAINNET ? "mainnet" : "testnet"}.active-claim`;
+
+function operationScope(action: "deploy" | "claim", paymentId: string) {
+  return `${IS_ARC_MAINNET ? "mainnet" : "testnet"}.${action}.${paymentId.toLowerCase()}`;
+}
 
 const SESSION_KEYS = {
   deviceToken: "arc-paylink.circle.device-token",
@@ -69,30 +75,6 @@ function delay(milliseconds: number) {
   return new Promise((resolve) => window.setTimeout(resolve, milliseconds));
 }
 
-function parseStoredReceipt(value: string | null): ConfirmedClaimReceipt | null {
-  if (!value) return null;
-  try {
-    const receipt = JSON.parse(value) as Partial<ConfirmedClaimReceipt>;
-    if (
-      typeof receipt.transactionHash !== "string"
-      || !/^0x[0-9a-fA-F]{64}$/.test(receipt.transactionHash)
-      || typeof receipt.recipient !== "string"
-      || !isAddress(receipt.recipient)
-      || typeof receipt.escrow !== "string"
-      || !isAddress(receipt.escrow)
-      || typeof receipt.amountUsdc !== "string"
-      || !receipt.amountUsdc
-      || typeof receipt.amountBaseUnits !== "string"
-      || !/^\d+$/.test(receipt.amountBaseUnits)
-      || typeof receipt.confirmedAt !== "string"
-      || !Number.isFinite(Date.parse(receipt.confirmedAt))
-    ) return null;
-    return receipt as ConfirmedClaimReceipt;
-  } catch {
-    return null;
-  }
-}
-
 function receiptFromUrl() {
   const url = new URL(window.location.href);
   const encoded = url.searchParams.get("receipt");
@@ -100,7 +82,7 @@ function receiptFromUrl() {
   try {
     const base64 = encoded.replace(/-/g, "+").replace(/_/g, "/");
     const padded = base64.padEnd(Math.ceil(base64.length / 4) * 4, "=");
-    return parseStoredReceipt(atob(padded));
+    return parseConfirmedClaimReceipt(atob(padded));
   } catch {
     return null;
   } finally {
@@ -138,14 +120,44 @@ export function RecipientWallet() {
   const [restoringReceipt, setRestoringReceipt] = useState(true);
 
   useEffect(() => {
+    queueMicrotask(() => {
+      try {
+        const linked = parseClaimFragment(window.location.hash);
+        if (linked) {
+          sessionStorage.setItem(CLAIM_CONTEXT_KEY, JSON.stringify(linked));
+          window.history.replaceState({}, "", `${window.location.pathname}${window.location.search}`);
+        }
+        const raw = linked ? null : sessionStorage.getItem(CLAIM_CONTEXT_KEY);
+        const restored = linked ?? (raw ? parsePrivateClaimPackage(JSON.parse(raw)) : null);
+        if (!restored) return;
+        claimPackageRef.current = restored;
+        setClaimPackage(restored);
+        setClaimStep("deployment-needed");
+        setClaimMessage(`PayLink verified for ${restored.amountUsdc} USDC. Continue to your recipient wallet.`);
+      } catch (error) {
+        sessionStorage.removeItem(CLAIM_CONTEXT_KEY);
+        setClaimStep("failed");
+        setClaimMessage(errorMessage(error));
+      }
+    });
+  }, []);
+
+  useEffect(() => {
     let active = true;
 
     async function restoreReceipt() {
       const recovered = receiptFromUrl();
-      if (recovered) localStorage.setItem(CLAIM_RECEIPT_KEY, JSON.stringify(recovered));
-      const saved = recovered ?? parseStoredReceipt(localStorage.getItem(CLAIM_RECEIPT_KEY));
+      let activeClaim: PrivateClaimPackage | null = null;
+      try {
+        const linked = parseClaimFragment(window.location.hash);
+        const raw = linked ? null : sessionStorage.getItem(CLAIM_CONTEXT_KEY);
+        activeClaim = linked ?? (raw ? parsePrivateClaimPackage(JSON.parse(raw)) : null);
+      } catch {
+        // The claim-context effect reports malformed links. Never let an old receipt hide that error.
+      }
+      if (recovered) saveConfirmedClaimReceipt(localStorage, RECEIPT_NETWORK, recovered);
+      const saved = recovered ?? loadConfirmedClaimReceipt(localStorage, RECEIPT_NETWORK, activeClaim?.escrow);
       if (!saved) {
-        localStorage.removeItem(CLAIM_RECEIPT_KEY);
         if (active) setRestoringReceipt(false);
         return;
       }
@@ -164,11 +176,11 @@ export function RecipientWallet() {
         }).catch(() => null),
       ]);
       if (!active) return;
-      const receiptConfirmed = !transaction || transaction.status === "success";
+      const receiptConfirmed = transaction?.status === "success";
       if (receiptConfirmed && escrowState === 2 && escrowAmount === BigInt(saved.amountBaseUnits)) {
         setStoredReceipt(saved);
       } else {
-        localStorage.removeItem(CLAIM_RECEIPT_KEY);
+        removeConfirmedClaimReceipt(localStorage, RECEIPT_NETWORK, saved.escrow);
       }
       setRestoringReceipt(false);
     }
@@ -221,6 +233,17 @@ export function RecipientWallet() {
     setWallet(arcWallet);
     setStep("complete");
     setMessage("Your recipient wallet is ready for this PayLink.");
+    const activeClaim = claimPackageRef.current;
+    if (activeClaim) {
+      const bytecode = await confirmationClient.getCode({ address: getAddress(arcWallet.address) }).catch(() => undefined);
+      if (bytecode && bytecode !== "0x") {
+        setClaimStep("ready");
+        setClaimMessage("Recipient wallet is already active on Arc. Prepare the claim authorization.");
+      } else {
+        setClaimStep("deployment-needed");
+        setClaimMessage("Recipient wallet must be activated once on Arc before signing.");
+      }
+    }
   }, []);
 
   useEffect(() => {
@@ -253,6 +276,13 @@ export function RecipientWallet() {
             if (!result?.userToken || !result.encryptionKey) {
               setStep("failed");
               setMessage("Circle login completed without a usable wallet session.");
+              return;
+            }
+            const signedInEmail = (result as SocialLoginResult).oAuthInfo?.socialUserInfo?.email?.trim().toLowerCase();
+            const intendedEmail = claimPackageRef.current?.recipientEmail?.trim().toLowerCase();
+            if (intendedEmail && signedInEmail !== intendedEmail) {
+              setStep("failed");
+              setMessage(`This PayLink was sent to ${intendedEmail}. Sign in with that Google account.`);
               return;
             }
             loginRef.current = { userToken: result.userToken, encryptionKey: result.encryptionKey };
@@ -413,6 +443,7 @@ export function RecipientWallet() {
       setClaimMessage("Preparing the one-time Arc wallet deployment.");
       const result = await circleAction<{ challengeId?: string }>({
         action: "deployWallet",
+        idempotencyKey: clientIdempotencyKey(sessionStorage, operationScope("deploy", activeClaim.paymentId)),
         userToken: login.userToken,
         walletId: wallet.id,
         walletAddress: wallet.address,
@@ -444,8 +475,7 @@ export function RecipientWallet() {
       }
       claimChallengeRef.current = null;
       window.setTimeout(() => {
-        setClaimStep("ready");
-        setClaimMessage("Recipient wallet deployed. Prepare the address-bound authorization.");
+        void prepareSignature();
       }, 2500);
     });
   }
@@ -490,8 +520,7 @@ export function RecipientWallet() {
       }
       claimChallengeRef.current = null;
       claimSignatureRef.current = signature;
-      setClaimStep("signed");
-      setClaimMessage(`Authorization signed. Prepare the final ${claimPackageRef.current?.amountUsdc ?? "payment"} USDC claim transaction.`);
+      void prepareClaim();
     });
   }
 
@@ -506,6 +535,7 @@ export function RecipientWallet() {
       setClaimMessage(`Preparing the final ${ARC_NETWORK_NAME} transaction.`);
       const result = await circleAction<{ challengeId?: string }>({
         action: "executeClaim",
+        idempotencyKey: clientIdempotencyKey(sessionStorage, operationScope("claim", activeClaim.paymentId)),
         userToken: login.userToken,
         walletId: wallet.id,
         walletAddress: wallet.address,
@@ -560,7 +590,10 @@ export function RecipientWallet() {
           amountBaseUnits: activeClaim.amountBaseUnits,
           confirmedAt: new Date().toISOString(),
         };
-        localStorage.setItem(CLAIM_RECEIPT_KEY, JSON.stringify(receipt));
+        saveConfirmedClaimReceipt(localStorage, RECEIPT_NETWORK, receipt);
+        sessionStorage.removeItem(CLAIM_CONTEXT_KEY);
+        clearClientIdempotencyKey(sessionStorage, operationScope("deploy", activeClaim.paymentId));
+        clearClientIdempotencyKey(sessionStorage, operationScope("claim", activeClaim.paymentId));
         setStoredReceipt(receipt);
         setClaimTxHash(confirmedHash);
         claimPackageRef.current = null;
@@ -601,7 +634,7 @@ export function RecipientWallet() {
             Confirmed · View transaction ↗
           </a>
           <button className="text-button" onClick={() => {
-            localStorage.removeItem(CLAIM_RECEIPT_KEY);
+            removeConfirmedClaimReceipt(localStorage, RECEIPT_NETWORK, storedReceipt.escrow);
             setStoredReceipt(null);
           }}>Claim a different PayLink</button>
         </>
@@ -619,6 +652,9 @@ export function RecipientWallet() {
         <>
           <dl className="payment-details wallet-details">
             <div><dt>Network</dt><dd>{wallet.blockchain}</dd></div>
+            {claimPackage?.title && <div><dt>Payment</dt><dd>{claimPackage.title}</dd></div>}
+            {claimPackage?.reference && <div><dt>Reference</dt><dd className="mono">{claimPackage.reference}</dd></div>}
+            {claimPackage?.recipientEmail && <div><dt>Sent to</dt><dd>{claimPackage.recipientEmail}</dd></div>}
             <div><dt>Recipient wallet</dt><dd className="mono">{wallet.address}</dd></div>
             {claimPackage && <div><dt>Claim amount</dt><dd>{claimPackage.amountUsdc} USDC</dd></div>}
             {claimPackage && <div><dt>Escrow</dt><dd className="mono">{claimPackage.escrow.slice(0, 8)}…{claimPackage.escrow.slice(-6)}</dd></div>}
@@ -649,7 +685,7 @@ export function RecipientWallet() {
       )}
         </>
       )}
-      <p className="security-note">Google authenticates you. Circle secures the wallet. The next step will bind this address to the escrow claim.</p>
+      <p className="security-note">Google verifies the intended account in this app. Circle secures the wallet. The private link remains a bearer secret; do not forward it.</p>
     </section>
   );
 }

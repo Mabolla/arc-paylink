@@ -4,8 +4,9 @@ const { createPublicClient, getAddress, http, parseAbi } = require("viem");
 const { arc } = require("viem/chains");
 
 const root = path.join(__dirname, "..");
+const deploymentFilename = process.env.ARC_MAINNET_DEPLOYMENT_FILE || "arc-mainnet-escrow-v2.json";
 const deployment = JSON.parse(
-  fs.readFileSync(path.join(root, "deployments", "arc-mainnet-escrow.json"), "utf8"),
+  fs.readFileSync(path.join(root, "deployments", deploymentFilename), "utf8"),
 );
 const factoryArtifact = require(path.join(
   root,
@@ -72,6 +73,7 @@ function verifyFactoryBytecode(onchainCode) {
 }
 
 async function main() {
+  if (deployment.schemaVersion !== 2 || deployment.release !== "surplus-safe-v2") fail("unexpected deployment release");
   if (deployment.chainId !== 5042) fail(`unexpected chain ID ${deployment.chainId}`);
   const client = createPublicClient({ chain: arc, transport: http("https://rpc.mainnet.arc.io") });
   const chainId = await client.getChainId();

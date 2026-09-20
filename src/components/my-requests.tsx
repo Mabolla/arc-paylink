@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { managedRequestReferences, saveManagedRequestReference, type ManagedRequestReference } from "@/lib/managed-request-client";
 import type { RequestView } from "@/lib/request-lifecycle";
+import { WalletlessRequests } from "@/components/walletless-requests";
 
 type Item = ManagedRequestReference & { view: RequestView };
 
@@ -55,7 +56,7 @@ export function MyRequests() {
     await refresh();
   }
 
-  return <section className="requests-list">
+  return <><section className="requests-list">
     <div className="panel-heading"><div><p className="eyebrow">Creator workspace</p><h1>My Requests</h1></div><Link href="/">New request</Link></div>
     {message && <div className="status-box"><b>{message}</b></div>}
     {items.map((item) => <article className="request-card" key={item.requestId}>
@@ -69,5 +70,5 @@ export function MyRequests() {
         <details><summary>Revoke and replace</summary><form className="request-form compact" onSubmit={(event) => void replace(event, item)}><input name="title" defaultValue={item.view.request.title} required /><input name="amount" defaultValue={item.view.request.amount} required /><input name="recipient" defaultValue={item.view.request.recipient} required /><input name="obligationId" placeholder="New obligation ID" required /><button className="primary-button full">Create replacement</button></form></details>
       </>}
     </article>)}
-  </section>;
+  </section><WalletlessRequests /></>;
 }

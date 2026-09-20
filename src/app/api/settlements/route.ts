@@ -2,20 +2,16 @@ import { list, put } from "@vercel/blob";
 import { NextResponse } from "next/server";
 import { persistSettlementRecord } from "@/lib/server-settlement-store";
 import { validateSettlementCorrelationRecord } from "@/lib/validate-settlement-record";
+import { readJsonObject } from "@/lib/api-request";
 
 export const runtime = "nodejs";
-const MAX_BODY_BYTES = 64 * 1024;
 
 export async function POST(request: Request) {
   const token = process.env.BLOB_READ_WRITE_TOKEN;
   if (!token) return NextResponse.json({ state: "not-configured" }, { status: 503 });
 
   try {
-    const body = await request.text();
-    if (new TextEncoder().encode(body).byteLength > MAX_BODY_BYTES) {
-      return NextResponse.json({ error: "Settlement record is too large." }, { status: 413 });
-    }
-    const record = validateSettlementCorrelationRecord(JSON.parse(body));
+    const record = validateSettlementCorrelationRecord(await readJsonObject(request));
     const state = await persistSettlementRecord(record, {
       async list(prefix) {
         const result = await list({ prefix, limit: 2, token });

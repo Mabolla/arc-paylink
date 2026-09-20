@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { assertPending, authorizeRequest, requestView } from "@/lib/request-lifecycle";
 import { appendRequestEvent, loadRequestRecord } from "@/lib/server-request-store";
 import { vercelRequestStore } from "@/lib/vercel-request-store";
+import { readJsonObject } from "@/lib/api-request";
 
 export const runtime = "nodejs";
 
@@ -11,7 +12,7 @@ export async function POST(request: Request, context: { params: Promise<{ reques
   if (!blobToken) return NextResponse.json({ state: "not-configured" }, { status: 503 });
   try {
     const { requestId } = await context.params;
-    const input = await request.json() as { managementToken?: unknown };
+    const input = await readJsonObject(request);
     const token = String(input.managementToken ?? "");
     const store = vercelRequestStore(blobToken);
     const result = await loadRequestRecord(requestId, store);

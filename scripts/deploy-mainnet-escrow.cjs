@@ -43,7 +43,8 @@ async function main() {
   const implementationAddress = await factory.implementation();
 
   const evidence = {
-    schemaVersion: 1,
+    schemaVersion: 2,
+    release: "surplus-safe-v2",
     network: "Arc Mainnet",
     chainId: Number(ARC_MAINNET_CHAIN_ID),
     usdc: ARC_USDC,
@@ -54,10 +55,11 @@ async function main() {
     blockNumber: receipt.blockNumber,
     deployedAt: new Date().toISOString(),
     sourceCommit: process.env.SOURCE_COMMIT || null,
+    supersedesFactory: "0x19fbf0B85e66d68D312cD18D04A1a789107387FF",
     explorer: `https://explorer.arc.io/tx/${deploymentTx.hash}`,
   };
 
-  const output = path.join(__dirname, "..", "deployments", "arc-mainnet-escrow.json");
+  const output = path.join(__dirname, "..", "deployments", "arc-mainnet-escrow-v2.json");
   fs.writeFileSync(output, `${JSON.stringify(evidence, null, 2)}\n`, { flag: "wx" });
   console.log(JSON.stringify(evidence, null, 2));
 }
