@@ -18,4 +18,24 @@ describe("walletless creator registration message", () => {
     expect(message).not.toContain("recipient@example.com");
     expect(walletlessRegistrationMessage({ ...input, recipientEmail: "recipient@example.com" })).toBe(message);
   });
+
+  it("canonicalizes address casing before constructing the signed message", () => {
+    const lowerCaseMessage = walletlessRegistrationMessage({
+      sender: "0x94705a9d675daa924f9190eca4c05ed6b12d5345",
+      factory: "0x1234567890abcdef1234567890abcdef12345678",
+      paymentId: `0x${"11".repeat(32)}`,
+      escrow: "0xabcdefabcdefabcdefabcdefabcdefabcdefabcd",
+      recipientEmail: "recipient@example.com",
+      issuedAt: "2026-09-20T00:00:00.000Z",
+    });
+    const mixedCaseMessage = walletlessRegistrationMessage({
+      sender: "0x94705A9d675dAa924F9190ECa4C05ED6B12d5345",
+      factory: "0x1234567890AbcdEF1234567890aBcdef12345678",
+      paymentId: `0x${"11".repeat(32)}`,
+      escrow: "0xABcdEFABcdEFabcdEfAbCdefabcdeFABcDEFabCD",
+      recipientEmail: "recipient@example.com",
+      issuedAt: "2026-09-20T00:00:00.000Z",
+    });
+    expect(lowerCaseMessage).toBe(mixedCaseMessage);
+  });
 });

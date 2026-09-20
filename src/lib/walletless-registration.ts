@@ -1,4 +1,4 @@
-import { keccak256, stringToHex, type Address, type Hex } from "viem";
+import { getAddress, keccak256, stringToHex, type Address, type Hex } from "viem";
 import { ARC_CHAIN_ID } from "./arc";
 
 export function walletlessRegistrationMessage(input: {
@@ -14,13 +14,18 @@ export function walletlessRegistrationMessage(input: {
   const email = input.recipientEmail.trim().toLowerCase();
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error("Recipient email is invalid.");
   const emailHash = keccak256(stringToHex(email));
+  // Wallet providers and RPC reads may return the same address with different
+  // casing. Canonicalize them so both sides sign identical message bytes.
+  const sender = getAddress(input.sender);
+  const factory = getAddress(input.factory);
+  const escrow = getAddress(input.escrow);
   return [
     "Arc PayLink creator registration",
     `Chain ID: ${ARC_CHAIN_ID}`,
-    `Sender: ${input.sender}`,
-    `Factory: ${input.factory}`,
+    `Sender: ${sender}`,
+    `Factory: ${factory}`,
     `Payment ID: ${input.paymentId}`,
-    `Escrow: ${input.escrow}`,
+    `Escrow: ${escrow}`,
     `Recipient email hash: ${emailHash}`,
     `Issued at: ${issuedAt.toISOString()}`,
   ].join("\n");
