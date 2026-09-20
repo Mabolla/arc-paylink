@@ -57,6 +57,10 @@ Raw CCTP message and attestation bytes are not retained. The immutable correlati
 
 Set `BLOB_READ_WRITE_TOKEN` in Vercel to enable shared settlement persistence. The token is server-only and must never use a `NEXT_PUBLIC_` prefix. This milestone records recovery intent only; it does not automatically retry, refund, or top up funds.
 
+For Google social login in a production deployment, update the Web OAuth client in Google Cloud before testing. Add the production origin (for example, `https://arc-paylink-two.vercel.app`) to **Authorized JavaScript origins** and both exact callbacks (`https://arc-paylink-two.vercel.app/claim` and `https://arc-paylink-two.vercel.app/wallet`) to **Authorized redirect URIs**. Preview domains require their own exact entries; changing the Vercel production domain without updating these values causes `redirect_uri_mismatch`.
+
+After a successful claim, the recipient can open `/wallet`, authenticate with the same Google account, view the Circle user-controlled Arc wallet address and onchain USDC balance, and prepare an ERC-20 USDC transfer. The server hardcodes the official Arc USDC contract and validates the destination and base-unit amount; Circle still requires the recipient's explicit secure approval before submission.
+
 The `/audit` page retrieves a private record only when both the full correlation ID and exact obligation type/ID match. The server reads the private Blob, validates the record again, and returns no record data for missing, mismatched, or conflicting references. Blob URLs are never exposed to the browser.
 
 `POST /api/settlements/recover` requires the same exact references plus the source burn transaction hash as the payment reference. It returns a deterministic, non-executable recovery plan: completed settlements are no-ops, pending settlements wait for destination verification, partial settlements describe the exact outstanding top-up, duplicates are rejected, and mismatches require manual review. Every response explicitly sets `fundMovement: false` and `executable: false`.

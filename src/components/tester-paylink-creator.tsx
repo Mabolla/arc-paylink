@@ -179,8 +179,8 @@ export function TesterPayLinkCreator() {
         setMessage("Escrow funded. Sign the free creator-recovery record; this does not move funds.");
         const managementToken = await registerWalletlessPayLink({ item: localReference, account, wallet: walletClient });
         saveWalletlessPayLink(window.localStorage, { ...localReference, managementToken });
-      } catch {
-        registrationWarning = " The funded link is safe in this browser, but private creator backup is temporarily unavailable.";
+      } catch (error) {
+        registrationWarning = ` The funded link is safe in this browser, but encrypted creator backup was not saved: ${errorMessage(error)} You can retry from My Requests.`;
       }
       setClaimPackage(portablePackage);
       setStage("complete");
@@ -240,7 +240,7 @@ export function TesterPayLinkCreator() {
       </>}
       {creationHash && <a className="explorer-link" href={`${ARC_EXPLORER_URL}/tx/${creationHash}`} target="_blank" rel="noreferrer">View escrow creation on ArcScan ↗</a>}
       {fundingHash && <a className="explorer-link" href={`${ARC_EXPLORER_URL}/tx/${fundingHash}`} target="_blank" rel="noreferrer">View escrow funding on ArcScan ↗</a>}
-      <p className="security-note">Treat this link like a payment secret. Automated email delivery and recipient-email binding are not yet enabled; whoever has the link can claim to their own verified Circle wallet.</p>
+      <p className="security-note">Treat this link like a payment secret. Delivery is manual; only the intended Google email can continue to the recipient wallet and claim.</p>
     </section>
   );
 }

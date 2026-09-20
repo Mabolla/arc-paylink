@@ -1,4 +1,4 @@
-import { isAddress, isHex, keccak256 } from "viem";
+import { getAddress, isAddress, isHex, keccak256 } from "viem";
 import { NextResponse } from "next/server";
 import { verifyClaimContext, type VerifiedClaimContext } from "@/lib/claim-validation";
 import { ARC_CHAIN_ID, ARC_USDC_ADDRESS, IS_ARC_MAINNET } from "@/lib/arc";
@@ -20,6 +20,7 @@ type CircleAction =
   | "listWallets"
   | "inspectChallenge"
   | "deployWallet"
+  | "transferUsdc"
   | "signClaim"
   | "executeClaim";
 
@@ -151,6 +152,26 @@ export async function POST(request: Request) {
     const walletAddress = claimWallet(body.walletAddress);
     const ownershipError = await assertWalletOwnership(userToken, walletId, walletAddress);
     if (ownershipError) return circleResponse(ownershipError);
+
+    if (action === "transferUsdc") {
+      const recipient = requiredString(body.recipient, "recipient");
+      if (!isAddress(recipient)) throw new Error("Destination Arc address is invalid.");
+      const amountBaseUnits = requiredString(body.amountBaseUnits, "amountBaseUnits");
+      if (!/^[1-9][0-9]*$/.test(amountBaseUnits)) throw new Error("USDC amount must be greater than zero.");
+      return circleResponse(await circleRequest("/v1/w3s/user/transactions/contractExecution", {
+        method: "POST",
+        headers: userHeaders,
+        body: JSON.stringify({
+          idempotencyKey: idempotencyKey(body.idempotencyKey),
+          walletId,
+          contractAddress: ARC_USDC_ADDRESS,
+          abiFunctionSignature: "transfer(address,uint256)",
+          abiParameters: [getAddress(recipient), amountBaseUnits],
+          feeLevel: "MEDIUM",
+          refId: "arc-paylink-recipient-usdc-transfer",
+        }),
+      }));
+    }
 
     const claim = await verifyClaimContext(body);
 

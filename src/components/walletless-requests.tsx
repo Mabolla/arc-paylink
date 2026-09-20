@@ -154,13 +154,34 @@ export function WalletlessRequests() {
         setMessage("Funding confirmed. Sign the free creator-recovery record; this does not move funds.");
         const managementToken = await registerWalletlessPayLink({ item: fundedItem, account, wallet });
         saveWalletlessPayLink(window.localStorage, { ...fundedItem, managementToken });
-      } catch {
-        registrationWarning = " Private creator backup is temporarily unavailable; the claim link remains safe in this browser.";
+      } catch (error) {
+        registrationWarning = ` Encrypted creator backup was not saved: ${error instanceof Error ? error.message : "creator registration failed"}. You can retry below.`;
       }
       setMessage(`Funding confirmed on ${ARC_NETWORK_NAME}. The private claim link is now active.${registrationWarning}`);
       await refresh();
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Funding failed.");
+    } finally {
+      setBusyEscrow(undefined);
+    }
+  }
+
+  async function registerBackup(item: Item) {
+    try {
+      setBusyEscrow(item.claimPackage.escrow);
+      if (!item.fundingHash) throw new Error("Funding transaction evidence is missing from this browser.");
+      setMessage("Connect the original sender wallet and sign the free creator-backup records. These signatures cannot move funds.");
+      const provider = getBrowserProvider();
+      const account = await connectWallet(provider);
+      await ensureArcNetwork(provider);
+      if (account.toLowerCase() !== item.sender.toLowerCase()) throw new Error("Connect the wallet that created this PayLink.");
+      const wallet = createWalletClient({ account, chain: arcChain, transport: custom(provider) });
+      const managementToken = await registerWalletlessPayLink({ item: { ...item, fundingHash: item.fundingHash }, account, wallet });
+      saveWalletlessPayLink(window.localStorage, { ...item, managementToken });
+      setMessage("Encrypted creator backup saved. This PayLink can now be recovered in a new browser with the original sender wallet.");
+      await refresh();
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Creator backup registration failed.");
     } finally {
       setBusyEscrow(undefined);
     }
@@ -259,6 +280,7 @@ export function WalletlessRequests() {
       {item.status === "expired" && !isSurplusSafeArcPayLinkFactory(item.claimPackage.factory) && (item.escrowBalance ?? 0n) > 0n && (item.escrowBalance ?? 0n) < BigInt(item.claimPackage.amountBaseUnits) && <p className="fine-print">This legacy escrow expired before it was fully funded. Its earlier contract version cannot return a partial balance.</p>}
       {(item.status === "claimed" || item.status === "refunded") && item.escrowBalance !== null && item.escrowBalance > 0n && isSurplusSafeArcPayLinkFactory(item.claimPackage.factory) && <button className="secondary-button full" disabled={busyEscrow === item.claimPackage.escrow} onClick={() => void recoverSurplus(item)}>Recover {formatUnits(item.escrowBalance, 6)} surplus USDC</button>}
       {(item.status === "claimed" || item.status === "refunded") && item.escrowBalance !== null && item.escrowBalance > 0n && !isSurplusSafeArcPayLinkFactory(item.claimPackage.factory) && <p className="fine-print">This legacy escrow contains an unrecoverable surplus from its earlier contract version.</p>}
+      {!item.managementToken && item.fundingHash && <button className="secondary-button full" disabled={busyEscrow === item.claimPackage.escrow} onClick={() => void registerBackup(item)}>Save encrypted creator backup</button>}
       <a className="explorer-link mono" href={`${ARC_EXPLORER_URL}/address/${item.claimPackage.escrow}`} target="_blank" rel="noreferrer">View escrow on ArcScan ↗</a>
     </article>)}
   </section>;

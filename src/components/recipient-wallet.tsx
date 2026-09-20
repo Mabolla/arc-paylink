@@ -635,6 +635,7 @@ export function RecipientWallet() {
           <a className="explorer-link mono" href={`${ARC_EXPLORER_URL}/tx/${storedReceipt.transactionHash}`} target="_blank" rel="noreferrer">
             Confirmed · View transaction ↗
           </a>
+          <a className="primary-button full wallet-open-link" href="/wallet">Open recipient wallet <span aria-hidden>→</span></a>
           <button className="text-button" onClick={() => {
             removeConfirmedClaimReceipt(localStorage, RECEIPT_NETWORK, storedReceipt.escrow);
             setStoredReceipt(null);
@@ -684,6 +685,7 @@ export function RecipientWallet() {
               Confirmed · View transaction ↗
             </a>
           )}
+          {claimStep === "claimed" && <a className="primary-button full wallet-open-link" href="/wallet">Open recipient wallet <span aria-hidden>→</span></a>}
         </>
       )}
         </>
