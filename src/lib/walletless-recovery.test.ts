@@ -3,7 +3,7 @@ import { decryptClaimBackup, encryptClaimBackup, recoveryManagementToken, wallet
 import { ARC_CHAIN_ID, ARC_NETWORK_NAME } from "./arc";
 import { ARC_PAYLINK_FACTORY } from "./claim-package";
 import type { PrivateClaimPackage } from "./claim-package";
-import { keccak256 } from "viem";
+import { keccak256, type Address } from "viem";
 
 const context = {
   sender: `0x${"11".repeat(20)}` as const,
@@ -47,5 +47,15 @@ describe("encrypted creator recovery", () => {
     expect(message).toContain(context.paymentId);
     expect(message).toContain("cannot move funds");
     expect(recoveryManagementToken(signature)).toMatch(/^0x[0-9a-f]{64}$/);
+  });
+
+  it("keeps recovery signatures stable across address casing", () => {
+    const lowerCaseContext = {
+      ...context,
+      sender: context.sender.toLowerCase() as Address,
+      factory: context.factory.toLowerCase() as Address,
+      escrow: context.escrow.toLowerCase() as Address,
+    };
+    expect(walletlessRecoveryMessage(lowerCaseContext)).toBe(walletlessRecoveryMessage(context));
   });
 });

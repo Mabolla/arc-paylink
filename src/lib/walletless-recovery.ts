@@ -1,6 +1,6 @@
 import { ARC_CHAIN_ID } from "./arc";
 import { parsePrivateClaimPackage, type PrivateClaimPackage } from "./claim-package";
-import { hexToBytes, isHex, keccak256, type Address, type Hex } from "viem";
+import { getAddress, hexToBytes, isHex, keccak256, type Address, type Hex } from "viem";
 
 export type EncryptedClaimBackup = {
   schemaVersion: 1;
@@ -23,13 +23,19 @@ function fromBase64Url(value: string) {
 }
 
 function recoveryContext(input: { sender: Address; factory: Address; paymentId: Hex; escrow: Address }) {
+  // Wallet providers commonly return the connected account in lowercase while
+  // persisted records use checksum casing. Keep the sender lowercase for
+  // compatibility with existing backups, and canonicalize claim addresses.
+  const sender = input.sender.toLowerCase();
+  const factory = getAddress(input.factory);
+  const escrow = getAddress(input.escrow);
   return [
     "Arc PayLink creator recovery",
     `Chain ID: ${ARC_CHAIN_ID}`,
-    `Sender: ${input.sender}`,
-    `Factory: ${input.factory}`,
+    `Sender: ${sender}`,
+    `Factory: ${factory}`,
     `Payment ID: ${input.paymentId}`,
-    `Escrow: ${input.escrow}`,
+    `Escrow: ${escrow}`,
     "Purpose: decrypt this PayLink creator backup; this signature cannot move funds.",
   ].join("\n");
 }
