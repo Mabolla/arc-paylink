@@ -116,6 +116,7 @@ export function RecipientWallet() {
   const [claimMessage, setClaimMessage] = useState("Load the private PayLink package to unlock this claim.");
   const [claimTxHash, setClaimTxHash] = useState("");
   const [claimPackage, setClaimPackage] = useState<PrivateClaimPackage | null>(null);
+  const [claimLinkError, setClaimLinkError] = useState<string | null>(null);
   const [storedReceipt, setStoredReceipt] = useState<ConfirmedClaimReceipt | null>(null);
   const [restoringReceipt, setRestoringReceipt] = useState(true);
 
@@ -136,6 +137,7 @@ export function RecipientWallet() {
         setClaimMessage(`PayLink verified for ${restored.amountUsdc} USDC. Continue to your recipient wallet.`);
       } catch (error) {
         sessionStorage.removeItem(CLAIM_CONTEXT_KEY);
+        setClaimLinkError(errorMessage(error));
         setClaimStep("failed");
         setClaimMessage(errorMessage(error));
       }
@@ -641,13 +643,14 @@ export function RecipientWallet() {
       )}
       {!restoringReceipt && !storedReceipt && (
         <>
-      <div className={`status-box ${step === "failed" ? "failed" : step === "complete" ? "paid" : ""}`} role="status">
-        <b>{message}</b>
-        {!["ready", "challenge-ready", "complete", "failed"].includes(step) && <span className="spinner" />}
+      <div className={`status-box ${claimLinkError || step === "failed" ? "failed" : step === "complete" ? "paid" : ""}`} role="status">
+        <b>{claimLinkError ?? message}</b>
+        {!claimLinkError && !["ready", "challenge-ready", "complete", "failed"].includes(step) && <span className="spinner" />}
       </div>
-      {step === "ready" && <button className="primary-button full" onClick={signIn}>Continue with Google <span aria-hidden>→</span></button>}
-      {step === "challenge-ready" && <button className="primary-button full" onClick={createWallet}>Create Arc wallet <span aria-hidden>→</span></button>}
-      {step === "failed" && <button className="text-button" onClick={() => window.location.reload()}>Start again</button>}
+      {claimLinkError && <a className="text-button" href="/claim">Open claim page</a>}
+      {!claimLinkError && step === "ready" && <button className="primary-button full" onClick={signIn}>Continue with Google <span aria-hidden>→</span></button>}
+      {!claimLinkError && step === "challenge-ready" && <button className="primary-button full" onClick={createWallet}>Create Arc wallet <span aria-hidden>→</span></button>}
+      {!claimLinkError && step === "failed" && <button className="text-button" onClick={() => window.location.reload()}>Start again</button>}
       {wallet && (
         <>
           <dl className="payment-details wallet-details">
