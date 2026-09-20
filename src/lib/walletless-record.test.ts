@@ -44,6 +44,13 @@ describe("walletless server records", () => {
     expect(() => authorizeWalletlessRecord(record, "22222222-2222-4222-8222-222222222222")).toThrow("not found");
   });
 
+  it("accepts a signature-derived walletless management capability", () => {
+    const walletlessToken = `0x${"ab".repeat(32)}`;
+    const record = createWalletlessRecord({ ...input(), managementToken: walletlessToken });
+    expect(() => authorizeWalletlessRecord(record, walletlessToken)).not.toThrow();
+    expect(() => authorizeWalletlessRecord(record, `0x${"cd".repeat(32)}`)).toThrow("not found");
+  });
+
   it("rejects malformed creator metadata", () => {
     expect(() => createWalletlessRecord({ ...input(), recipientEmail: "wrong" })).toThrow("email");
   });
