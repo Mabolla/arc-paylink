@@ -3,23 +3,41 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { SocialLoginProvider } from "@circle-fin/w3s-pw-web-sdk/dist/src/types";
 import type { W3SSdk } from "@circle-fin/w3s-pw-web-sdk";
-import { createPublicClient, erc20Abi, formatUnits, getAddress, http, isAddress, parseUnits, type Hash } from "viem";
+import { createPublicClient, erc20Abi, formatUnits, getAddress, http, isAddress, parseAbiItem, parseUnits, type Hash } from "viem";
 import { ARC_EXPLORER_URL, ARC_NETWORK_NAME, ARC_RPC_URL, ARC_USDC_ADDRESS, IS_ARC_MAINNET, arcChain } from "@/lib/arc";
 
 const appId = process.env.NEXT_PUBLIC_CIRCLE_APP_ID ?? "";
 const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? "";
 const circleBlockchain = IS_ARC_MAINNET ? "ARC" : "ARC-TESTNET";
 const client = createPublicClient({ chain: arcChain, transport: http(ARC_RPC_URL) });
+const transferEvent = parseAbiItem("event Transfer(address indexed from, address indexed to, uint256 value)");
 const SESSION_KEYS = { deviceToken: "arc-paylink.circle.device-token", deviceEncryptionKey: "arc-paylink.circle.device-encryption-key" } as const;
 
 type Login = { userToken: string; encryptionKey: string };
 type Wallet = { id: string; address: string; blockchain: string };
-type TransferReview = { recipient: `0x${string}`; amount: string };
+type TransferReview = { recipient: `0x${string}`; amount: string; amountBaseUnits: bigint; fromBlock: bigint };
 type Status = "loading" | "ready" | "authenticating" | "loading-wallet" | "active" | "preparing" | "approval" | "submitting" | "confirming" | "sent" | "failed";
 
 function messageOf(value: unknown) {
   if (value && typeof value === "object" && "message" in value && typeof value.message === "string") return value.message;
   return "Circle wallet request failed.";
+}
+
+async function findTransferHash(review: TransferReview, from: `0x${string}`): Promise<Hash> {
+  const deadline = Date.now() + 120_000;
+  while (Date.now() < deadline) {
+    const logs = await client.getLogs({
+      address: ARC_USDC_ADDRESS,
+      event: transferEvent,
+      args: { from, to: review.recipient },
+      fromBlock: review.fromBlock,
+      toBlock: "latest",
+    });
+    const match = [...logs].reverse().find((log) => log.args.value === review.amountBaseUnits);
+    if (match?.transactionHash) return match.transactionHash;
+    await new Promise((resolve) => window.setTimeout(resolve, 2_000));
+  }
+  throw new Error("The transfer was submitted, but its Arc transaction hash is not available yet. Refresh and verify before retrying.");
 }
 
 async function circleAction<T>(body: Record<string, unknown>): Promise<T> {
@@ -110,16 +128,18 @@ export function RecipientWalletDashboard() {
       const units = parseUnits(amount, 6);
       if (units <= 0n) throw new Error("Amount must be greater than zero.");
       if (units > balance) throw new Error("Amount exceeds this wallet's USDC balance.");
+      setTxHash(null);
       setStatus("preparing"); setMessage("Preparing the exact USDC transfer.");
       const normalizedRecipient = getAddress(recipient);
       const normalizedAmount = formatUnits(units, 6);
+      const fromBlock = await client.getBlockNumber();
       const result = await circleAction<{ challengeId?: string }>({
         action: "transferUsdc", userToken: login.userToken, walletId: wallet.id, walletAddress: wallet.address,
         recipient: normalizedRecipient, amountBaseUnits: units.toString(), idempotencyKey: crypto.randomUUID(),
       });
       if (!result.challengeId) throw new Error("Circle did not return a transfer challenge.");
       challengeRef.current = result.challengeId;
-      setTransferReview({ recipient: normalizedRecipient, amount: normalizedAmount });
+      setTransferReview({ recipient: normalizedRecipient, amount: normalizedAmount, amountBaseUnits: units, fromBlock });
       setStatus("approval"); setMessage("Verify every transfer detail before opening Circle's secure approval.");
     } catch (error) { setStatus("failed"); setMessage(messageOf(error)); }
   }
@@ -131,11 +151,14 @@ export function RecipientWalletDashboard() {
     sdk.setAuthentication(login);
     sdk.execute(challengeId, async (error: unknown, result) => {
       if (error) { setStatus("failed"); setMessage(messageOf(error)); return; }
-      const hash = result && "data" in result && result.data && "txHash" in result.data ? result.data.txHash as Hash | undefined : undefined;
+      const callbackHash = result && "data" in result && result.data && "txHash" in result.data ? result.data.txHash as Hash | undefined : undefined;
       challengeRef.current = null;
-      if (!hash) { setStatus("active"); setMessage("Transfer submitted. Refresh the balance after Arc confirms it."); return; }
-      setTxHash(hash); setStatus("confirming"); setMessage("Transfer submitted. Waiting for Arc confirmation.");
+      setStatus("confirming"); setMessage("Transfer submitted. Locating and confirming the Arc transaction.");
       try {
+        const review = transferReview;
+        if (!review) throw new Error("Transfer review details are unavailable.");
+        const hash = callbackHash ?? await findTransferHash(review, getAddress(wallet.address));
+        setTxHash(hash);
         const receipt = await client.waitForTransactionReceipt({ hash, timeout: 120_000 });
         if (receipt.status !== "success") throw new Error("The Arc transfer reverted.");
         await refreshBalance(wallet.address);
