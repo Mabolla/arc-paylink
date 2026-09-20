@@ -96,7 +96,7 @@ export function RecipientWalletDashboard() {
       const tokens = await circleAction<{ deviceToken: string; deviceEncryptionKey: string }>({ action: "createDeviceToken", deviceId: await sdk.getDeviceId() });
       sessionStorage.setItem(SESSION_KEYS.deviceToken, tokens.deviceToken);
       sessionStorage.setItem(SESSION_KEYS.deviceEncryptionKey, tokens.deviceEncryptionKey);
-      sdk.updateConfigs({ appSettings: { appId }, loginConfigs: { deviceToken: tokens.deviceEncryptionKey, google: { clientId: googleClientId, redirectUri: `${window.location.origin}/wallet`, selectAccountPrompt: true } } });
+      sdk.updateConfigs({ appSettings: { appId }, loginConfigs: { deviceToken: tokens.deviceToken, deviceEncryptionKey: tokens.deviceEncryptionKey, google: { clientId: googleClientId, redirectUri: `${window.location.origin}/wallet`, selectAccountPrompt: true } } });
       sdk.performLogin(SocialLoginProvider.GOOGLE);
     } catch (error) { setStatus("failed"); setMessage(messageOf(error)); }
   }
@@ -134,16 +134,55 @@ export function RecipientWalletDashboard() {
       const hash = result && "data" in result && result.data && "txHash" in result.data ? result.data.txHash as Hash | undefined : undefined;
       challengeRef.current = null;
       if (!hash) { setStatus("active"); setMessage("Transfer submitted. Refresh the balance after Arc confirms it."); return; }
-      setTxHash���͠��͕�Mх��̠������ɵ������͕�5��ͅ����QɅ�͙�ȁ�Չ���ѕ���]��ѥ�����ȁɌ������ɵ�ѥ������(����������(������������Ёɕ����Ѐ�݅�Ё�����й݅����QɅ�ͅ�ѥ��I�����С쁡�͠��ѥ���������|�������(������������ɕ����й�х��̀����Ս���̈��ѡɽ܁��܁�ɽȠ�Q���Ɍ��Ʌ�͙�ȁɕٕ�ѕ�����(���������݅�Ёɕ�ɕ͡	�������݅���й���ɕ�̤�(��������͕���չР����͕�I�������Р����͕�Mх��̠�͕�Ј��͕�5��ͅ����UM�͕�Ё���������ɵ������Ɍ����(������􁍅э��������ɵ�ѥ���ɽȤ��͕�Mх��̠����������͕�5��ͅ������ͅ��=�������ɵ�ѥ���ɽȤ���(�������(���((���չ�ѥ�������QɅ�͙�Ƞ���(�������������I������ɕ�Ѐ�ձ��(����͕�QɅ�͙��I�٥�ܡ�ձ���(����͕�Mх��̠���ѥٔ���(����͕�5��ͅ����QɅ�͙�ȁ���ɽم���������������Ёѡ�����ѥ��ѥ����ȁ���չа�ѡ���ɕ٥�܁���������(���((������Ё�����l��������������ѡ��ѥ��ѥ��������������݅���Ј����ɕ��ɥ�������Չ���ѥ�����������ɵ����t�����Ց�̡�х��̤�(��ɕ��ɸ��͕�ѥ��������9����݅���е��������ɥ�������������݅���е��͡���ɐ����������(�����؁�����9������������������������������9����啉ɽ܈�I�������Ё݅��������ȁ���݅���е��͡���ɐ����������e��ȁɌ�݅�������𽑥�������������9�����ѕ���
-�ɍ���
-܁�����������𽑥��(������������9����݅���е���������́ѡ��݅���Ё�ɕ�ѕ����ɥ�����ȁ�������Ɍ�A��1������ٕȁɕ���ٕ́��́�ɥمє����̸���(�����؁�����9������х��̵�������х��̀��􀉙��������������������х��̀���͕�Ј����������聉���������������耈����ɽ����х��̈�����ͅ������䀘�������������9����������Ȉ����𽑥��(������х��̀���ɕ��䈀������ѽ�������9�����ɥ���䵉��ѽ���ձ�����
-�����젤����ٽ���ͥ��%�����
-��ѥ�Ք�ݥѠ��������������H���������ѽ���(�����݅���Ѐ�����(������񑰁�����9������嵕�е��х��́݅���е��х��̈�(��������������9��ݽɬ������I
-}9Q]=I-}95�𽑐�𽑥��(��������������]��������񑐁�����9���􉵽���݅���е���ɕ�̈��݅���й���ɕ���𽑐�𽑥��(��������������م����������������������ɽ���홽ɵ��U���̡���������إ�UM���ɽ���𽑐�𽑥��(������𽑰�(��������х��̀��􀉅��ɽم�������х��̀����Չ���ѥ��������ɴ������9����ɕ�Օ�е��ɴ����MՉ����졕ٕ�Ф����ٽ����ɕ��ɕQɅ�͙�ȡ�ٕ�Х��(��������񱅉�����ѥ��ѥ���Ɍ����ɕ�����Ёم�Ք��ɕ�������􁽹
-������졕ٕ�Ф����͕�I�������С�ٕ�йхɝ�йم�Ք���������������ุ���ɕ�եɕ����𽱅����(��������񱅉���UM����չ��؁�����9���􉅵�չе����Ј����Ёم�Ք�텵�չ�􁽹
-������졕ٕ�Ф����͕���չС�ٕ�йхɝ�йم�Ք�􁥹���5���􉑕�������������������������ɕ�եɕ������UM��𽑥��𽱅����(�����������ѽ�������9�����ɥ���䵉��ѽ���ձ�����ͅ���������������������������I�٥�܁�Ʌ�͙�Ȁ�������H���������ѽ��(������𽙽ɴ��(��������х��̀��􀉅��ɽم�������Ʌ�͙��I�٥�܀�����(��������񑰁�����9������嵕�е��х��̈��ɥ��������QɅ�͙�ȁɕ٥�܈�(����������������ɽ��݅�������񑐁�����9���􉵽���݅���е���ɕ�̈��݅���й���ɕ���𽑐�𽑥��(������������������ѥ��ѥ�����񑐁�����9���􉵽���݅���е���ɕ�̈���Ʌ�͙��I�٥�ܹɕ��������𽑐�𽑥��(������������������չ���������ɽ�����Ʌ�͙��I�٥�ܹ���չ��UM���ɽ���𽑐�𽑥��(����������������9��ݽɬ������I
-}9Q]=I-}95�𽑐�𽑥��(��������𽑰�(���������؁�����9�����Ʌ�͙�ȵ��ѥ��̈�(�������������ѽ�������9�����ɥ���䵉��ѽ���ձ�����
-��������ɽٕQɅ�͙������ɽٔ���Ʌ�͙��I�٥�ܹ���չ��UM��Ʌ�͙�Ȁ�������H���������ѽ��(�������������ѽ�������9����͕������䵉��ѽ���ձ����������ѽ�����
-�����핑��QɅ�͙����	�����������Ё�Ʌ�͙�����ѽ��(��������𽑥��(���������(���������!�͠����񄁍����9��������ɕȵ������������ɕ��퀑�I
-}aA1=II}UI1���༑���!�͡���хɝ���}�������ɕ�􉹽ɕ���ɕȈ�Y��܁�Ʌ�ͅ�ѥ������ɍM�����\���(���������ѽ�������9����ѕ�е���ѽ�����ͅ���������􁽹
-�����젤����ٽ���ɕ�ɕ͡	�������݅���й���ɕ�̤���э�����ɽȤ�����͕�Mх��̠����������͕�5��ͅ������ͅ��=����ɽȤ������I��ɕ͠�����������ѽ��(�������(������������9����͕��ɥ�䵹�є��=��䁅��ɽٔ�ѡ�����ѥ��ѥ����������չЁ�ԁ��ѕ���Ѽ�͕����QɅ�͙��́�����ɵ������Ɍ������Ё���ɕٕ�͕�����(���͕�ѥ����)�(
+      setTxHash(hash); setStatus("confirming"); setMessage("Transfer submitted. Waiting for Arc confirmation.");
+      try {
+        const receipt = await client.waitForTransactionReceipt({ hash, timeout: 120_000 });
+        if (receipt.status !== "success") throw new Error("The Arc transfer reverted.");
+        await refreshBalance(wallet.address);
+        setAmount(""); setRecipient(""); setStatus("sent"); setMessage("USDC sent and confirmed on Arc.");
+      } catch (confirmationError) { setStatus("failed"); setMessage(messageOf(confirmationError)); }
+    });
+  }
+
+  function editTransfer() {
+    challengeRef.current = null;
+    setTransferReview(null);
+    setStatus("active");
+    setMessage("Transfer approval cancelled. Edit the destination or amount, then review again.");
+  }
+
+  const busy = ["loading", "authenticating", "loading-wallet", "preparing", "submitting", "confirming"].includes(status);
+  return <section className="wallet-panel" aria-labelledby="wallet-dashboard-heading">
+    <div className="panel-heading"><div><p className="eyebrow">Recipient wallet</p><h2 id="wallet-dashboard-heading">Your Arc wallet</h2></div><span className="step">Circle · Google</span></div>
+    <p className="wallet-copy">Access the wallet created during your claim. Arc PayLink never receives its private keys.</p>
+    <div className={`status-box ${status === "failed" ? "failed" : status === "sent" ? "paid" : busy ? "pending" : ""}`} role="status">{message}{busy && <span className="spinner" />}</div>
+    {status === "ready" && <button className="primary-button full" onClick={() => void signIn()}>Continue with Google <span>→</span></button>}
+    {wallet && <>
+      <dl className="payment-details wallet-details">
+        <div><dt>Network</dt><dd>{ARC_NETWORK_NAME}</dd></div>
+        <div><dt>Wallet</dt><dd className="mono wallet-address">{wallet.address}</dd></div>
+        <div><dt>Available balance</dt><dd><strong>{formatUnits(balance, 6)} USDC</strong></dd></div>
+      </dl>
+      {status !== "approval" && status !== "submitting" && <form className="request-form" onSubmit={(event) => void prepareTransfer(event)}>
+        <label>Destination Arc address<input value={recipient} onChange={(event) => setRecipient(event.target.value)} placeholder="0x..." required /></label>
+        <label>USDC amount<div className="amount-input"><input value={amount} onChange={(event) => setAmount(event.target.value)} inputMode="decimal" placeholder="0.00" required /><b>USDC</b></div></label>
+        <button className="primary-button full" disabled={busy || balance === 0n}>Review transfer <span>→</span></button>
+      </form>}
+      {status === "approval" && transferReview && <>
+        <dl className="payment-details" aria-label="Transfer review">
+          <div><dt>From wallet</dt><dd className="mono wallet-address">{wallet.address}</dd></div>
+          <div><dt>Destination</dt><dd className="mono wallet-address">{transferReview.recipient}</dd></div>
+          <div><dt>Amount</dt><dd><strong>{transferReview.amount} USDC</strong></dd></div>
+          <div><dt>Network</dt><dd>{ARC_NETWORK_NAME}</dd></div>
+        </dl>
+        <div className="transfer-actions">
+          <button className="primary-button full" onClick={approveTransfer}>Approve {transferReview.amount} USDC transfer <span>→</span></button>
+          <button className="secondary-button full" type="button" onClick={editTransfer}>Back and edit transfer</button>
+        </div>
+      </>}
+      {txHash && <a className="explorer-link mono" href={`${ARC_EXPLORER_URL}/tx/${txHash}`} target="_blank" rel="noreferrer">View transaction on ArcScan ↗</a>}
+      <button className="text-button" disabled={busy} onClick={() => void refreshBalance(wallet.address).catch((error) => { setStatus("failed"); setMessage(messageOf(error)); })}>Refresh balance</button>
+    </>}
+    <p className="security-note">Only approve the destination and amount you intend to send. Transfers confirmed on Arc cannot be reversed.</p>
+  </section>;
+}
