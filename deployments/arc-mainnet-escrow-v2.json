@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 2,
+  "release": "surplus-safe-v2",
+  "network": "Arc Mainnet",
+  "chainId": 5042,
+  "usdc": "0x3600000000000000000000000000000000000000",
+  "deployer": "0xE7be265f2301E08a6EaE5Cfd0C1113a7Cd35b3dd",
+  "factory": "0x23c6DAed3617812249C3b9A3Db8525532D0787B9",
+  "implementation": "0xA51932CB63aF7B1Bb5d401eaA4052ED17194E760",
+  "transactionHash": "0x430c4cfb2dd859efa2e9468d9023c8a53e591e146947a6c28378c2ab5c32e249",
+  "blockNumber": 21876743,
+  "deployedAt": "2026-09-20T17:49:57.831Z",
+  "sourceCommit": "bf3d529c8593b0f83943458b549267d045d40968",
+  "supersedesFactory": "0x19fbf0B85e66d68D312cD18D04A1a789107387FF",
+  "explorer": "https://explorer.arc.io/tx/0x430c4cfb2dd859efa2e9468d9023c8a53e591e146947a6c28378c2ab5c32e249"
+}
