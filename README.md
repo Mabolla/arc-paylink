@@ -4,6 +4,13 @@ Arc PayLink lets a sender fund an isolated USDC escrow on Arc and deliver a priv
 
 **Live mainnet pilot:** [arc-paylink-two.vercel.app](https://arc-paylink-two.vercel.app)
 
+## Reviewer quick check
+
+- Open the live sender flow: [`/create`](https://arc-paylink-two.vercel.app/create)
+- Verify the active surplus-safe V2 factory deployment on Arc mainnet: [`0x430c…e249`](https://explorer.arc.io/tx/0x430c4cfb2dd859efa2e9468d9023c8a53e591e146947a6c28378c2ab5c32e249)
+- Inspect the machine-readable deployment record: [`deployments/arc-mainnet-escrow-v2.json`](./deployments/arc-mainnet-escrow-v2.json)
+- Review the mainnet acceptance evidence: [`docs/mainnet-microgrants-evidence.md`](./docs/mainnet-microgrants-evidence.md)
+
 ## What is verified
 
 The production build has completed a real Arc mainnet acceptance flow with `0.01 USDC`:
@@ -67,11 +74,13 @@ flowchart TD
 | --- | --- |
 | Network | Arc mainnet (`5042`) |
 | USDC | `0x3600000000000000000000000000000000000000` |
-| Factory | `0x19fbf0B85e66d68D312cD18D04A1a789107387FF` |
-| Implementation | `0xc90d21bDfcbA415ea9Ca15B3873C7E95Ac05d465` |
-| Deployment transaction | [`0x737e…c4c7f`](https://explorer.arc.io/tx/0x737e467a112113d987ca0f845f256d73a1aa9f82c76655f87450898866cf4c7f) |
+| Active factory | `0x23c6DAed3617812249C3b9A3Db8525532D0787B9` |
+| Active implementation | `0xA51932CB63aF7B1Bb5d401eaA4052ED17194E760` |
+| Deployment transaction | [`0x430c…e249`](https://explorer.arc.io/tx/0x430c4cfb2dd859efa2e9468d9023c8a53e591e146947a6c28378c2ab5c32e249) |
+| Deployment block | `21876743` |
+| Legacy factory | `0x19fbf0B85e66d68D312cD18D04A1a789107387FF` |
 
-Machine-readable deployment evidence: [`deployments/arc-mainnet-escrow.json`](./deployments/arc-mainnet-escrow.json).
+Machine-readable deployment evidence: [`deployments/arc-mainnet-escrow-v2.json`](./deployments/arc-mainnet-escrow-v2.json). The original pilot deployment remains in [`deployments/arc-mainnet-escrow.json`](./deployments/arc-mainnet-escrow.json) for legacy escrow verification.
 
 ## Security boundary
 
