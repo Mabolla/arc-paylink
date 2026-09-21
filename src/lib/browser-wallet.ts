@@ -18,7 +18,7 @@ export async function connectWallet(provider: EIP1193Provider): Promise<`0x${str
   return accounts[0];
 }
 
-export async function ensureArcTestnet(provider: EIP1193Provider): Promise<void> {
+export async function ensureArcNetwork(provider: EIP1193Provider): Promise<void> {
   const current = (await provider.request({ method: "eth_chainId" })) as string;
   const target = `0x${ARC_CHAIN_ID.toString(16)}`;
   if (current.toLowerCase() === target.toLowerCase()) return;

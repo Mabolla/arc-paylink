@@ -1,13 +1,14 @@
 import { get, list } from "@vercel/blob";
 import { createPublicClient, http, isHash } from "viem";
 import { NextResponse } from "next/server";
-import { arcTestnet } from "@/lib/arc";
+import { arcChain } from "@/lib/arc";
 import { requestView } from "@/lib/request-lifecycle";
-import { appendRequestEvent, loadRequestRecord } from "@/lib/server-request-store";
+import { appendRequestEvent, claimSettlementTransaction, loadRequestRecord } from "@/lib/server-request-store";
 import { vercelRequestStore } from "@/lib/vercel-request-store";
 import { verifyPaymentReceipt } from "@/lib/verify-payment";
 import { findSettlementRecord } from "@/lib/server-settlement-store";
 import { validateSettlementCorrelationRecord } from "@/lib/validate-settlement-record";
+import { readJsonObject } from "@/lib/api-request";
 
 export const runtime = "nodejs";
 
@@ -16,7 +17,7 @@ export async function POST(request: Request, context: { params: Promise<{ reques
   if (!blobToken) return NextResponse.json({ state: "not-configured" }, { status: 503 });
   try {
     const { requestId } = await context.params;
-    const input = await request.json() as { transactionHash?: unknown; correlationId?: unknown };
+    const input = await readJsonObject(request);
     if (typeof input.transactionHash !== "string" || !isHash(input.transactionHash)) throw new Error("Invalid settlement transaction hash.");
     const store = vercelRequestStore(blobToken);
     const result = await loadRequestRecord(requestId, store);
@@ -33,7 +34,7 @@ export async function POST(request: Request, context: { params: Promise<{ reques
       const correlation = validateSettlementCorrelationRecord(shared);
       if (!['settled', 'fee-adjusted'].includes(correlation.settlement.state) || correlation.destination.mintTransactionHash.toLowerCase() !== input.transactionHash.toLowerCase()) throw new Error("Bridge settlement does not match this request.");
     } else {
-      const client = createPublicClient({ chain: arcTestnet, transport: http() });
+      const client = createPublicClient({ chain: arcChain, transport: http() });
       const verified = await verifyPaymentReceipt(client, input.transactionHash, { recipient: result.record.request.recipient, amount: result.record.request.amount });
       if (current.status !== "pending") {
         const terminalAt = result.events.find((event) => event.type === "revoked" || event.type === "replaced")?.createdAt;
@@ -41,6 +42,7 @@ export async function POST(request: Request, context: { params: Promise<{ reques
         if (!terminalAt || Number(block.timestamp) * 1000 >= Date.parse(terminalAt)) throw new Error("A revoked or replaced request cannot accept a later settlement.");
       }
     }
+    await claimSettlementTransaction(requestId, input.transactionHash, store);
     await appendRequestEvent(requestId, { type: "settled", createdAt: new Date().toISOString(), transactionHash: input.transactionHash }, `settled-${input.transactionHash.slice(2)}`, store);
     const updated = await loadRequestRecord(requestId, store);
     return NextResponse.json({ view: requestView(updated!.record, updated!.events) });

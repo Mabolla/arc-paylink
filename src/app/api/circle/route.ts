@@ -1,12 +1,18 @@
-import { isAddress, isHex, keccak256 } from "viem";
+import { getAddress, isAddress, isHex, keccak256 } from "viem";
 import { NextResponse } from "next/server";
 import { verifyClaimContext, type VerifiedClaimContext } from "@/lib/claim-validation";
+import { ARC_CHAIN_ID, ARC_USDC_ADDRESS, IS_ARC_MAINNET } from "@/lib/arc";
+import { readJsonObject } from "@/lib/api-request";
 
 const CIRCLE_BASE_URL = "https://api.circle.com";
-const ARC_CHAIN_ID = 5_042_002;
-const ARC_BLOCKCHAIN = "ARC-TESTNET";
-const ARC_USDC = "0x3600000000000000000000000000000000000000";
 const CLAIM_WINDOW_SECONDS = 15 * 60;
+
+function circleArcBlockchain() {
+  const configured = process.env.CIRCLE_ARC_BLOCKCHAIN?.trim();
+  if (configured) return configured;
+  if (IS_ARC_MAINNET) throw new Error("Circle Arc mainnet blockchain identifier is not configured.");
+  return "ARC-TESTNET";
+}
 
 type CircleAction =
   | "createDeviceToken"
@@ -14,6 +20,7 @@ type CircleAction =
   | "listWallets"
   | "inspectChallenge"
   | "deployWallet"
+  | "transferUsdc"
   | "signClaim"
   | "executeClaim";
 
@@ -32,6 +39,15 @@ function apiKey() {
 function requiredString(value: unknown, name: string) {
   if (typeof value !== "string" || !value.trim()) throw new Error(`Missing ${name}.`);
   return value.trim();
+}
+
+function idempotencyKey(value: unknown) {
+  if (value === undefined) return crypto.randomUUID();
+  const key = requiredString(value, "idempotencyKey");
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(key)) {
+    throw new Error("Idempotency key is invalid.");
+  }
+  return key;
 }
 
 function claimWallet(value: unknown) {
@@ -86,7 +102,7 @@ async function assertWalletOwnership(userToken: string, walletId: string, wallet
     return wallet.id === walletId
       && typeof wallet.address === "string"
       && wallet.address.toLowerCase() === walletAddress.toLowerCase()
-      && wallet.blockchain === ARC_BLOCKCHAIN;
+      && wallet.blockchain === circleArcBlockchain();
   });
   if (!ownsWallet) throw new Error("Circle session does not own the recipient wallet.");
   return null;
@@ -94,7 +110,7 @@ async function assertWalletOwnership(userToken: string, walletId: string, wallet
 
 export async function POST(request: Request) {
   try {
-    const body = (await request.json()) as Record<string, unknown>;
+    const body = await readJsonObject(request);
     const action = requiredString(body.action, "action") as CircleAction;
 
     if (action === "createDeviceToken") {
@@ -113,9 +129,9 @@ export async function POST(request: Request) {
         method: "POST",
         headers: userHeaders,
         body: JSON.stringify({
-          idempotencyKey: crypto.randomUUID(),
+          idempotencyKey: idempotencyKey(body.idempotencyKey),
           accountType: "SCA",
-          blockchains: [ARC_BLOCKCHAIN],
+          blockchains: [circleArcBlockchain()],
         }),
       }));
     }
@@ -137,6 +153,26 @@ export async function POST(request: Request) {
     const ownershipError = await assertWalletOwnership(userToken, walletId, walletAddress);
     if (ownershipError) return circleResponse(ownershipError);
 
+    if (action === "transferUsdc") {
+      const recipient = requiredString(body.recipient, "recipient");
+      if (!isAddress(recipient)) throw new Error("Destination Arc address is invalid.");
+      const amountBaseUnits = requiredString(body.amountBaseUnits, "amountBaseUnits");
+      if (!/^[1-9][0-9]*$/.test(amountBaseUnits)) throw new Error("USDC amount must be greater than zero.");
+      return circleResponse(await circleRequest("/v1/w3s/user/transactions/contractExecution", {
+        method: "POST",
+        headers: userHeaders,
+        body: JSON.stringify({
+          idempotencyKey: idempotencyKey(body.idempotencyKey),
+          walletId,
+          contractAddress: ARC_USDC_ADDRESS,
+          abiFunctionSignature: "transfer(address,uint256)",
+          abiParameters: [getAddress(recipient), amountBaseUnits],
+          feeLevel: "MEDIUM",
+          refId: "arc-paylink-recipient-usdc-transfer",
+        }),
+      }));
+    }
+
     const claim = await verifyClaimContext(body);
 
     if (action === "deployWallet") {
@@ -144,9 +180,9 @@ export async function POST(request: Request) {
         method: "POST",
         headers: userHeaders,
         body: JSON.stringify({
-          idempotencyKey: crypto.randomUUID(),
+          idempotencyKey: idempotencyKey(body.idempotencyKey),
           walletId,
-          contractAddress: ARC_USDC,
+          contractAddress: ARC_USDC_ADDRESS,
           abiFunctionSignature: "transfer(address,uint256)",
           abiParameters: [walletAddress, "0"],
           feeLevel: "MEDIUM",
@@ -187,7 +223,7 @@ export async function POST(request: Request) {
         method: "POST",
         headers: userHeaders,
         body: JSON.stringify({
-          idempotencyKey: crypto.randomUUID(),
+          idempotencyKey: idempotencyKey(body.idempotencyKey),
           walletId,
           data: JSON.stringify(typedData),
         }),
@@ -207,7 +243,7 @@ export async function POST(request: Request) {
         method: "POST",
         headers: userHeaders,
         body: JSON.stringify({
-          idempotencyKey: crypto.randomUUID(),
+          idempotencyKey: idempotencyKey(body.idempotencyKey),
           walletId,
           contractAddress: claim.escrow,
           abiFunctionSignature: "claim(bytes32,address,uint256,bytes)",

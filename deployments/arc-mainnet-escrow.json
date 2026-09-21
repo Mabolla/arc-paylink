@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "network": "Arc Mainnet",
+  "chainId": 5042,
+  "usdc": "0x3600000000000000000000000000000000000000",
+  "deployer": "0xE7be265f2301E08a6EaE5Cfd0C1113a7Cd35b3dd",
+  "factory": "0x19fbf0B85e66d68D312cD18D04A1a789107387FF",
+  "implementation": "0xc90d21bDfcbA415ea9Ca15B3873C7E95Ac05d465",
+  "transactionHash": "0x737e467a112113d987ca0f845f256d73a1aa9f82c76655f87450898866cf4c7f",
+  "blockNumber": 21697256,
+  "deployedAt": "2026-09-19T16:32:30.938Z",
+  "sourceCommit": "5fa0d39f465a34178af8a808938e6bbcbe79f9ea",
+  "explorer": "https://explorer.arc.io/tx/0x737e467a112113d987ca0f845f256d73a1aa9f82c76655f87450898866cf4c7f"
+}

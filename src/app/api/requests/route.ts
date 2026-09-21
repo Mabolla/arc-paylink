@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createManagedRequest } from "@/lib/request-lifecycle";
 import { createRequestRecord } from "@/lib/server-request-store";
 import { vercelRequestStore } from "@/lib/vercel-request-store";
+import { readJsonObject } from "@/lib/api-request";
 
 export const runtime = "nodejs";
 
@@ -9,7 +10,7 @@ export async function POST(request: Request) {
   const blobToken = process.env.BLOB_READ_WRITE_TOKEN;
   if (!blobToken) return NextResponse.json({ state: "not-configured" }, { status: 503 });
   try {
-    const input = await request.json() as Record<string, unknown>;
+    const input = await readJsonObject(request);
     const requestId = crypto.randomUUID();
     const managementToken = crypto.randomUUID();
     const record = createManagedRequest({

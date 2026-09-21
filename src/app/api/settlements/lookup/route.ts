@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { createObligation } from "@/lib/obligation";
 import { findSettlementRecord } from "@/lib/server-settlement-store";
 import { validateSettlementCorrelationRecord } from "@/lib/validate-settlement-record";
+import { readJsonObject } from "@/lib/api-request";
 
 export const runtime = "nodejs";
 const HASH = /^0x[0-9a-fA-F]{64}$/;
@@ -11,7 +12,7 @@ export async function POST(request: Request) {
   const token = process.env.BLOB_READ_WRITE_TOKEN;
   if (!token) return NextResponse.json({ state: "not-configured" }, { status: 503 });
   try {
-    const input = (await request.json()) as { correlationId?: unknown; obligationKind?: unknown; obligationId?: unknown };
+    const input = await readJsonObject(request);
     if (typeof input.correlationId !== "string" || !HASH.test(input.correlationId)) {
       return NextResponse.json({ error: "Enter a valid correlation ID." }, { status: 400 });
     }

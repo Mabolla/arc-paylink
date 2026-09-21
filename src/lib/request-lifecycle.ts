@@ -28,9 +28,12 @@ export type RequestView = {
 };
 
 const ID = /^[0-9a-f-]{36}$/;
+const SIGNATURE_DERIVED_CAPABILITY = /^0x[0-9a-f]{64}$/;
 
 export function hashManagementToken(token: string): `0x${string}` {
-  if (!ID.test(token)) throw new Error("Invalid management capability.");
+  if (!ID.test(token) && !SIGNATURE_DERIVED_CAPABILITY.test(token)) {
+    throw new Error("Invalid management capability.");
+  }
   return keccak256(stringToHex(token));
 }
 

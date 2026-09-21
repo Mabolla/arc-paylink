@@ -1,6 +1,7 @@
 import { keccak256, stringToHex } from "viem";
 import type { SettlementCorrelationRecord } from "./settlement-correlation";
 import { settlementRecordJson } from "./settlement-record-store";
+import { ARC_CHAIN_ID } from "./arc";
 
 export type SharedStoreResult = "created" | "unchanged" | "conflict";
 
@@ -17,7 +18,7 @@ export type SettlementBlobReader = {
 export async function persistSettlementRecord(record: SettlementCorrelationRecord, store: SettlementBlobStore): Promise<SharedStoreResult> {
   const body = settlementRecordJson(record);
   const digest = keccak256(stringToHex(body)).slice(2);
-  const prefix = `settlements/v1/${record.correlationId}/`;
+  const prefix = `settlements/v1/chain-${ARC_CHAIN_ID}/${record.correlationId}/`;
   const pathname = `${prefix}${digest}.json`;
   const existing = await store.list(prefix);
   if (existing.includes(pathname)) return "unchanged";
@@ -38,7 +39,7 @@ export async function findSettlementRecord(
   obligation: SettlementCorrelationRecord["obligation"],
   store: SettlementBlobReader,
 ): Promise<SettlementCorrelationRecord | "not-found" | "conflict"> {
-  const prefix = `settlements/v1/${correlationId.toLowerCase()}/`;
+  const prefix = `settlements/v1/chain-${ARC_CHAIN_ID}/${correlationId.toLowerCase()}/`;
   const matches = await store.list(prefix);
   if (matches.length === 0) return "not-found";
   if (matches.length !== 1) return "conflict";

@@ -1,4 +1,6 @@
+import type { Hash } from "viem";
 import type { ManagedRequest, RequestEvent } from "./request-lifecycle";
+import { ARC_CHAIN_ID } from "./arc";
 
 export type RequestStore = {
   list(prefix: string): Promise<string[]>;
@@ -6,7 +8,7 @@ export type RequestStore = {
   put(pathname: string, body: string): Promise<void>;
 };
 
-const root = (id: string) => `requests/v1/${id}/`;
+const root = (id: string) => `requests/v1/chain-${ARC_CHAIN_ID}/${id}/`;
 
 export async function createRequestRecord(record: ManagedRequest, store: RequestStore): Promise<void> {
   const path = `${root(record.requestId)}request.json`;
@@ -28,4 +30,34 @@ export async function appendRequestEvent(id: string, event: RequestEvent, key: s
   const path = `${root(id)}events/${key}.json`;
   if ((await store.list(path)).length) return;
   await store.put(path, JSON.stringify(event));
+}
+
+export async function claimSettlementTransaction(
+  requestId: string,
+  transactionHash: Hash,
+  store: RequestStore,
+): Promise<void> {
+  const path = `settlement-claims/v1/chain-${ARC_CHAIN_ID}/${transactionHash.toLowerCase()}.json`;
+
+  async function existingOwner() {
+    if (!(await store.list(path)).includes(path)) return undefined;
+    const value = await store.read(path);
+    if (!value || typeof value !== "object") throw new Error("Settlement transaction ownership record is invalid.");
+    const owner = (value as { requestId?: unknown }).requestId;
+    if (typeof owner !== "string") throw new Error("Settlement transaction ownership record is invalid.");
+    return owner;
+  }
+
+  const owner = await existingOwner();
+  if (owner === requestId) return;
+  if (owner) throw new Error("This settlement transaction is already assigned to another request.");
+
+  try {
+    await store.put(path, JSON.stringify({ schemaVersion: 1, requestId, transactionHash, chainId: ARC_CHAIN_ID }));
+  } catch (error) {
+    const racedOwner = await existingOwner();
+    if (racedOwner === requestId) return;
+    if (racedOwner) throw new Error("This settlement transaction is already assigned to another request.");
+    throw error;
+  }
 }

@@ -31,6 +31,7 @@ contract ArcPayLinkEscrow {
     error InvalidSecret();
     error InvalidSignature();
     error Unauthorized();
+    error NoSurplus();
 
     IERC20 public token;
     address public sender;
@@ -44,6 +45,7 @@ contract ArcPayLinkEscrow {
     event Initialized(address indexed sender, address indexed token, uint256 amount, uint256 expiry, bytes32 secretHash);
     event Claimed(address indexed recipient, uint256 amount);
     event Refunded(address indexed sender, uint256 amount);
+    event SurplusRecovered(address indexed sender, uint256 amount);
 
     constructor() {
         initialized = true;
@@ -92,18 +94,35 @@ contract ArcPayLinkEscrow {
             revert InvalidSignature();
         }
 
+        uint256 balance = token.balanceOf(address(this));
         claimed = true;
         token.safeTransfer(recipient, amount);
+        if (balance > amount) {
+            uint256 surplus = balance - amount;
+            token.safeTransfer(sender, surplus);
+            emit SurplusRecovered(sender, surplus);
+        }
         emit Claimed(recipient, amount);
     }
 
     function refund() external {
         if (msg.sender != sender) revert Unauthorized();
-        if (claimed || refunded || state() != State.Funded) revert InvalidState();
+        if (claimed || refunded) revert InvalidState();
         if (block.timestamp < expiry) revert PaymentNotExpired();
 
+        uint256 balance = token.balanceOf(address(this));
         refunded = true;
-        token.safeTransfer(sender, amount);
-        emit Refunded(sender, amount);
+        if (balance != 0) token.safeTransfer(sender, balance);
+        emit Refunded(sender, balance);
+    }
+
+    function recoverSurplus() external {
+        if (msg.sender != sender) revert Unauthorized();
+        uint256 balance = token.balanceOf(address(this));
+        uint256 reserved = claimed || refunded ? 0 : amount;
+        if (balance <= reserved) revert NoSurplus();
+        uint256 surplus = balance - reserved;
+        token.safeTransfer(sender, surplus);
+        emit SurplusRecovered(sender, surplus);
     }
 }

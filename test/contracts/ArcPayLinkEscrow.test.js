@@ -60,6 +60,27 @@ describe("ArcPayLink escrow", function () {
     expect(await link.escrow.state()).to.equal(1);
   });
 
+  it("recognizes funds sent to the deterministic address before escrow deployment", async function () {
+    const context = await fixture();
+    const latest = await ethers.provider.getBlock("latest");
+    const secret = ethers.hexlify(ethers.randomBytes(32));
+    const secretHash = ethers.keccak256(secret);
+    const expiry = latest.timestamp + HOUR;
+    const nonce = await context.factory.nonces(context.sender.address);
+    const network = await ethers.provider.getNetwork();
+    const paymentId = ethers.keccak256(
+      ethers.AbiCoder.defaultAbiCoder().encode(
+        ["uint256", "address", "address", "uint256", "address", "uint256", "uint256", "bytes32"],
+        [network.chainId, context.factory.target, context.sender.address, nonce, context.token.target, AMOUNT, expiry, secretHash],
+      ),
+    );
+    const predicted = await context.factory.predictEscrow(paymentId);
+    await context.token.mint(predicted, AMOUNT);
+    await context.factory.connect(context.sender).createPayLink(AMOUNT, expiry, secretHash);
+    const escrow = await ethers.getContractAt("ArcPayLinkEscrow", predicted);
+    expect(await escrow.state()).to.equal(1);
+  });
+
   it("lets a relayer claim only to the address that signed the request", async function () {
     const context = await fixture();
     const link = await createPayLink(context);
@@ -140,6 +161,67 @@ describe("ArcPayLink escrow", function () {
 
     expect(await context.token.balanceOf(context.sender.address)).to.equal(link.amount);
     expect(await link.escrow.state()).to.equal(3);
+  });
+
+  it("returns partial funding after expiry instead of locking it", async function () {
+    const context = await fixture();
+    const link = await createPayLink(context);
+    const partial = link.amount / 4n;
+    await context.token.mint(link.escrow.target, partial);
+    expect(await link.escrow.state()).to.equal(0);
+
+    await ethers.provider.send("evm_setNextBlockTimestamp", [link.expiry]);
+    await ethers.provider.send("evm_mine");
+    await expect(link.escrow.connect(context.sender).refund())
+      .to.emit(link.escrow, "Refunded")
+      .withArgs(context.sender.address, partial);
+    expect(await context.token.balanceOf(context.sender.address)).to.equal(partial);
+    expect(await link.escrow.state()).to.equal(3);
+  });
+
+  it("pays the exact claim and returns accidental overfunding to the sender", async function () {
+    const context = await fixture();
+    const link = await createPayLink(context);
+    const surplus = 7_000_000n;
+    await context.token.mint(link.escrow.target, link.amount + surplus);
+    const signature = await signClaim(context.recipient, link.escrow, context.recipient.address, link.secretHash, link.expiry - 1);
+
+    await expect(link.escrow.claim(link.secret, context.recipient.address, link.expiry - 1, signature))
+      .to.emit(link.escrow, "SurplusRecovered")
+      .withArgs(context.sender.address, surplus);
+    expect(await context.token.balanceOf(context.recipient.address)).to.equal(link.amount);
+    expect(await context.token.balanceOf(context.sender.address)).to.equal(surplus);
+    expect(await context.token.balanceOf(link.escrow.target)).to.equal(0);
+  });
+
+  it("lets only the sender recover surplus without touching the reserved claim amount", async function () {
+    const context = await fixture();
+    const link = await createPayLink(context);
+    const surplus = 3_000_000n;
+    await context.token.mint(link.escrow.target, link.amount + surplus);
+
+    await expect(link.escrow.connect(context.attacker).recoverSurplus()).to.be.revertedWithCustomError(link.escrow, "Unauthorized");
+    await expect(link.escrow.connect(context.sender).recoverSurplus())
+      .to.emit(link.escrow, "SurplusRecovered")
+      .withArgs(context.sender.address, surplus);
+    expect(await context.token.balanceOf(link.escrow.target)).to.equal(link.amount);
+    expect(await link.escrow.state()).to.equal(1);
+    await expect(link.escrow.connect(context.sender).recoverSurplus()).to.be.revertedWithCustomError(link.escrow, "NoSurplus");
+  });
+
+  it("recovers tokens accidentally sent after a terminal claim", async function () {
+    const context = await fixture();
+    const link = await createPayLink(context);
+    await context.token.mint(link.escrow.target, link.amount);
+    const signature = await signClaim(context.recipient, link.escrow, context.recipient.address, link.secretHash, link.expiry - 1);
+    await link.escrow.claim(link.secret, context.recipient.address, link.expiry - 1, signature);
+
+    const lateTransfer = 2_000_000n;
+    await context.token.mint(link.escrow.target, lateTransfer);
+    await expect(link.escrow.connect(context.sender).recoverSurplus())
+      .to.emit(link.escrow, "SurplusRecovered")
+      .withArgs(context.sender.address, lateTransfer);
+    expect(await context.token.balanceOf(link.escrow.target)).to.equal(0);
   });
 
   it("prevents claiming after expiry and reinitializing a clone", async function () {

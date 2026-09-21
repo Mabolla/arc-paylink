@@ -45,7 +45,7 @@ export async function verifyPaymentReceipt(
   hash: Hash,
   expected: { recipient: Address; amount: string },
 ): Promise<VerificationResult> {
-  if (client.chain?.id !== ARC_CHAIN_ID) throw new Error("Receipt verification must use Arc Testnet.");
+  if (client.chain?.id !== ARC_CHAIN_ID) throw new Error(`Receipt verification must use Arc chain ${ARC_CHAIN_ID}.`);
   const receipt = await client.waitForTransactionReceipt({ hash });
   const transfer = verifyTransferLog(receipt, {
     recipient: expected.recipient,

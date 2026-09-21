@@ -1,12 +1,13 @@
 import Link from "next/link";
 import { RecipientWallet } from "@/components/recipient-wallet";
+import { ARC_NETWORK_NAME, IS_ARC_MAINNET } from "@/lib/arc";
 
 export default function ClaimPage() {
   return (
     <main>
       <nav className="topbar">
-        <Link className="brand" href="/"><span className="brand-mark">A</span>Arc PayLink <sup>v3</sup></Link>
-        <span className="network-pill"><i /> Arc Testnet</span>
+        <Link className="brand" href="/"><span className="brand-mark">A</span>Arc PayLink <sup>v3.1</sup></Link>
+        <span className="network-pill"><i /> {ARC_NETWORK_NAME}</span>
       </nav>
       <div className="claim-layout">
         <section className="claim-intro">
@@ -17,7 +18,7 @@ export default function ClaimPage() {
         </section>
         <RecipientWallet />
       </div>
-      <footer><span>Non-custodial recipient onboarding</span><span>USDC · Testnet only</span></footer>
+      <footer><span>Non-custodial recipient onboarding</span><span>USDC · {IS_ARC_MAINNET ? "Mainnet pilot" : "Testnet only"}</span></footer>
     </main>
   );
 }

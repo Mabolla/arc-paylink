@@ -6,7 +6,7 @@ import { settlePaymentRequest } from "./settle-payment-request";
 const recipient = "0x94705A9d675daa924F9190Eca4c05ED6B12d5345" as const;
 const mintHash = "0x02cc00bd06e3e87b8bf9a042bdad7d7c6b566a84b7bd3f14a4afdff85c404741" as const;
 const burnHash = "0xc3c0368632821d4656c1cba2348f0a338911ef6b7cacc2cb1d9a6cfb6e37169c" as const;
-const request = { title: "Real CCTP proof", amount: "1", recipient, route: "bridge" as const, obligation: { kind: "invoice" as const, id: "INV-REAL-1" } };
+const request = { title: "Real CCTP proof", amount: "1", recipient, route: "bridge" as const, chainId: ARC_CHAIN_ID, obligation: { kind: "invoice" as const, id: "INV-REAL-1" } };
 const transferLog = {
   address: ARC_USDC_ADDRESS,
   topics: ["0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef", "0x0000000000000000000000000000000000000000000000000000000000000000", "0x00000000000000000000000094705a9d675daa924f9190eca4c05ed6b12d5345"],

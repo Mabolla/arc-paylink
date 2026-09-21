@@ -23,6 +23,7 @@ function reader(overrides: Partial<Record<string, unknown>> = {}) {
   const values: Record<string, unknown> = {
     escrows: escrow,
     token: ARC_USDC_ADDRESS,
+    sender: "0x1111111111111111111111111111111111111111",
     amount: 10_000n,
     expiry: BigInt(expiry),
     secretHash,
