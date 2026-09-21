@@ -7,7 +7,7 @@ export default function Home() {
     <main>
       <nav className="topbar">
         <Link className="brand" href="/"><span className="brand-mark">A</span>Arc PayLink <sup>v3.1</sup></Link>
-        <div className="top-actions"><Link href="/wallet">Recipient wallet</Link><Link href="/requests">My Requests</Link><Link href="/test-recipient">Create walletless PayLink</Link>{!IS_ARC_MAINNET && <Link href="/audit">Verify settlement</Link>}<span className="network-pill"><i /> {ARC_NETWORK_NAME}</span></div>
+        <div className="top-actions"><Link href="/wallet">Recipient wallet</Link><Link href="/requests">My Requests</Link><Link href="/create">Create walletless PayLink</Link>{!IS_ARC_MAINNET && <Link href="/audit">Verify settlement</Link>}<span className="network-pill"><i /> {ARC_NETWORK_NAME}</span></div>
       </nav>
       <section className="home-grid">
         <div className="intro">
