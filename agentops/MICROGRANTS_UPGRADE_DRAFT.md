@@ -1,6 +1,6 @@
 # Arc Microgrants upgrade — prepared draft
 
-Prepared text for the [existing Arc PayLink project](https://dorahacks.io/buidl/49049). The application has not been edited or submitted.
+Prepared text for the [existing Arc PayLink project](https://dorahacks.io/buidl/49049), which already has a Microgrants submission. This upgrade has not yet been applied to that existing application.
 
 ## Title
 
@@ -41,4 +41,4 @@ Release context: original production and `main` remain unchanged.
 
 ## Türkçe durum
 
-Mevcut Microgrants kaydını güçlendirecek metin hazırlandı; başvuru henüz düzenlenmedi veya gönderilmedi. Şirket tahsilatı, beş salt-okuma agent aracı ve sunucuda kontrol çalışan ürün kapsamına yazıldı. Gerçek 0,01 USDC iç test ile Google/Circle giriş kanıtı açık; örnek rakamlar müşteri veya gelir sayılmadı. Son ödeme ekranı düzeltmeleri yerelde doğrulandı, yayın kontrolleri de geçti. Etkin Circle bildirim aboneliği sunucudan doğrulandı. Circle üzerinden gerçek satın alma/bildirim ve otomatik zamanlama tamamlanmadan tamamlandı iddiası yapılmıyor.
+Daha önce gönderilmiş mevcut Microgrants kaydını güçlendirecek metin hazırlandı; bu yükseltme o başvuru kaydına henüz uygulanmadı. Şirket tahsilatı, beş salt-okuma agent aracı ve sunucuda kontrol çalışan ürün kapsamına yazıldı. Gerçek 0,01 USDC iç test ile Google/Circle giriş kanıtı açık; örnek rakamlar müşteri veya gelir sayılmadı. Son ödeme ekranı düzeltmeleri yerelde doğrulandı, yayın kontrolleri de geçti. Etkin Circle bildirim aboneliği sunucudan doğrulandı. Circle üzerinden gerçek satın alma/bildirim ve otomatik zamanlama tamamlanmadan tamamlandı iddiası yapılmıyor.
