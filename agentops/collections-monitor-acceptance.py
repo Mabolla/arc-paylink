@@ -38,6 +38,7 @@ def main():
     opener = urllib.request.build_opener(NoRedirect)
 
     def call(path, body=None, credential=None, extra=None):
+        print(json.dumps({"request": "POST" if body is not None else "GET", "path": path}), flush=True)
         headers = {"Accept": "application/json"}
         if credential:
             headers["Authorization"] = "Bearer " + credential
@@ -128,11 +129,15 @@ def main():
         raise
     finally:
         if reader and reader.get("key") and reader.get("token"):
-            status, _ = call("/api/business/keys/" + reader["key"]["id"] + "/revoke", {}, token)
-            evidence["temporaryReaderRevoked"] = status == 200
-            status, _ = call("/api/business/monitor", credential=reader["token"])
-            evidence["revokedReaderDenied"] = status == 401
-            evidence["allChecksPassed"] &= evidence["temporaryReaderRevoked"] and evidence["revokedReaderDenied"]
+            try:
+                status, _ = call("/api/business/keys/" + reader["key"]["id"] + "/revoke", {}, token)
+                evidence["temporaryReaderRevoked"] = status == 200
+                status, _ = call("/api/business/monitor", credential=reader["token"])
+                evidence["revokedReaderDenied"] = status == 401
+                evidence["allChecksPassed"] &= evidence["temporaryReaderRevoked"] and evidence["revokedReaderDenied"]
+            except Exception as error:
+                evidence["cleanupErrorType"] = type(error).__name__
+                evidence["allChecksPassed"] = False
         pathlib.Path(args.output).write_text(json.dumps(evidence, indent=2) + "\n")
     check(evidence["allChecksPassed"], "Hosted acceptance checks did not all pass.")
     print(json.dumps({"passed": True, "trackedReceipts": 1, "paidUsdc": "0.01", "replayNewReceipts": 0, "newTransfers": 0, "schedulerVerified": False}))
@@ -141,5 +146,7 @@ def main():
 if __name__ == "__main__":
     try:
         main()
-    except Exception:
-        raise SystemExit("Hosted monitor acceptance failed; sanitized evidence saved when available.")
+    except RuntimeError as error:
+        raise SystemExit("Hosted monitor acceptance failed: " + str(error))
+    except Exception as error:
+        raise SystemExit("Hosted monitor acceptance failed (" + type(error).__name__ + "); sanitized evidence saved when available.")

@@ -2,13 +2,14 @@
 
 The hosted monitor observes a company's existing orders and confirmed payment events without requiring an open browser. It records a durable private receipt ledger and a resumable receivables report. It does not approve or send payments, create orders, unlock payment attempts or mark an unconfirmed purchase as paid.
 
-The hosted implementation and deployment template are being integrated. A real manual server acceptance run is planned but has not yet passed. No provider schedule is active or verified. The existing two-pass local reader proof in `evidence/collections-watch.json` is separate evidence; it does not prove this hosted endpoint or a scheduled deployment.
+The hosted implementation passed real manual server acceptance on the isolated feature preview. Two complete scans retained one internal 0.01-USDC receipt; replay found zero new receipts. Owner and reader status, the remote MCP report, read-only restrictions and temporary key revocation passed. No new transfer was made. No provider schedule is active or verified. The local reader proof in `evidence/collections-watch.json` is separate from this hosted acceptance.
 
 ## Endpoints and access
 
 | Request | Authentication | Purpose |
 | --- | --- | --- |
 | `GET /api/business/monitor` | The current workspace owner or scoped reader, using the business API's supported authentication. | Read a safe monitor status and latest completed report for that workspace. |
+| `GET /api/business/monitor/storage` | Workspace owner only. | Read checkpoint presence and version kind for maintenance; no raw ETag, lease or credentials. |
 | `POST /api/business/monitor/refresh` | Workspace owner Bearer key or owner session cookie, plus a supplied reader key for the same workspace and selected chain. | Run one bounded hosted observation pass. |
 | `GET /api/cron/collections` | Exact `Authorization: Bearer <CRON_SECRET>` header. | Run one bounded pass for the fixed server-configured workspace and reader key. |
 
@@ -72,9 +73,11 @@ The account's current plan and spend limits have not been verified. The template
 
 Scheduled delivery is best effort and can be missed or duplicated. Vercel does not automatically retry a failed invocation. The checkpoint and ledger allow the next authorized pass to resume safely; operational review must check the last successful report and runtime logs. [Vercel delivery, idempotency and error handling](https://vercel.com/docs/cron-jobs/manage-cron-jobs).
 
-## Acceptance still required
+## Completed manual acceptance and remaining scheduler gate
 
-The next server proof must run the owner-authorized manual endpoint twice against the already-paid internal 0.01-USDC order, without a browser session or new transfer. It should verify one durable receipt, the exact known transaction hash, matching paid/outstanding totals, zero newly discovered events on replay, safe status access and reader revocation. Publish only sanitized results after those checks actually pass.
+The owner-authorized manual endpoint completed two scans against the already-paid internal 0.01-USDC order, without a browser session or new transfer. Both returned one tracked receipt, paid `0.01` and outstanding `0`; replay reported zero newly discovered events. Owner and reader status matched the persisted report, remote `get_collections_monitor` returned the same report, a reader could not start a refresh, and revocation denied subsequent access. The confirmed source event retained the exact original transaction hash. Sanitized proof: [collections-monitor.json](evidence/collections-monitor.json). Release checks and the explicitly simulated panel screenshot: [collections-monitor-release.json](evidence/collections-monitor-release.json).
+
+The first live attempt exposed a weak HTTP ETag from private storage, which cannot be used for a conditional update. The adapter now obtains the authoritative object version from the Blob API. A matching transformed HTTP tag is bound to that version; unrelated or missing tags require a fresh uncached body read between matching metadata versions. Changed or unavailable versions stop the operation. Conditional writes, fencing and creation without overwrite remain enforced. Six storage adapter regression tests cover these cases. Initial failure and diagnosis are preserved in `evidence/collections-monitor-initial-failure.json`; the subsequent live check reported a strong conditional version.
 
 Scheduler acceptance is a further gate: verify the new production project, active provider schedule, authentication configuration and a genuine provider-originated runtime invocation with a matching durable checkpoint. A manual endpoint run, unit tests or valid environment settings cannot close this gate. Circle webhook delivery and Google/Circle customer checkout require their own independent acceptance.
 
