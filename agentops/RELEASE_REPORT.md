@@ -27,7 +27,7 @@ Deneme alanındaki işlemler açıkça simülasyondur; tarayıcıda yerel veri k
 
 ## Doğrulama
 
-196 uygulama testi içinde 39 ödeme yapan AgentOps ve 32 şirket tahsilatı testi bulunuyor. Şirketler arası erişim, anahtar iptali, eş zamanlı ödeme, zaman aşımı, yanlış tutar/gönderen/ağ/makbuz, işlem tekrar kullanımı, kayıt arızası ve imzalı bildirim tekrarı kapsanıyor. MCP istemci protokolü hem yerel taşıma hem HTTP üzerinden sınandı.
+208 uygulama testi içinde 40 ödeme yapan AgentOps, 32 şirket tahsilatı, 8 arka plan okuyucu ve 3 deployment makbuzu yeniden deneme testi bulunuyor. Şirketler arası erişim, anahtar iptali, eş zamanlı ödeme, zaman aşımı, yanlış tutar/gönderen/ağ/makbuz, işlem tekrar kullanımı, kayıt arızası ve imzalı bildirim tekrarı kapsanıyor. MCP istemci protokolü hem yerel taşıma hem HTTP üzerinden sınandı.
 
 Tarayıcı senaryosu: sipariş oluştur → müşteri ekranını aç → simüle onay → panelde ödenmiş sipariş → agent raporu. Mobil görünüm ve mevcut alıcı cüzdanına dönüş kontrol edildi. Sonuçlar `evidence/collections-ui.json` içinde. Lint, TypeScript, üretim derlemesi ve mevcut sözleşme testleri ayrıca çalıştırılır; en son sonuç PR'da raporlanır.
 
@@ -55,7 +55,9 @@ Bu test, mevcut cüzdanla API üzerinden imza ve ödeme → bağımsız zincir d
 
 Yeni akışta gerçek müşterinin Google/Circle oturumu ile zincirde satın alma henüz yapılmadı. Önizlemede Google girişi `400 redirect_uri_mismatch` verdi; tam `/wallet` callback adresi sağlayıcı izinlerinde henüz kabul edilmiyor. Circle hesabı üzerinden onay ve webhook aboneliği ayrıca doğrulanmalıdır. Kodun bulunması bu dış bağlantıların aktif olduğunu kanıtlamaz. Simülasyon gerçek kullanıcı veya tahsilat hacmi olarak sayılmaz.
 
-Önceki Circle Agent Wallet CLI girişini otomatik onay denetimi, kullanım şartlarının kabulü ve telemetri nedeniyle durdurmuştu. Resmî `DO_NOT_TRACK=1` seçeneği adaptöre eklendi; hesap e-postası ve şart onayı olmadan CLI girişi tekrar denenmedi. Bu ayrı engel şirket paneli ve gömülü müşteri akışının geliştirilmesini durdurmadı.
+Önceki Circle Agent Wallet CLI girişini otomatik onay denetimi, kullanım şartlarının kabulü ve telemetri nedeniyle durdurmuştu. Resmî `DO_NOT_TRACK=1` seçeneği adaptöre eklendi; açık şart onayı ve güvenli hesap oturumu olmadan CLI girişi tekrar denenmedi. Ödeme alt süreçleri artık üst ortamdan gelen `CIRCLE_ACCEPT_TERMS` değişkenini de kaldırıyor. Bu ayrı engel şirket paneli ve gömülü müşteri akışının geliştirilmesini durdurmadı.
+
+Tarayıcıdan bağımsız salt-okuma tahsilat okuyucusu eklendi. Gerçek önizlemede iki ayrı çalıştırma yapıldı: ilkinde 1 makbuz, ikincisinde 0 yeni makbuz; kalıcı kayıt aynı işlem hash’ini korudu. Geçici okuyucu anahtarı iptal edildi. Yeni transfer yapılmadı. Kanıt: [collections-watch.json](evidence/collections-watch.json); işletim ve kurtarma: [COLLECTIONS_WATCH.md](COLLECTIONS_WATCH.md). Sürekli çalışan servis henüz kurulmadı.
 
 Agentin düzenli sorgulamaları kendi çalışma ortamında zamanlanır. Bilinmeyen ödeme sonucu otomatik sıfırlanmaz. Muhasebe yazılımı bağlantısı, otomatik iade ve kart ödeme bu sürümün kapsamı dışındadır. Ayrıntılar [COLLECTIONS.md](COLLECTIONS.md).
 
@@ -70,3 +72,11 @@ Tameion formu gönderilmedi; mevcut Microgrants başvurusu düzenlenmedi. İngil
 Son uygulama düzeltmesi `ebbae15` ve gerçek ödeme çalışması `b6e7885` için GitHub doğrulamaları başarılıdır: 196 uygulama + 13 sözleşme testi, lint, derleme, değişmemiş mainnet sözleşme doğrulaması ve salt-okuma preflight. Gerçek ödeme run ID: `36906656820`; uygulama doğrulama run ID: `36906663777`. Ana dal `e82173d7580f1698f503d544202b986c143fd2a9` olarak kaldı; canlı ana sayfa ve `/wallet` HTTP 200 ve ana arayüz tarayıcıda doğrulandı.
 
 Eski canlı uygulamanın yayımlanmış istemci paketi ayrıca kontrol edildi: `https://rpc.mainnet.arc.io` kullanıyor. Yakalanan testnet RPC kalıntısı ayrı önizleme ortamına aitti.
+
+## Son devam çalışması
+
+`42d9584` için doğrulama run `36907479345` ilk denemede yalnızca eski deployment makbuzunun geçici olarak bulunamaması nedeniyle durdu. Aynı kodla yeniden çalıştırılan job `110523348036` tamamen başarılıdır. Bu geçici eksik makbuz hatasına özel, 4 denemeyle sınırlı toplam 7 saniyelik bekleme eklendi; receipt, blok, adres, bytecode ve getter kontrolleri korunuyor. Yerel 208 uygulama + 13 sözleşme testi, lint ve üretim derlemesi geçti.
+
+Google yönetim konsolu bu ortamda `Site Unavailable` verdi; Circle Console erişimi bu tarayıcıya reddetti. Ayarlar değiştirilmedi. Tam callback, kısıtlı webhook aboneliği ve canlı kabul ölçütleri [CONFIGURATION_ACCEPTANCE.md](CONFIGURATION_ACCEPTANCE.md) içinde somutlaştırıldı. Bu iki hesap tarafı kabulü ve sürekli çalışan host kurulmadan sürümün tamamı bitti denmez.
+
+Yeni şirket/müşteri sürümü için `/collections-demo/index.html` ürün turu ve 72 saniyelik İngilizce altyazılı ekran görüntüsü videosu hazırlandı. Video ilk üç sahnede simülasyonu, devamında daha önce tamamlanan gerçek iç test makbuzunu ve okuyucu sonucunu gösterir; canlı Google/Circle onayı kaydı değildir. Kaynak ekran görüntüleri ve kapsam kaydı GitHub’dadır. Ayrıntı: [COLLECTIONS_DEMO.md](COLLECTIONS_DEMO.md).

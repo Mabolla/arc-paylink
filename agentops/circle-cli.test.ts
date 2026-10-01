@@ -16,7 +16,7 @@ async function fakeCli(output: unknown) {
   directories.push(directory);
   const binary = join(directory, "circle");
   const argsFile = join(directory, "args.json");
-  await writeFile(binary, `#!/usr/bin/env node\nif (process.env.DO_NOT_TRACK !== '1') throw new Error('Optional CLI telemetry must be disabled');\nrequire('node:fs').writeFileSync(${JSON.stringify(argsFile)}, JSON.stringify(process.argv.slice(2)));\nprocess.stdout.write(${JSON.stringify(JSON.stringify(output))});\n`);
+  await writeFile(binary, `#!/usr/bin/env node\nif (process.env.DO_NOT_TRACK !== '1') throw new Error('Optional CLI telemetry must be disabled');\nif (process.env.CIRCLE_ACCEPT_TERMS !== undefined) throw new Error('Payment invocations must not accept CLI terms');\nrequire('node:fs').writeFileSync(${JSON.stringify(argsFile)}, JSON.stringify(process.argv.slice(2)));\nprocess.stdout.write(${JSON.stringify(JSON.stringify(output))});\n`);
   await chmod(binary, 0o700);
   return { binary, argsFile };
 }
@@ -24,6 +24,19 @@ async function fakeCli(output: unknown) {
 afterEach(async () => Promise.all(directories.splice(0).map((directory) => rm(directory, { recursive: true, force: true }))));
 
 describe("Circle CLI 1.1.4 adapter", () => {
+  it("does not inherit a parent's automatic terms acceptance setting", async () => {
+    const previous = process.env.CIRCLE_ACCEPT_TERMS;
+    process.env.CIRCLE_ACCEPT_TERMS = "1";
+    try {
+      const { binary } = await fakeCli({ data: { wallets: [{ type: "agent", address: walletAddress, blockchain: "ARC-TESTNET" }] } });
+      await expect(assertAgentWallet({ walletAddress, chain: "ARC-TESTNET", binary })).resolves.toBeUndefined();
+      expect(process.env.CIRCLE_ACCEPT_TERMS).toBe("1");
+    } finally {
+      if (previous === undefined) delete process.env.CIRCLE_ACCEPT_TERMS;
+      else process.env.CIRCLE_ACCEPT_TERMS = previous;
+    }
+  });
+
   it("specifies ERC20 USDC, the approved wallet and a persisted idempotency key", async () => {
     const { binary, argsFile } = await fakeCli({ data: { state: "COMPLETE", txHash: hash } });
     await expect(transferUsdc({ recipient, amount: "1.250000", walletAddress, chain: "ARC-TESTNET", idempotencyKey, binary })).resolves.toEqual({ transactionHash: hash });

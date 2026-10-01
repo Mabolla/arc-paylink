@@ -9,11 +9,15 @@ type WalletInput = { walletAddress: string; chain: "ARC" | "ARC-TESTNET"; binary
 
 async function runCli(binary: string, args: string[]): Promise<unknown> {
   let stdout: string;
+  const environment: NodeJS.ProcessEnv = { ...process.env, DO_NOT_TRACK: "1" };
+  // Acceptance belongs to the user's explicit CLI setup, not a payment invocation.
+  // An unrelated parent shell/CI setting must never silently accept new terms.
+  delete environment.CIRCLE_ACCEPT_TERMS;
   try {
     ({ stdout } = await execFileAsync(binary, args, {
       timeout: 120_000, maxBuffer: 1_000_000, windowsHide: true,
       // Official CLI privacy setting. Keep invoice/wallet operations out of optional telemetry.
-      env: { ...process.env, DO_NOT_TRACK: "1" },
+      env: environment,
     }));
   } catch {
     // Never put raw CLI stdout/stderr (which can include session diagnostics) in MCP results.

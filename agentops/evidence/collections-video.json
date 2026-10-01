@@ -1,0 +1,37 @@
+{
+  "mode": "CAPTIONED_STILL_SCREENSHOT_WALKTHROUGH",
+  "durationSeconds": 72,
+  "video": "public/collections-demo/walkthrough.mp4",
+  "scenes": [
+    {
+      "frame": "frames/business-sandbox.jpg",
+      "caption": "SIMULATED UI · Company creates purchase links and tracks orders.\nSample totals here are local demo data, not customer revenue."
+    },
+    {
+      "frame": "frames/customer-sandbox.jpg",
+      "caption": "SIMULATED UI · Customer reviews the fixed amount and recipient.\nThis walkthrough does not authenticate with Google or send funds."
+    },
+    {
+      "frame": "frames/paid-sandbox.jpg",
+      "caption": "SIMULATED UI · Example approval updates the local order and receipt.\nThe sample transaction hash is not a blockchain payment."
+    },
+    {
+      "frame": "receipt.jpg",
+      "caption": "REAL INTERNAL TEST · Earlier 0.01-USDC EOA payment on Arc mainnet.\nThis is a saved receipt screenshot, not a live signing recording."
+    },
+    {
+      "frame": "receipt.jpg",
+      "caption": "REAL READ-ONLY CHECK · Two worker passes observed this saved receipt.\nFirst pass: 1 new event. Second: 0. No new transfer or browser used."
+    },
+    {
+      "frame": "receipt.jpg",
+      "caption": "PENDING · Google/Circle purchase, Circle webhook delivery, worker host.\nZero verified external customers. Original production is unchanged."
+    }
+  ],
+  "simulatedScenes": 3,
+  "realInternalReceiptScenes": 3,
+  "livePaymentRecording": false,
+  "googleCirclePaymentRecorded": false,
+  "externalCustomers": 0,
+  "proofTransactionHash": "0x892cee4be94814a5fd0da6fb7408b5811738ce5bfe311ae45e2e87a05e736158"
+}

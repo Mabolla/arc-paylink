@@ -4,6 +4,8 @@ Arc PayLink lets a sender fund an isolated USDC escrow on Arc and deliver a priv
 
 Business collections are available at `/business`, with an interactive sandbox at `/business/demo`. Companies create customer payment links, customers use existing Arc wallets or the Google / Circle embedded checkout path, and scoped read-only agents follow orders and chain-verified receipts over remote MCP. See [integration and acceptance details](agentops/COLLECTIONS.md). No real customer purchase is claimed by the sandbox.
 
+The [collections watcher](agentops/COLLECTIONS_WATCH.md) also reads receipts without a browser, with a durable ledger and duplicate suppression. Two deployed one-shot passes verified the internal mainnet receipt; a production schedule has not been installed. The new product/evidence tour is at `/collections-demo/index.html`.
+
 An isolated invoice-agent prototype is available in [`agentops/`](agentops/README.md). Its five MCP tools inspect PayLinks, evaluate invoice policy, request exact approval, verify Circle Agent Wallet payments, and reconcile recorded transactions without resending funds. Run `npm run agentops:demo` for the explicitly simulated local rehearsal. Real AgentOps wallet/business acceptance is still pending; the existing escrow and walletless claim flow are unchanged.
 
 **Live mainnet pilot:** [arc-paylink-two.vercel.app](https://arc-paylink-two.vercel.app)

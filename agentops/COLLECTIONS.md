@@ -111,3 +111,7 @@ The live preview initially inherited a legacy `NEXT_PUBLIC_ARC_RPC_URL` pointing
 The existing project signer completed a 0.01-USDC self-test on Arc mainnet, block `23751439`, transaction `0x892cee4be94814a5fd0da6fb7408b5811738ce5bfe311ae45e2e87a05e736158`. Actual gas: `0.001478760025582548 USDC`. The company order became paid, the public checkout rendered its receipt, and the remote merchant MCP returned the same receipt plus paid total `0.01` and outstanding total `0`. Re-confirmation produced one event only. The temporary reader was denied writes and revoked afterward.
 
 This was a programmatic existing-wallet payment using the real deployed APIs. It was not a Google/Circle payment or a browser-extension approval test. Verified external customers remain zero. Public evidence: `evidence/collections-mainnet.json`, `evidence/collections-mainnet-transaction.json` and `evidence/collections-mainnet.jpg`.
+
+## Browser-independent reader worker
+
+The reference worker and its real two-pass acceptance are documented in [COLLECTIONS_WATCH.md](COLLECTIONS_WATCH.md). It reads already verified payment events using a scoped reader key, resumes interrupted pagination and stores a durable deduplicated ledger. It does not send money or reconcile an unknown transfer hash. A continuously provisioned host and live Circle notification delivery remain pending; exact account settings and final gates are recorded in [CONFIGURATION_ACCEPTANCE.md](CONFIGURATION_ACCEPTANCE.md).

@@ -18,7 +18,7 @@ This is an isolated extension to the existing Arc PayLink product. The walletles
 - Reproducible offline demo: `npm run agentops:demo`.
 - Mobile-friendly evidence replay: `/agentops-demo/index.html` on this branch's preview deployment.
 - [84-second captioned video](../public/agentops-demo/rehearsal.mp4): actual screenshots of the working evidence replay, with simulated external payment activity clearly labeled throughout. Silent, with English captions.
-- 39 payer AgentOps tests; 32 business collections tests; 196 total application tests; 13 escrow contract tests.
+- 40 payer AgentOps tests; 32 business collections tests; 8 read-only watcher tests; 3 deployment receipt retry tests; 208 total application tests; 13 escrow contract tests.
 - Verified external business pilots: **0**. Payer-side Circle Agent Wallet CLI transfers: **0 verified**. Customer collections: **one internal 0.01-USDC mainnet self-test**, detailed below. Simulation results are excluded.
 - Existing product: https://arc-paylink-two.vercel.app — this is the existing PayLink mainnet pilot, not a deployed AgentOps demo.
 
@@ -54,3 +54,11 @@ One internal 0.01-USDC mainnet payment has now completed through existing-wallet
 [Public receipt page](https://arc-paylink-git-feat-tameion-agentops-mabolla1.vercel.app/checkout/604c797f-68d3-40bd-a483-bc7a36e7a33c) · [Agent acceptance evidence](evidence/collections-mainnet.json) · [Receipt screenshot](evidence/collections-mainnet.jpg).
 
 This is a self-test between project-controlled accounts, not revenue or an external business pilot. Verified external customers: **0**. The separate Circle Agent Wallet CLI payment path remains unverified. Google preview login currently returns `redirect_uri_mismatch`; Circle approval and background webhook delivery remain acceptance gates.
+
+## Browser-independent company reporting
+
+The reference reader worker is implemented with tenant-scoped access, resumable pagination, a durable private receipt ledger and event deduplication. Two actual one-shot passes against the deployed internal pilot captured one receipt then zero new receipts; the exact paid amount and hash matched. The temporary reader was revoked, and no new transfer occurred. [Watcher proof](evidence/collections-watch.json). A continuous production scheduler is not installed; real Circle notification delivery remains unverified. See the [account configuration and release gates](CONFIGURATION_ACCEPTANCE.md).
+
+A new product/evidence tour at `/collections-demo/index.html` leads with the business dashboard, customer collections receipt and reader worker. The prior payer demo remains a separate simulated scenario.
+
+The new [72-second company collections video](../public/collections-demo/walkthrough.mp4) is a captioned still-screenshot walkthrough. It labels the sample UI as simulated and the saved receipt as an earlier internal EOA payment. It is not a live Google/Circle approval recording. Recorded captions and scope: [collections-video.json](evidence/collections-video.json).

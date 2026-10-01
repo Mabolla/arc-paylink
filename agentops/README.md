@@ -49,6 +49,8 @@ The repository includes **Circle CLI 1.1.4**, pinned in the lockfile. A separate
 
 Every CLI subprocess receives Circle's supported `DO_NOT_TRACK=1` setting, disabling optional CLI telemetry. The adapter does not accept service terms or perform login on the operator's behalf; those are separate setup actions.
 
+Inherited `CIRCLE_ACCEPT_TERMS` is explicitly removed from payment subprocesses. Customer collections can be followed separately with the [read-only watcher](COLLECTIONS_WATCH.md); its deployed receipt acceptance does not validate a Circle Agent Wallet CLI payment.
+
 Use a dedicated account/runtime with no imported local wallet keys. Complete the Circle Agent Wallet login with the account owner present, following the [official quickstart](https://developers.circle.com/agent-stack/agent-wallets/quickstart). The owner accepts terms and enters the email OTP; do not grant an agent mailbox access. Select testnet for the test wallet:
 
 ```sh
