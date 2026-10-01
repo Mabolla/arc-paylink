@@ -31,6 +31,10 @@ Deneme alanındaki işlemler açıkça simülasyondur; tarayıcıda yerel veri k
 
 Tarayıcı senaryosu: sipariş oluştur → müşteri ekranını aç → simüle onay → panelde ödenmiş sipariş → agent raporu. Mobil görünüm ve mevcut alıcı cüzdanına dönüş kontrol edildi. Sonuçlar `evidence/collections-ui.json` içinde. Lint, TypeScript, üretim derlemesi ve mevcut sözleşme testleri ayrıca çalıştırılır; en son sonuç PR'da raporlanır.
 
+## Yayımlanan sunucuda gerçek API kontrolü
+
+Önizlemede gerçek özel veri deposuyla şirket kaydı ve test siparişi oluşturuldu. Siparişin kalıcı kaydı, müşteri sayfasının özel alanları gizlemesi, agent anahtarının okuma yapıp yazma yapamaması ve uzaktan MCP tahsilat toplamı doğrulandı. Test siparişi iptal edildi, geçici agent anahtarı kaldırıldı. Para gönderilmedi. Circle/gömülü cüzdan yapılandırması sunucuda mevcut. Kanıt: `evidence/collections-deployed.json`.
+
 ## Gerçek hesap kabulü
 
 Yeni akışta gerçek müşterinin Google/Circle oturumu ile zincirde satın alma henüz yapılmadı. Önizleme adresinin OAuth izinleri, Circle hesabı ve webhook aboneliği gerçek ortamda doğrulanmalıdır. Kodun bulunması bu dış bağlantıların aktif olduğunu kanıtlamaz. Simülasyon gerçek kullanıcı veya tahsilat hacmi olarak sayılmaz.
@@ -43,6 +47,6 @@ Agentin düzenli sorgulamaları kendi çalışma ortamında zamanlanır. Bilinme
 
 Sözleşmeler, mevcut ödeme/claim API'leri ve deployment scriptleri değiştirilmedi. Ana sayfaya şirket paneli bağlantısı, `/wallet` sayfasına satın alma dönüşünü yöneten sınırlı bir sarmalayıcı eklendi. Yeni kayıtlar ayrı `commerce/v1` alanındadır. Ana dal ve üretim dağıtımı değiştirilmedi.
 
-Önceki CI'da mevcut mainnet sözleşme makbuzu RPC'de bulunamadığından deployment doğrulaması kırmızıydı; aynı script yerelde doğrulamıştı. Bu kontrol gevşetilmedi. En son CI ayrıca PR'da raporlanır.
+Son uygulama commit’i `98f2880` için GitHub Actions run 53 tamamen başarılı: bağımlılıklar, lint, 188 uygulama + 13 sözleşme testi, üretim derlemesi, değişmemiş mainnet deployment doğrulaması ve salt-okuma preflight geçti. Vercel önizlemesi de başarıyla yayımlandı. Önceki makbuz/RPC tutarsızlığı bu çalışmada tekrarlanmadı; doğrulama kontrolü gevşetilmedi.
 
 Tameion formu gönderilmedi; mevcut Microgrants başvurusu düzenlenmedi. İngilizce taslak [SUBMISSION.md](SUBMISSION.md) yeni şirket akışını ve gerçek kabul sınırlarını içeriyor.

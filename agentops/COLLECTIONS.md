@@ -82,3 +82,7 @@ The earlier Circle Agent Wallet CLI terms/telemetry approval blocker is separate
 - https://vercel.com/docs/vercel-blob/using-blob-sdk
 
 Reviewed 2026-10-01. The installed Circle Web SDK and Vercel Blob type declarations were also inspected.
+
+## Deployed no-funds acceptance
+
+Application commit `98f2880` passed the complete GitHub Actions run 53, including the existing mainnet verifier and read-only preflight. The Vercel preview succeeded. A real private-storage workspace and order were created on the preview; scoped agent reading, write denial, remote MCP reporting, public/private field separation, order cancellation and key revocation were verified. The test order was cancelled and the reader key revoked. No funds moved and no Google/Circle approval was performed. Sanitized evidence is in `evidence/collections-deployed.json`; owner credentials are not committed.
