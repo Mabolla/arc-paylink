@@ -21,6 +21,7 @@ import { parseUsdcAmount } from "@/lib/amount";
 import { demoOrders, demoPay } from "@/lib/commerce/demo-client";
 import type { PublicOrder } from "@/lib/commerce/types";
 import styles from "./business.module.css";
+import { ExternalCheckout } from "./external-checkout";
 
 export const CHECKOUT_RETURN = "arcpaylink.checkout.return";
 type Login = { userToken: string; encryptionKey: string };
@@ -605,6 +606,7 @@ export function CustomerCheckout({
                 </>
               )}
               <div className={styles.divider} />
+              {!demo && order && <ExternalCheckout order={order} onPaid={setOrder} />}
               <p className={styles.muted}>
                 Your account remains under your control. Arc PayLink does not
                 receive your private keys. A USDC balance is required.

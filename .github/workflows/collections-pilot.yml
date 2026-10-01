@@ -1,0 +1,35 @@
+name: Arc PayLink internal collections acceptance
+on:
+  push:
+    branches: [feat/tameion-agentops]
+    paths: [.github/collections-pilot.json]
+permissions:
+  contents: read
+concurrency:
+  group: arc-paylink-internal-collections-pilot
+  cancel-in-progress: false
+jobs:
+  pilot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    environment: arc-mainnet
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - name: Validate the existing signer and run the explicitly configured pilot
+        run: node --import tsx scripts/collections-pilot.ts
+        env:
+          NEXT_PUBLIC_ARC_NETWORK: mainnet
+          ARC_PILOT_PRIVATE_KEY: ${{ secrets.ARC_TESTNET_PRIVATE_KEY }}
+      - name: Preserve public acceptance evidence even if reconciliation needs recovery
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: collections-pilot-${{ github.run_id }}
+          path: pilot-evidence/collections-pilot.json
+          if-no-files-found: warn
+          retention-days: 90

@@ -1,0 +1,4 @@
+{
+  "mode": "preflight",
+  "purpose": "Read-only check of the existing signer for internal collections acceptance"
+}

@@ -24,3 +24,4 @@ next-env.d.ts
 Thumbs.db
 *.log
 *.private-claim.json
+/pilot-evidence

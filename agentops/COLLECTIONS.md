@@ -35,6 +35,19 @@ Orders, credentials, references, transaction ownership and receipt events are pe
 
 Unknown, expired or unsuccessful attempts remain `processing` for reconciliation. They are not automatically unlocked. After 23 hours an attempt lacking a stored challenge cannot issue a new provider request, because provider retry retention must not be assumed forever. The operator must investigate it. This version does not provide a automatic refund or dispute workflow.
 
+## Existing-wallet payments
+
+The customer may also connect an existing EVM wallet, and programmatic clients may use `/api/checkout/<orderId>/external`. This is an additional payment method for the same business order, not a replacement for the Google/Circle experience.
+
+1. `GET ?payer=<address>` returns a short-lived EIP-191 reservation message and nonce. Clients independently reconstruct the message with `externalPaymentMessage` before signing.
+2. `POST {action: "reserve", ...intent, signature}` verifies the payer signature against the stored order, amount, recipient, chain, token, expiry, attempt UUID and transaction nonce. It atomically reserves the order and returns the exact unsigned transfer once. The service never receives a private key.
+3. The wallet signs and sends the exact transfer. The browser stores only the resulting transaction hash. A retry or reload of a reserved attempt offers receipt recovery, never a second send instruction.
+4. `POST {action: "confirm", transactionHash}` checks the reserved wallet and nonce, token contract, exact calldata and zero native value, then invokes the same independent receipt verification and unique-transfer accounting used by embedded checkout. It creates the same paid order and durable merchant/agent receipt event.
+
+This path currently supports EOA message signatures; Circle smart accounts continue to use the embedded path. A rejected or interrupted wallet send may leave the order reserved and needing reconciliation. It is deliberately not automatically unlocked. Another order or unrelated transfer using the same wallet nonce invalidates the prepared transfer; customers should complete one checkout at a time.
+
+The internal pilot runner uses the already-configured `ARC_TESTNET_PRIVATE_KEY` GitHub secret through the existing `arc-mainnet` environment. It verifies the known mainnet signer, uses a separate receiving address deterministically derived with HMAC-SHA256 from that signer under `ArcPayLink/internal-collections-recipient/v1`, and never exports either private key. Both accounts remain controlled by the same original signer. This is internal acceptance, not external customer activity. Transfer amount is fixed at 0.01 USDC; maximum gas is capped at another 0.01 USDC; retries are bound to the preflight nonce and receipt recovery. The same derivation can recover the recipient for a later fund return. The trigger defaults to read-only preflight.
+
 ## Agent integration
 
 Connect an MCP client that supports Streamable HTTP and Bearer headers:
@@ -86,3 +99,7 @@ Reviewed 2026-10-01. The installed Circle Web SDK and Vercel Blob type declarati
 ## Deployed no-funds acceptance
 
 Application commit `98f2880` passed the complete GitHub Actions run 53, including the existing mainnet verifier and read-only preflight. The Vercel preview succeeded. A real private-storage workspace and order were created on the preview; scoped agent reading, write denial, remote MCP reporting, public/private field separation, order cancellation and key revocation were verified. The test order was cancelled and the reader key revoked. No funds moved and no Google/Circle approval was performed. Sanitized evidence is in `evidence/collections-deployed.json`; owner credentials are not committed.
+
+## Observed Google preview configuration blocker
+
+On 2026-10-01, the real preview Google login returned `400 redirect_uri_mismatch` for the preview origin's `/wallet` callback. This is a confirmed OAuth allowlist gap, not a completed customer sign-in. Existing-wallet acceptance cannot prove Google/Circle onboarding or Circle webhook delivery. Production main and its deployment were left unchanged.

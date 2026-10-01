@@ -33,6 +33,8 @@ export class CheckoutPayments {
       return { order: publicOrder(saved.value) };
     if (saved.value.status === "cancelled")
       throw new CommerceError("This payment link has been cancelled.", 409);
+    if (saved.value.attempt?.provider === "external")
+      throw new CommerceError("This order already has an external-wallet payment. Check its transaction instead of starting a Circle payment.", 409);
     if (getAddress(wallet.address) === getAddress(saved.value.recipient))
       throw new CommerceError(
         "Use the customer's account, not the receiving business account.",

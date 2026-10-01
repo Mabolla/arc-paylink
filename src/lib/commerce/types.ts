@@ -30,11 +30,13 @@ export type Order = {
   fingerprint: string;
   status: "pending" | "processing" | "paid" | "cancelled";
   attempt?: {
+    provider?: "circle" | "external";
     walletId: string;
     walletAddress: `0x${string}`;
     idempotencyKey: string;
     startedAt: string;
     challengeId?: string;
+    externalNonce?: number;
   };
   receipt?: {
     transactionHash: `0x${string}`;
