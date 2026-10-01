@@ -1,4 +1,5 @@
 {
   "mode": "preflight",
-  "purpose": "Read-only check of the existing signer for internal collections acceptance"
+  "purpose": "Read-only check of the existing signer for internal collections acceptance",
+  "revision": 2
 }

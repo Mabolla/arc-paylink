@@ -27,8 +27,11 @@ async function api<T>(path: string, body?: unknown): Promise<T> {
 }
 async function main() {
   if (ARC_CHAIN_ID !== 5042) throw new Error("Mainnet configuration required.");
-  const secret = process.env.ARC_PILOT_PRIVATE_KEY?.trim();
-  if (!secret || !/^0x[0-9a-fA-F]{64}$/.test(secret)) throw new Error("Configured pilot signing key is missing or invalid.");
+  const inputKey = process.env.ARC_PILOT_PRIVATE_KEY?.trim();
+  evidence.signerConfigured = Boolean(inputKey);
+  if (!inputKey || !/^(?:0x)?[0-9a-fA-F]{64}$/.test(inputKey)) throw new Error("Configured pilot signing key is missing or invalid.");
+  // Match the existing Hardhat signer: repository secrets may omit the 0x prefix.
+  const secret = `0x${inputKey.replace(/^0x/, "")}`;
   const payer = privateKeyToAccount(secret as `0x${string}`);
   if (payer.address.toLowerCase() !== EXPECTED_PAYER.toLowerCase()) throw new Error("Configured key is not the existing project signer.");
   // Recoverable from the existing signer and this public domain string; no key is logged or exported.
