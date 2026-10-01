@@ -10,6 +10,7 @@ import { merchantOrder } from "@/lib/commerce/service";
 import { monitorStatus, runOwnerMonitorRefresh } from "@/lib/commerce/monitor-http";
 import { monitorPath } from "@/lib/commerce/monitor";
 import { CommerceError } from "@/lib/commerce/store";
+import { checkoutHealth } from "@/lib/commerce/checkout-health";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -33,6 +34,10 @@ export async function GET(request: Request, context: Context) {
       throw new CommerceError("Invalid page cursor.");
     if (!path.length || path[0] === "session")
       return json({ workspace: principal.workspace, role: principal.key.role });
+    if (path.length === 1 && path[0] === "checkout-health") {
+      service.owner(principal);
+      return json(await checkoutHealth(request));
+    }
     if (path.length === 1 && path[0] === "monitor")
       return json(await monitorStatus(service, principal));
     if (path.length === 2 && path[0] === "monitor" && path[1] === "storage") {

@@ -182,6 +182,10 @@ describe("embedded purchase lifecycle", () => {
     ).rejects.toThrow("timeout");
     const first = (await s.service.checkout(s.order.id)).value.attempt!
       .idempotencyKey;
+    await expect(
+      s.payments.reconcile(s.order.id, "session", walletId),
+    ).rejects.toMatchObject({ status: 409 });
+    expect(s.provider.transaction).not.toHaveBeenCalled();
     await s.payments.prepare(s.order.id, "session", walletId);
     expect(
       vi.mocked(s.provider.prepare).mock.calls[1][1].attempt!.idempotencyKey,
@@ -196,8 +200,13 @@ describe("embedded purchase lifecycle", () => {
     s.service.now = () => "2026-10-03T12:00:00.000Z";
     await expect(
       s.payments.prepare(s.order.id, "session", walletId),
-    ).rejects.toThrow("reconciliation");
+    ).rejects.toMatchObject({ status: 409 });
+    await expect(
+      s.payments.reconcile(s.order.id, "session", walletId),
+    ).rejects.toMatchObject({ status: 409 });
     expect(s.provider.prepare).toHaveBeenCalledTimes(1);
+    expect(s.provider.transaction).not.toHaveBeenCalled();
+    expect((await s.service.checkout(s.order.id)).value.attempt?.challengeId).toBeUndefined();
   });
   it("reconciles after restart, writes one receipt event and never calls transfer preparation again", async () => {
     const s = await setup();

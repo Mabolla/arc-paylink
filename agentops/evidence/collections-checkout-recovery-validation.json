@@ -1,0 +1,30 @@
+{
+  "recordedAt": "2026-10-01T22:53:22.126457+00:00",
+  "baseCommit": "181eb8e99aaf27233d3dcaba6310b0d59e1e0171",
+  "scope": [
+    "Transient checkout read recovery",
+    "Approval state bound to purchase ID",
+    "Expired missing-challenge recovery guidance",
+    "Owner-only server-side checkout notification readiness"
+  ],
+  "localValidation": {
+    "applicationTests": 270,
+    "contractTests": 13,
+    "lint": "passed",
+    "productionBuild": "passed",
+    "typescript": "passed",
+    "diffCheck": "passed",
+    "mockedCheckoutChecks": 15,
+    "applicationTestFiles": 49,
+    "checkoutHealthTests": 22,
+    "providerDiagnosticMocks": "passed"
+  },
+  "newTransfers": 0,
+  "credentialsUsedInMocks": false,
+  "liveCirclePurchaseVerified": false,
+  "proofLimits": [
+    "Checkout lifecycle checks mocked checkout GET requests only.",
+    "Existing-key acceptance retained the previously paid internal order; it did not send a new payment.",
+    "Actual owner browser click, Circle outbound payment notification and recurring schedule remain separate acceptance gates."
+  ]
+}

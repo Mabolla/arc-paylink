@@ -4,12 +4,9 @@ export default async function CheckoutDemoPage({
 }: {
   searchParams: Promise<{ order?: string }>;
 }) {
+  const orderId =
+    (await searchParams).order ?? "2caa3625-565c-474a-beba-40ea3c93ee01";
   return (
-    <CustomerCheckout
-      demo
-      orderId={
-        (await searchParams).order ?? "2caa3625-565c-474a-beba-40ea3c93ee01"
-      }
-    />
+    <CustomerCheckout key={orderId} demo orderId={orderId} />
   );
 }

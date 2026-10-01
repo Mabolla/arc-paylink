@@ -4,5 +4,6 @@ export default async function CheckoutPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  return <CustomerCheckout orderId={(await params).id} />;
+  const orderId = (await params).id;
+  return <CustomerCheckout key={orderId} orderId={orderId} />;
 }

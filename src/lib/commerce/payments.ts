@@ -19,6 +19,13 @@ export interface CheckoutProvider {
   verify(hash: Hash, order: Order): Promise<PaymentProof>;
 }
 
+const expiredPaymentMessage =
+  "Contact the business to review this saved payment. Do not start another payment.";
+
+function recoveryWindowExpired(startedAt: string, now: string) {
+  return Date.parse(now) - Date.parse(startedAt) > 23 * 3600_000;
+}
+
 export class CheckoutPayments {
   constructor(
     public commerce: CommerceService,
@@ -66,15 +73,8 @@ export class CheckoutPayments {
       );
     let challengeId = saved.value.attempt!.challengeId;
     if (!challengeId) {
-      if (
-        Date.parse(this.commerce.now()) -
-          Date.parse(saved.value.attempt!.startedAt) >
-        23 * 3600_000
-      )
-        throw new CommerceError(
-          "This payment needs reconciliation before another approval can be prepared.",
-          409,
-        );
+      if (recoveryWindowExpired(saved.value.attempt!.startedAt, this.commerce.now()))
+        throw new CommerceError(expiredPaymentMessage, 409);
       challengeId = uuid.parse(
         await this.provider.prepare(userToken, saved.value),
       );
@@ -140,7 +140,9 @@ export class CheckoutPayments {
       );
     if (!order.attempt.challengeId)
       throw new CommerceError(
-        "Resume payment preparation with the same account to recover the saved attempt.",
+        recoveryWindowExpired(order.attempt.startedAt, this.commerce.now())
+          ? expiredPaymentMessage
+          : "Resume payment preparation with the same account to recover the saved attempt.",
         409,
       );
     const hash = await this.provider.transaction(userToken, order);

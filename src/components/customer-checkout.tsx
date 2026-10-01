@@ -63,6 +63,7 @@ export function CustomerCheckout({
 }) {
   const [order, setOrder] = useState<PublicOrder>();
   const [error, setError] = useState("");
+  const [initialLoadError, setInitialLoadError] = useState("");
   const [message, setMessage] = useState(
     "Sign in to pay without a wallet extension.",
   );
@@ -75,6 +76,15 @@ export function CustomerCheckout({
   const challengeRef = useRef<string | undefined>(undefined);
   const guard = useRef(false);
   const active = useRef(true);
+  const loadSucceeded = useRef(false);
+  const markLoaded = useCallback(() => {
+    if (loadSucceeded.current) return;
+    loadSucceeded.current = true;
+    setInitialLoadError("");
+    setStage((current) =>
+      current === "loading" || current === "unavailable" ? "signin" : current,
+    );
+  }, []);
   const refresh = useCallback(async () => {
     if (demo) {
       const found = demoOrders().find((o) => o.id === orderId);
@@ -84,6 +94,7 @@ export function CustomerCheckout({
         );
       setOrder(found);
       setReady(true);
+      markLoaded();
       return found;
     }
     const result = await api<{
@@ -92,8 +103,9 @@ export function CustomerCheckout({
     }>(`/api/checkout/${orderId}`);
     setOrder(result.order);
     setReady(result.embeddedWalletReady);
+    markLoaded();
     return result.order;
-  }, [demo, orderId]);
+  }, [demo, orderId, markLoaded]);
   const loadWallet = useCallback(
     async (login: Login) => {
       const result = await api<{ wallets?: Wallet[] }>("/api/circle", {
@@ -139,10 +151,10 @@ export function CustomerCheckout({
     active.current = true;
     queueMicrotask(() => {
       void refresh()
-        .then(() => setStage((s) => (s === "loading" ? "signin" : s)))
         .catch((e) => {
-          setError(messageOf(e));
-          setStage("unavailable");
+          if (!active.current || loadSucceeded.current) return;
+          setInitialLoadError(messageOf(e));
+          setStage((current) => current === "loading" ? "unavailable" : current);
         });
     });
     if (!demo && appId && googleClientId)
@@ -486,9 +498,9 @@ export function CustomerCheckout({
                   <span>Get a receipt after Arc confirms the transfer.</span>
                 </div>
               </div>
-              {error && (
+              {(error || initialLoadError) && (
                 <div className={styles.alert} role="alert">
-                  {error}
+                  {error || initialLoadError}
                 </div>
               )}
               <p className={styles.note} role="status">

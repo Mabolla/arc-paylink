@@ -27,7 +27,7 @@ export function WalletEntry({ children }: { children: ReactNode }) {
     return <p style={{ padding: 32 }}>Loading secure account…</p>;
   return target ? (
     <>
-      <CustomerCheckout orderId={target} />
+      <CustomerCheckout key={target} orderId={target} />
       <button
         style={{ margin: 20 }}
         onClick={() => {
