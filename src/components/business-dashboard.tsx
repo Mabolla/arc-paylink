@@ -85,7 +85,9 @@ export function BusinessDashboard({ demo = false }: { demo?: boolean }) {
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [loading, setLoading] = useState(true);
-  const [busy, setBusy] = useState(false);
+  const [actionBusy, setBusy] = useState(false);
+  const [monitorBusy, setMonitorBusy] = useState(false);
+  const busy = actionBusy || monitorBusy;
   const [showForm, setShowForm] = useState(false);
   const [login, setLogin] = useState(false);
   const [filter, setFilter] = useState("all");
@@ -174,6 +176,7 @@ export function BusinessDashboard({ demo = false }: { demo?: boolean }) {
     };
   }, [refresh, demo]);
   async function act(fn: () => Promise<void>) {
+    if (busy) return;
     setBusy(true);
     setError("");
     try {
@@ -726,7 +729,15 @@ export function BusinessDashboard({ demo = false }: { demo?: boolean }) {
                 )}
               </section>
               <aside className={styles.stack}>
-                <CollectionsMonitorStatus demo={demo} />
+                <CollectionsMonitorStatus
+                  key={workspace.id}
+                  demo={demo}
+                  workspaceName={workspace.name}
+                  workspaceId={workspace.id}
+                  disabled={busy}
+                  onBusyChange={setMonitorBusy}
+                  onRefresh={refresh}
+                />
                 <section className={styles.card}>
                   <p className={styles.eyebrow}>Agent access</p>
                   <h2>Your agent can follow along.</h2>
@@ -806,6 +817,7 @@ export function BusinessDashboard({ demo = false }: { demo?: boolean }) {
                         {!k.revokedAt && (
                           <button
                             className={styles.link}
+                            disabled={busy}
                             onClick={() =>
                               void act(async () => {
                                 await call(`keys/${k.id}/revoke`, {});
@@ -832,6 +844,7 @@ export function BusinessDashboard({ demo = false }: { demo?: boolean }) {
                   {!demo && (
                     <button
                       className={styles.link}
+                      disabled={busy}
                       onClick={() =>
                         void act(async () => {
                           await fetch("/api/business/session", {

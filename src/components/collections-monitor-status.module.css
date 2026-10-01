@@ -69,6 +69,60 @@
   color: #9f3d3d;
 }
 
+.notice {
+  font-size: 13px;
+  line-height: 1.65;
+  color: #137b5b;
+  margin: 0 0 8px;
+}
+
+.check {
+  margin: 18px 0;
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  border-radius: 7px;
+  border: 1px solid #182431;
+  padding: 10px 16px;
+  background: #182431;
+  color: #fff;
+  font: 600 13px Arial, Helvetica, sans-serif;
+  cursor: pointer;
+}
+
+.button:hover:not(:disabled) {
+  background: #304659;
+}
+
+.button:focus-visible {
+  outline: 3px solid #137b5b;
+  outline-offset: 3px;
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.cleanup {
+  background: #fff5da;
+  border: 1px solid #ead89c;
+  border-radius: 8px;
+  padding: 12px;
+  color: #775b14;
+  margin-bottom: 16px;
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.cleanup p {
+  margin: 0 0 12px;
+}
+
 .details {
   display: flex;
   flex-wrap: wrap;

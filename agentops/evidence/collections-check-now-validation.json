@@ -1,0 +1,44 @@
+{
+  "recordedAt": "2026-10-01T22:19:20.322944+00:00",
+  "baseCommit": "4a949724eafb883f87d8036e52b905b600b31d05",
+  "scope": "Owner Check now UI and signed Circle webhook route regression tests",
+  "localValidation": {
+    "applicationTests": {
+      "passed": 248,
+      "files": 48
+    },
+    "contractTests": {
+      "passed": 13
+    },
+    "lint": "passed",
+    "productionBuild": "passed",
+    "typescript": "passed via Next.js production build",
+    "diffCheck": "passed",
+    "mockedUiLifecycle": {
+      "passed": 6,
+      "covers": [
+        "double click suppression and normal revocation",
+        "pagehide and unmount coalesced cleanup",
+        "late creation after unmount revoked without scan",
+        "cleanup failure retains public key identity only",
+        "rejected creation does not scan or revoke",
+        "demo cannot trigger writes"
+      ]
+    }
+  },
+  "circleActivation": {
+    "status": "owner-reported green retest after Webhooks Read Only enabled",
+    "subscriptionEnabledMetadataRetained": false,
+    "realPaidNotificationVerified": false
+  },
+  "liveOwnerCheckNowVerified": false,
+  "newTransfers": 0,
+  "verifiedExternalCustomers": 0,
+  "recurringSchedulerVerified": false,
+  "mainUnchangedExpected": "e82173d7580f1698f503d544202b986c143fd2a9",
+  "limitations": [
+    "Local signature fixtures are not Circle delivery evidence.",
+    "UI lifecycle mocks are not live deployed UI acceptance.",
+    "Existing 0.01-USDC self-test is not external customer traction."
+  ]
+}
