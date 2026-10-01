@@ -1,0 +1,33 @@
+{
+  "mode": "execute",
+  "internalAcceptance": true,
+  "externalCustomers": 0,
+  "amountUsdc": "0.01",
+  "maxGasUsdc": "0.01",
+  "generatedAt": "2026-10-01T18:25:36.302Z",
+  "sourceCommit": "b6e788551888a94045ec4920198916d771375403",
+  "signerConfigured": true,
+  "payer": "0xE7be265f2301E08a6EaE5Cfd0C1113a7Cd35b3dd",
+  "recipient": "0xE8E330061433e0Ba3111ED804EEE0Bf0717da32B",
+  "recipientDerivation": "ArcPayLink/internal-collections-recipient/v1",
+  "chainId": 5042,
+  "nonce": 5,
+  "gasLimit": "89776",
+  "maxFeePerGas": "24000000346",
+  "maximumGasUsdc": "0.002154624031062496",
+  "balanceSufficient": true,
+  "keyMatched": true,
+  "orderId": "604c797f-68d3-40bd-a483-bc7a36e7a33c",
+  "checkout": "https://arc-paylink-git-feat-tameion-agentops-mabolla1.vercel.app/checkout/604c797f-68d3-40bd-a483-bc7a36e7a33c",
+  "transactionHash": "0x892cee4be94814a5fd0da6fb7408b5811738ce5bfe311ae45e2e87a05e736158",
+  "stage": "recorded-paid",
+  "blockNumber": "23751439",
+  "actualGasUsdc": "0.001478760025582548",
+  "receipt": {
+    "transactionHash": "0x892cee4be94814a5fd0da6fb7408b5811738ce5bfe311ae45e2e87a05e736158",
+    "sender": "0xE7be265f2301E08a6EaE5Cfd0C1113a7Cd35b3dd",
+    "blockNumber": "23751439",
+    "confirmedAt": "2026-10-01T18:25:41.141Z"
+  },
+  "realTransfers": 1
+}

@@ -2,7 +2,7 @@
 
 A local MCP add-on for a business agent to check invoice obligations, request approval, pay through a Circle Agent Wallet, verify Arc USDC settlement, and recover a failed status update without paying twice. The escrow contracts and existing payment APIs remain unchanged. For the added customer purchase flow, company dashboard and remote read-only agent tools, see [Business collections](COLLECTIONS.md).
 
-**Status:** locally verified prototype, including an offline integration rehearsal. No real AgentOps payment or business pilot is claimed. This is a tool layer for an MCP host, not a continuously running autonomous finance operator.
+**Status:** locally verified prototype, including an offline integration rehearsal. No real payer-side Circle Agent Wallet CLI payment or external business pilot is claimed. Customer collections separately passed a real internal 0.01-USDC mainnet acceptance test; see [COLLECTIONS.md](COLLECTIONS.md). This is a tool layer for an MCP host, not a continuously running autonomous finance operator.
 
 ## Review it without a wallet
 

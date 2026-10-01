@@ -74,7 +74,7 @@ The extension reuses the app's `BLOB_READ_WRITE_TOKEN`, `CIRCLE_API_KEY`, `NEXT_
 
 For updates after the customer closes their browser, register `/api/checkout/webhooks/circle` in the owning Circle account for `transactions.outbound` notifications. The handler verifies ECDSA-SHA256 over the raw body using the Circle public key endpoint and then independently verifies Arc settlement. Merely deploying the handler does not create that subscription. Browser reconciliation remains available without it. Notifications lacking both a saved transaction correlation and an `apc:<orderId>` reference cannot be automatically assigned to an order.
 
-Real acceptance requires an owner-authenticated customer session, adequate USDC on the correct network, Circle approval and a genuine onchain receipt. Unit tests, signed test fixtures and the interactive sandbox are not evidence of a real customer purchase. No real purchase has been executed as part of this implementation.
+Real acceptance requires an owner-authenticated customer session, adequate USDC on the correct network, Circle approval and a genuine onchain receipt. Unit tests, signed test fixtures and the interactive sandbox are not evidence of a real customer purchase. The existing-wallet path now has a real 0.01-USDC internal mainnet acceptance payment. This does not validate Google/Circle approval or represent an external customer purchase; see the evidence below.
 
 The earlier Circle Agent Wallet CLI terms/telemetry approval blocker is separate from embedded customer checkout; this extension does not invoke that CLI or silently accept its terms.
 
@@ -105,3 +105,9 @@ Application commit `98f2880` passed the complete GitHub Actions run 53, includin
 On 2026-10-01, the real preview Google login returned `400 redirect_uri_mismatch` for the preview origin's `/wallet` callback. This is a confirmed OAuth allowlist gap, not a completed customer sign-in. Existing-wallet acceptance cannot prove Google/Circle onboarding or Circle webhook delivery. Production main and its deployment were left unchanged.
 
 The live preview initially inherited a legacy `NEXT_PUBLIC_ARC_RPC_URL` pointing to testnet while selecting mainnet. The new collection paths now use the canonical RPC for their explicit chain selection and still verify the actual RPC chain ID. This correction is confined to collections; the legacy product deployment and global network module are unchanged. Both network directions have regression coverage.
+
+## Real internal acceptance result
+
+The existing project signer completed a 0.01-USDC self-test on Arc mainnet, block `23751439`, transaction `0x892cee4be94814a5fd0da6fb7408b5811738ce5bfe311ae45e2e87a05e736158`. Actual gas: `0.001478760025582548 USDC`. The company order became paid, the public checkout rendered its receipt, and the remote merchant MCP returned the same receipt plus paid total `0.01` and outstanding total `0`. Re-confirmation produced one event only. The temporary reader was denied writes and revoked afterward.
+
+This was a programmatic existing-wallet payment using the real deployed APIs. It was not a Google/Circle payment or a browser-extension approval test. Verified external customers remain zero. Public evidence: `evidence/collections-mainnet.json`, `evidence/collections-mainnet-transaction.json` and `evidence/collections-mainnet.jpg`.
