@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { CollectionsMonitorStatus } from "./collections-monitor-status";
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { formatUnits } from "viem";
 import { ARC_EXPLORER_URL, ARC_NETWORK_NAME } from "@/lib/arc";
@@ -725,6 +726,7 @@ export function BusinessDashboard({ demo = false }: { demo?: boolean }) {
                 )}
               </section>
               <aside className={styles.stack}>
+                <CollectionsMonitorStatus demo={demo} />
                 <section className={styles.card}>
                   <p className={styles.eyebrow}>Agent access</p>
                   <h2>Your agent can follow along.</h2>

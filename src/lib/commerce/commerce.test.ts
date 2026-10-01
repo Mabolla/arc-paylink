@@ -304,12 +304,19 @@ describe("company agent and signed background updates", () => {
       "get_customer_order",
       "get_receivables_summary",
       "list_payment_events",
+      "get_collections_monitor",
     ]);
     const result = await client.callTool({
       name: "get_receivables_summary",
       arguments: {},
     });
     expect(JSON.stringify(result)).toContain("outstandingUsdc");
+    const monitor = await client.callTool({
+      name: "get_collections_monitor",
+      arguments: {},
+    });
+    expect(monitor.isError).not.toBe(true);
+    expect(monitor.content).toEqual([{ type: "text", text: '{"monitor":null}' }]);
     const missing = await client.callTool({
       name: "get_customer_order",
       arguments: { orderId: randomUUID() },

@@ -114,7 +114,10 @@ describe("business HTTP and remote agent boundaries", () => {
         )
       ).result.serverInfo.name,
     ).toBe("arcpaylink-collections");
-    expect((await rpc("tools/list", {}, 2)).result.tools).toHaveLength(4);
+    const tools = (await rpc("tools/list", {}, 2)).result.tools;
+    expect(tools).toHaveLength(5);
+    expect(tools.find((tool: { name: string }) => tool.name === "get_collections_monitor"))
+      .toMatchObject({ annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false } });
     const report = await rpc(
       "tools/call",
       { name: "get_receivables_summary", arguments: {} },
@@ -123,10 +126,17 @@ describe("business HTTP and remote agent boundaries", () => {
     expect(JSON.parse(report.result.content[0].text).outstandingUsdc).toBe(
       "2.5",
     );
+    const monitor = await rpc(
+      "tools/call",
+      { name: "get_collections_monitor", arguments: {} },
+      4,
+    );
+    expect(monitor.result.isError).not.toBe(true);
+    expect(JSON.parse(monitor.result.content[0].text)).toEqual({ monitor: null });
     await context.service!.revokeKey(p, agent.key.id);
     const revoked = request(
       "mcp",
-      { jsonrpc: "2.0", id: 4, method: "tools/list" },
+      { jsonrpc: "2.0", id: 5, method: "tools/list" },
       agent.token,
     );
     expect((await mcpPost(revoked)).status).toBe(401);

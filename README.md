@@ -6,6 +6,8 @@ Business collections are available at `/business`, with an interactive sandbox a
 
 The [collections watcher](agentops/COLLECTIONS_WATCH.md) also reads receipts without a browser, with a durable ledger and duplicate suppression. Two deployed one-shot passes verified the internal mainnet receipt; a production schedule has not been installed. The new product/evidence tour is at `/collections-demo/index.html`.
 
+The [hosted collections monitor](agentops/COLLECTIONS_MONITOR.md) adds private server checkpoints, interrupted-run recovery and a recorded report in the business dashboard. The fifth read-only merchant tool, `get_collections_monitor`, exposes that report without starting work. A separate cron endpoint and isolated-deployment template are ready; automatic scheduling requires independent provider activation and acceptance.
+
 An isolated invoice-agent prototype is available in [`agentops/`](agentops/README.md). Its five MCP tools inspect PayLinks, evaluate invoice policy, request exact approval, verify Circle Agent Wallet payments, and reconcile recorded transactions without resending funds. Run `npm run agentops:demo` for the explicitly simulated local rehearsal. Real AgentOps wallet/business acceptance is still pending; the existing escrow and walletless claim flow are unchanged.
 
 **Live mainnet pilot:** [arc-paylink-two.vercel.app](https://arc-paylink-two.vercel.app)

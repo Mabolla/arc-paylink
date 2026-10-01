@@ -13,6 +13,7 @@ Güncelleme: 1 Ekim 2026. Çalışma `feat/tameion-agentops` dalında, taslak [P
 | Agent bağlantısı | Uzaktan MCP: sipariş listesi/ayrıntısı, tahsilat özeti ve ödeme olayları. Şirkete özel, yalnızca okuyan, iptal edilebilir anahtar. |
 | Veri güvenilirliği | Kalıcı özel kayıtlar, şirket bazlı erişim, atomik ödeme rezervasyonu, mükerrer fatura/işlem engeli ve bağımsız Arc doğrulaması. |
 | Arka plan bildirimi | Circle imzalı webhook doğrulaması ve zincir kontrolü. Bildirim gelmesi için hesapta abonelik ayrıca bağlanmalıdır. |
+| Sunucuda takip | Özel kalıcı rapor, kesinti sonrası devam, aynı makbuzu tekrar saymama ve çakışan görev koruması; panelde son rapor, agentte beşinci okuma aracı. Otomatik zamanlama henüz aktif değil. |
 | Önceki AgentOps | Şirket adına insan onayıyla ödeme ve mükerrer transfer yapmadan kurtarma katmanı korundu. |
 
 ## Ekranlar
@@ -74,6 +75,10 @@ Son uygulama düzeltmesi `ebbae15` ve gerçek ödeme çalışması `b6e7885` iç
 Eski canlı uygulamanın yayımlanmış istemci paketi ayrıca kontrol edildi: `https://rpc.mainnet.arc.io` kullanıyor. Yakalanan testnet RPC kalıntısı ayrı önizleme ortamına aitti.
 
 ## Son devam çalışması
+
+Tarayıcıdan bağımsız takip artık uygulamanın sunucusunda da çalıştırılabilir. `GET /api/business/monitor` güvenli raporu okur; owner yetkisiyle tek seferlik kontrol ayrı uçtan, aynı şirkete ait okuyucu anahtarıyla yapılır. Cron ucu yalnızca ayrı güçlü sunucu secret'ı ve sabit şirket/okuyucu yapılandırmasıyla çalışır. Özel kalıcı depoda ETag kilidi, yarım sayfa kaydı ve makbuz kimliğiyle tekrar kontrolü kullanılır. Okuma araçları görev başlatamaz; takip hiçbir ödeme göndermez veya siparişi sahte şekilde ödenmiş yapmaz.
+
+Bu eklemeden sonra 232 uygulama testi, lint ve üretim derlemesi yerelde geçti. 14 sunucu takip testi; kesinti, çakışma, süresi dolan görevin yeni görevi bozamaması ve anahtar iptalini kapsar. 8 HTTP sınır testi; sabit ağ/şirket, ayrı cron kimliği, owner/reader sınırı ve güvenli rapor alanlarını kapsar. Canlı sunucu kabulü ve otomatik zamanlama ayrı ayrı doğrulanacaktır. İşletim ayrıntıları: [COLLECTIONS_MONITOR.md](COLLECTIONS_MONITOR.md). Ana proje yapılandırmasına cron eklenmedi; yeni üretim projesi için ayrı şablon hazırlandı.
 
 `42d9584` için doğrulama run `36907479345` ilk denemede yalnızca eski deployment makbuzunun geçici olarak bulunamaması nedeniyle durdu. Aynı kodla yeniden çalıştırılan job `110523348036` tamamen başarılıdır. Bu geçici eksik makbuz hatasına özel, 4 denemeyle sınırlı toplam 7 saniyelik bekleme eklendi; receipt, blok, adres, bytecode ve getter kontrolleri korunuyor. Yerel 208 uygulama + 13 sözleşme testi, lint ve üretim derlemesi geçti.
 

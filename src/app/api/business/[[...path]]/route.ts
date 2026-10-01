@@ -7,9 +7,11 @@ import {
   withSession,
 } from "@/lib/commerce/http";
 import { merchantOrder } from "@/lib/commerce/service";
+import { monitorStatus, runOwnerMonitorRefresh } from "@/lib/commerce/monitor-http";
 import { CommerceError } from "@/lib/commerce/store";
 
 export const runtime = "nodejs";
+export const maxDuration = 60;
 type Context = { params: Promise<{ path?: string[] }> };
 export async function GET(request: Request, context: Context) {
   try {
@@ -30,6 +32,8 @@ export async function GET(request: Request, context: Context) {
       throw new CommerceError("Invalid page cursor.");
     if (!path.length || path[0] === "session")
       return json({ workspace: principal.workspace, role: principal.key.role });
+    if (path.length === 1 && path[0] === "monitor")
+      return json(await monitorStatus(service, principal));
     if (path[0] === "summary") return json(await service.summary(principal));
     if (path[0] === "keys")
       return json({ keys: await service.keys(principal) });
@@ -72,6 +76,8 @@ export async function POST(request: Request, context: Context) {
       );
     }
     const principal = await service.authorize(credential(request));
+    if (path.length === 2 && path[0] === "monitor" && path[1] === "refresh")
+      return json(await runOwnerMonitorRefresh(service, principal, body));
     if (path[0] === "orders" && !path[1])
       return json(
         { order: merchantOrder(await service.createOrder(principal, body)) },

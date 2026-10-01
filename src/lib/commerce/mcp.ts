@@ -1,6 +1,8 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { CommerceService, merchantOrder } from "./service";
+import { readCollectionsMonitor } from "./monitor";
+import { monitorReport } from "./monitor-http";
 import type { Principal } from "./types";
 
 export function createMerchantMcp(
@@ -77,6 +79,18 @@ export function createMerchantMcp(
       annotations,
     },
     ({ cursor }) => run(() => service.events(principal, cursor)),
+  );
+  server.registerTool(
+    "get_collections_monitor",
+    {
+      description:
+        "Read this business's saved background collection report and last completed scan. The report may be stale; absent report means no saved scan. Reading it neither starts a scan nor installs an automatic schedule. No fund movement.",
+      inputSchema: {},
+      annotations,
+    },
+    () => run(async () => ({
+      monitor: monitorReport(await readCollectionsMonitor(service, principal)),
+    })),
   );
   return server;
 }
