@@ -158,7 +158,7 @@ export function CollectionsMonitorStatus({
             {current.schedulingConfigured
               ? "Automatic checks are configured. A completed report confirms a server check ran."
               : "Automatic checks are not active."}
-            {!current.schedulingConfigured && outcome === "complete" &&
+            {!demo && !current.schedulingConfigured && outcome === "complete" &&
               " This report came from a server check."}
           </p>
           {monitor && outcome !== "never" && (

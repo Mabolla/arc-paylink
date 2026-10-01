@@ -8,6 +8,7 @@ import {
 } from "@/lib/commerce/http";
 import { merchantOrder } from "@/lib/commerce/service";
 import { monitorStatus, runOwnerMonitorRefresh } from "@/lib/commerce/monitor-http";
+import { monitorPath } from "@/lib/commerce/monitor";
 import { CommerceError } from "@/lib/commerce/store";
 
 export const runtime = "nodejs";
@@ -34,6 +35,14 @@ export async function GET(request: Request, context: Context) {
       return json({ workspace: principal.workspace, role: principal.key.role });
     if (path.length === 1 && path[0] === "monitor")
       return json(await monitorStatus(service, principal));
+    if (path.length === 2 && path[0] === "monitor" && path[1] === "storage") {
+      service.owner(principal);
+      const saved = await service.store.read(monitorPath(principal.workspace.id));
+      return json({
+        checkpointPresent: !!saved,
+        versionKind: !saved ? "absent" : !saved.version ? "missing" : saved.version.startsWith("W/") ? "weak" : "strong",
+      });
+    }
     if (path[0] === "summary") return json(await service.summary(principal));
     if (path[0] === "keys")
       return json({ keys: await service.keys(principal) });
