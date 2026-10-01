@@ -1,9 +1,10 @@
 {
-  "mode": "execute",
-  "purpose": "User-authorized internal acceptance with existing project signer; not an external customer sale",
+  "mode": "confirm",
+  "purpose": "Receipt-only acceptance of the existing internal mainnet payment on the upgraded source; no new transfer or external customer sale",
   "confirmation": "INTERNAL_COLLECTIONS_EXACT_0_01_USDC",
   "orderId": "604c797f-68d3-40bd-a483-bc7a36e7a33c",
   "expectedNonce": 5,
   "amountUsdc": "0.01",
-  "maxGasUsdc": "0.01"
+  "maxGasUsdc": "0.01",
+  "transactionHash": "0x892cee4be94814a5fd0da6fb7408b5811738ce5bfe311ae45e2e87a05e736158"
 }
