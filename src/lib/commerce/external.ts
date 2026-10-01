@@ -1,7 +1,8 @@
 import { randomUUID } from "node:crypto";
 import { createPublicClient, getAddress, http, isAddress, isHash, verifyMessage, type Address, type Hash } from "viem";
 import { z } from "zod";
-import { ARC_CHAIN_ID, arcChain } from "../arc";
+import { ARC_CHAIN_ID } from "../arc";
+import { COMMERCE_RPC_URL, commerceChain } from "./network";
 import { CommerceError } from "./store";
 import { orderPath, uuid } from "./service";
 import { CheckoutPayments } from "./payments";
@@ -21,7 +22,7 @@ type ExternalNetwork = {
   transaction(hash: Hash): Promise<{ from: Address; to: Address | null; input: `0x${string}`; nonce: number; value: bigint }>;
 };
 export function externalNetwork(): ExternalNetwork {
-  const client = createPublicClient({ chain: arcChain, transport: http(undefined, { timeout: 12000, retryCount: 1 }) });
+  const client = createPublicClient({ chain: commerceChain, transport: http(COMMERCE_RPC_URL, { timeout: 12000, retryCount: 1 }) });
   const check = async () => {
     if (await client.getChainId() !== ARC_CHAIN_ID) throw new CommerceError("RPC network mismatch.", 502);
   };
@@ -63,7 +64,8 @@ export class ExternalCheckout {
     if (order.status === "paid") return { order: publicOrder(order), alreadyReserved: true };
     if (order.status === "cancelled") throw new CommerceError("This payment link has been cancelled.", 409);
     if (getAddress(order.recipient) === data.payer) throw new CommerceError("Use a different account from the receiving business.");
-    if (!await verifyMessage({ address: data.payer, message: externalPaymentMessage(order, data), signature: data.signature as `0x${string}` }))
+    const authorized = await verifyMessage({ address: data.payer, message: externalPaymentMessage(order, data), signature: data.signature as `0x${string}` }).catch(() => false);
+    if (!authorized)
       throw new CommerceError("The wallet signature does not match this order and payment attempt.", 401);
     if (order.attempt) {
       if (order.attempt.provider !== "external" || getAddress(order.attempt.walletAddress) !== data.payer || order.attempt.idempotencyKey !== data.idempotencyKey || order.attempt.externalNonce !== data.nonce)

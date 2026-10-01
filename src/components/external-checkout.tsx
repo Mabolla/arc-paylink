@@ -1,12 +1,24 @@
 "use client";
 import { useRef, useState } from "react";
-import { createWalletClient, custom, isHash, type Hash } from "viem";
-import { arcChain } from "@/lib/arc";
-import { connectWallet, ensureArcNetwork, getBrowserProvider } from "@/lib/browser-wallet";
+import { createWalletClient, custom, isHash, type Hash, type EIP1193Provider } from "viem";
+import { ARC_CHAIN_ID, arcChainParameter } from "@/lib/arc";
+import { COMMERCE_RPC_URL, commerceChain } from "@/lib/commerce/network";
+import { connectWallet, getBrowserProvider } from "@/lib/browser-wallet";
 import type { ExternalIntent } from "@/lib/commerce/external-payment";
 import { externalPaymentMessage, externalTransaction } from "@/lib/commerce/external-payment";
 import type { PublicOrder } from "@/lib/commerce/types";
 import styles from "./business.module.css";
+
+async function ensureCheckoutNetwork(provider: EIP1193Provider) {
+  const target = `0x${ARC_CHAIN_ID.toString(16)}`;
+  const current = await provider.request({ method: "eth_chainId" });
+  if (current.toLowerCase() === target) return;
+  try { await provider.request({ method: "wallet_switchEthereumChain", params: [{ chainId: target }] }); }
+  catch (e) {
+    if ((e as { code?: number }).code !== 4902) throw e;
+    await provider.request({ method: "wallet_addEthereumChain", params: [{ ...arcChainParameter, rpcUrls: [COMMERCE_RPC_URL] }] });
+  }
+}
 
 async function request<T>(path: string, body?: unknown): Promise<T> {
   const response = await fetch(path, { cache: "no-store", ...(body ? {
@@ -33,7 +45,7 @@ export function ExternalCheckout({ order, onPaid }: { order: PublicOrder; onPaid
     try {
       const provider = getBrowserProvider();
       const payer = await connectWallet(provider);
-      await ensureArcNetwork(provider);
+      await ensureCheckoutNetwork(provider);
       const result = await request<{ order: PublicOrder; reserved: boolean; intent?: ExternalIntent }>(`${path}?payer=${payer}`);
       if (result.order.status === "paid") { onPaid(result.order); return; }
       if (result.reserved) {
@@ -60,10 +72,10 @@ export function ExternalCheckout({ order, onPaid }: { order: PublicOrder; onPaid
     setIntent(undefined);
     try {
       const provider = getBrowserProvider();
-      await ensureArcNetwork(provider);
+      await ensureCheckoutNetwork(provider);
       const account = await connectWallet(provider);
       if (account.toLowerCase() !== current.payer.toLowerCase()) throw new Error("Your wallet account changed. Review the purchase again.");
-      const wallet = createWalletClient({ account: current.payer, chain: arcChain, transport: custom(provider) });
+      const wallet = createWalletClient({ account: current.payer, chain: commerceChain, transport: custom(provider) });
       const signature = await wallet.signMessage({ message: externalPaymentMessage(order, current) });
       const result = await request<{ order: PublicOrder; alreadyReserved: boolean; transaction?: ReturnType<typeof externalTransaction> }>(path, { action: "reserve", ...current, signature });
       if (result.order.status === "paid") { onPaid(result.order); return; }

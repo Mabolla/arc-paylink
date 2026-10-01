@@ -15,8 +15,8 @@ import {
   ARC_NETWORK_NAME,
   ARC_USDC_ADDRESS,
   IS_ARC_MAINNET,
-  arcChain,
 } from "@/lib/arc";
+import { COMMERCE_RPC_URL, commerceChain } from "@/lib/commerce/network";
 import { parseUsdcAmount } from "@/lib/amount";
 import { demoOrders, demoPay } from "@/lib/commerce/demo-client";
 import type { PublicOrder } from "@/lib/commerce/types";
@@ -30,7 +30,7 @@ const appId = process.env.NEXT_PUBLIC_CIRCLE_APP_ID ?? "";
 const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? "";
 const deviceKey = "arc-paylink.circle.device-token";
 const encryptionKey = "arc-paylink.circle.device-encryption-key";
-const client = createPublicClient({ chain: arcChain, transport: http() });
+const client = createPublicClient({ chain: commerceChain, transport: http(COMMERCE_RPC_URL) });
 async function api<T>(path: string, body?: unknown): Promise<T> {
   const response = await fetch(path, {
     cache: "no-store",

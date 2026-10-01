@@ -47,6 +47,7 @@ describe("existing-wallet checkout", () => {
     const signature = await wrongPayer.signMessage({ message: externalPaymentMessage(s.order, s.intent) });
     await expect(s.external.reserve(s.order.id, { ...s.signed, signature })).rejects.toMatchObject({ status: 401 });
     await expect(s.external.reserve(s.order.id, { ...s.signed, nonce: 9 })).rejects.toMatchObject({ status: 401 });
+    await expect(s.external.reserve(s.order.id, { ...s.signed, signature: `0x${"11".repeat(65)}` })).rejects.toMatchObject({ status: 401 });
     expect((await s.service.checkout(s.order.id)).value.status).toBe("pending");
   });
   it("rejects an expired reservation and a changed chain nonce before reserving", async () => {

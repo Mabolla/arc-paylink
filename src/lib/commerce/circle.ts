@@ -3,8 +3,8 @@ import {
   ARC_CHAIN_ID,
   ARC_USDC_ADDRESS,
   IS_ARC_MAINNET,
-  arcChain,
 } from "../arc";
+import { COMMERCE_RPC_URL, commerceChain } from "./network";
 import { parseUsdcAmount } from "../amount";
 import { verifyTransferLog } from "../verify-payment";
 import { CommerceError } from "./store";
@@ -45,8 +45,8 @@ export async function circleRequest<T>(
 
 export function circleCheckoutProvider(): CheckoutProvider {
   const client = createPublicClient({
-    chain: arcChain,
-    transport: http(undefined, { timeout: 12000, retryCount: 1 }),
+    chain: commerceChain,
+    transport: http(COMMERCE_RPC_URL, { timeout: 12000, retryCount: 1 }),
   });
   const blockchain =
     process.env.CIRCLE_ARC_BLOCKCHAIN ||

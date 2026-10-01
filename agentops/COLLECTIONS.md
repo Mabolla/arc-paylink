@@ -103,3 +103,5 @@ Application commit `98f2880` passed the complete GitHub Actions run 53, includin
 ## Observed Google preview configuration blocker
 
 On 2026-10-01, the real preview Google login returned `400 redirect_uri_mismatch` for the preview origin's `/wallet` callback. This is a confirmed OAuth allowlist gap, not a completed customer sign-in. Existing-wallet acceptance cannot prove Google/Circle onboarding or Circle webhook delivery. Production main and its deployment were left unchanged.
+
+The live preview initially inherited a legacy `NEXT_PUBLIC_ARC_RPC_URL` pointing to testnet while selecting mainnet. The new collection paths now use the canonical RPC for their explicit chain selection and still verify the actual RPC chain ID. This correction is confined to collections; the legacy product deployment and global network module are unchanged. Both network directions have regression coverage.
