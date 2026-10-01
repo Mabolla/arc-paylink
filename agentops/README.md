@@ -47,11 +47,13 @@ Policy is exposed as the `arcpaylink://policy` resource. Invoice evidence includ
 
 The repository includes **Circle CLI 1.1.4**, pinned in the lockfile. A separate global installation is not required. The runtime defaults to `node_modules/.bin/circle` and a local PayLink origin; it never silently targets the production site.
 
+Every CLI subprocess receives Circle's supported `DO_NOT_TRACK=1` setting, disabling optional CLI telemetry. The adapter does not accept service terms or perform login on the operator's behalf; those are separate setup actions.
+
 Use a dedicated account/runtime with no imported local wallet keys. Complete the Circle Agent Wallet login with the account owner present, following the [official quickstart](https://developers.circle.com/agent-stack/agent-wallets/quickstart). The owner accepts terms and enters the email OTP; do not grant an agent mailbox access. Select testnet for the test wallet:
 
 ```sh
-./node_modules/.bin/circle wallet login you@example.com --testnet
-./node_modules/.bin/circle wallet list --type agent --chain ARC-TESTNET --output json
+DO_NOT_TRACK=1 ./node_modules/.bin/circle wallet login you@example.com --testnet
+DO_NOT_TRACK=1 ./node_modules/.bin/circle wallet list --type agent --chain ARC-TESTNET --output json
 ```
 
 Run a separate Arc Testnet PayLink instance with persistent storage. Provide these variables to the MCP host process (placeholders below are not usable addresses):

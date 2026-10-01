@@ -16,7 +16,7 @@ async function fakeCli(output: unknown) {
   directories.push(directory);
   const binary = join(directory, "circle");
   const argsFile = join(directory, "args.json");
-  await writeFile(binary, `#!/usr/bin/env node\nrequire('node:fs').writeFileSync(${JSON.stringify(argsFile)}, JSON.stringify(process.argv.slice(2)));\nprocess.stdout.write(${JSON.stringify(JSON.stringify(output))});\n`);
+  await writeFile(binary, `#!/usr/bin/env node\nif (process.env.DO_NOT_TRACK !== '1') throw new Error('Optional CLI telemetry must be disabled');\nrequire('node:fs').writeFileSync(${JSON.stringify(argsFile)}, JSON.stringify(process.argv.slice(2)));\nprocess.stdout.write(${JSON.stringify(JSON.stringify(output))});\n`);
   await chmod(binary, 0o700);
   return { binary, argsFile };
 }

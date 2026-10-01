@@ -34,7 +34,7 @@ Yeni AgentOps ile gerçek Circle hesabı oturumu açılmadı, zincir üzerinde �
 
 Gerçek pilotun dış bağımlılığı, hesap sahibine ait doğrulanmış Circle Agent Wallet oturumu ve belirlenmiş test işletmesi/alıcıdır. Circle'ın [resmî giriş akışı](https://developers.circle.com/agent-stack/agent-wallets/quickstart) hesap sahibinin OTP girmesini gerektiriyor. Kullanıcıya geliştirme veya kurulum işi bırakılmadı; hesap sahipliği doğrulaması yazılımla uydurulamaz.
 
-Son erişim denemesi: CLI'nin belgelenmiş şart kabulü seçeneğiyle yalnız oturum durumunu okumak istendi. Otomatik onay denetimi, şart kabulü ve dış Datadog telemetri isteğinin açıkça onaylanmadığı gerekçesiyle komutu reddetti. Bu ret başka bir yolla aşılmadı. Sonraki Circle giriş denemesi için bu kapsamda açık kullanıcı onayı ve kullanılacak hesap e-postası gerekiyor. Giriş isteği/OTP henüz başlatılmadı.
+Son erişim denemesi: CLI'nin belgelenmiş şart kabulü seçeneğiyle yalnız oturum durumunu okumak istendi. Otomatik onay denetimi, şart kabulü ve dış Datadog telemetri isteğinin açıkça onaylanmadığı gerekçesiyle komutu reddetti. Bu ret başka bir yolla aşılmadı. CLI'nin resmî `DO_NOT_TRACK=1` seçeneği kaynak kodundan doğrulandı ve ödeme adaptörüne eklendi; isteğe bağlı telemetri kapalı tutuluyor. Sonraki gerçek giriş denemesi için kullanım şartlarını kabul etme konusunda açık kullanıcı onayı ve kullanılacak hesap e-postası gerekiyor. Giriş isteği/OTP henüz başlatılmadı.
 
 ## Başvuru ve geliştirme sırası
 

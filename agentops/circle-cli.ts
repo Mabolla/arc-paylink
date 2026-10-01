@@ -10,7 +10,11 @@ type WalletInput = { walletAddress: string; chain: "ARC" | "ARC-TESTNET"; binary
 async function runCli(binary: string, args: string[]): Promise<unknown> {
   let stdout: string;
   try {
-    ({ stdout } = await execFileAsync(binary, args, { timeout: 120_000, maxBuffer: 1_000_000, windowsHide: true }));
+    ({ stdout } = await execFileAsync(binary, args, {
+      timeout: 120_000, maxBuffer: 1_000_000, windowsHide: true,
+      // Official CLI privacy setting. Keep invoice/wallet operations out of optional telemetry.
+      env: { ...process.env, DO_NOT_TRACK: "1" },
+    }));
   } catch {
     // Never put raw CLI stdout/stderr (which can include session diagnostics) in MCP results.
     throw new Error("Circle CLI did not complete successfully. Its transfer result may be unknown; reconcile before retrying.");
