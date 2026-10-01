@@ -620,7 +620,7 @@ export function CustomerCheckout({
         <span>
           {demo
             ? "No real funds · Local sandbox"
-            : "Circle embedded wallet · USDC on Arc"}
+            : "Verified USDC payments on Arc"}
         </span>
       </footer>
     </div>

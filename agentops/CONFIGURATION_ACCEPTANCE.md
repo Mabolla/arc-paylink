@@ -64,6 +64,7 @@ Its local policy, human approval, durable reservation and reconciliation tests p
 | Gate | Current evidence |
 | --- | --- |
 | Existing-wallet collection → receipt → business → merchant MCP | Passed, one internal 0.01-USDC mainnet payment |
+| Existing-wallet browser approval and recovery | Live extension UI acceptance pending; the real EOA test used the API/GitHub signer |
 | Read-only worker persistence and duplicate suppression | Passed, two actual deployed one-shot reads |
 | Google / Circle authenticated customer payment | Account callback configuration and live acceptance pending |
 | Circle notification with customer browser closed | Account subscription and live delivery pending |
