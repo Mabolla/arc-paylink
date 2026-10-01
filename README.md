@@ -2,6 +2,8 @@
 
 Arc PayLink lets a sender fund an isolated USDC escrow on Arc and deliver a private, single-use claim link to someone who does not already have a crypto wallet. The recipient signs in with Google, creates or recovers a user-controlled Circle smart account, claims the exact payment, and can then use the USDC from the recipient wallet.
 
+An isolated invoice-agent prototype is available in [`agentops/`](agentops/README.md). Its five MCP tools inspect PayLinks, evaluate invoice policy, request exact approval, verify Circle Agent Wallet payments, and reconcile recorded transactions without resending funds. Run `npm run agentops:demo` for the explicitly simulated local rehearsal. Real AgentOps wallet/business acceptance is still pending; the existing escrow and walletless claim flow are unchanged.
+
 **Live mainnet pilot:** [arc-paylink-two.vercel.app](https://arc-paylink-two.vercel.app)
 
 ## Reviewer quick check
