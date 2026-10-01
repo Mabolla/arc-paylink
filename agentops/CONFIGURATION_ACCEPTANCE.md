@@ -65,7 +65,7 @@ Production scheduling still requires a selected worker host, a scoped reader key
 
 The company panel now implements an owner-only **Check now** action for an immediate server scan. It creates a temporary reader key for that workspace, calls the existing monitor refresh endpoint and attempts revocation in cleanup; leaving the page triggers best-effort cleanup. Failed cleanup is surfaced for retry, and an interrupted browser session can leave a key that must be checked in Agent access. Workspace changes reset the local key/setup state. Users do not have to construct API requests or install a worker to request this one-shot check. The action does not activate recurring scheduling or send funds.
 
-Targeted lint, TypeScript and production build checks and six mocked UI lifecycle checks passed. Live deployed **Check now** UI acceptance remains pending. Integration verification passed on the exact source being published: 248 application tests, 13 contract tests, full lint, production build (including TypeScript) and `git diff --check`. Live deployed UI acceptance remains a separate gate.
+Targeted lint, TypeScript and production build checks and six mocked UI lifecycle checks passed. The deployed sandbox visibly includes a disabled **Check now** action, correctly labelled as simulated. Two real owner HTTP refresh passes on `39d1223` completed with the unchanged internal receipt; MCP matched, the temporary key was revoked and its next access returned 401. This verifies the hosted API flow. An actual owner browser button click remains pending because that browser has no business owner session; no credential entry or user prompt was attempted. Integration verification passed on the exact source being published: 248 application tests, 13 contract tests, full lint, production build (including TypeScript) and `git diff --check`. Live deployed UI acceptance remains a separate gate.
 
 ## Separate payer-side Circle Agent Wallet
 
@@ -79,7 +79,7 @@ Its local policy, human approval, durable reservation and reconciliation tests p
 | Existing-wallet browser approval and recovery | Live extension UI acceptance pending; the real EOA test used the API/GitHub signer |
 | Read-only worker persistence and duplicate suppression | Passed, two actual deployed one-shot reads |
 | Hosted monitor owner API → report → merchant MCP | Passed, two recorded complete scans of the existing internal receipt |
-| Company panel Check now | Implemented; targeted checks and six mocked lifecycle checks passed, live UI acceptance pending |
+| Company panel Check now | Deployed; local lifecycle and hosted owner API acceptance passed, sandbox visibility verified; actual owner browser click pending |
 | Google sign-in → Circle wallet → Arc balance readback | Passed after the account owner added the preview callback; connected wallet showed 0 USDC |
 | Google / Circle authenticated customer payment | Wallet funding, exact purchase approval and receipt acceptance pending; sign-in is verified separately |
 | Circle signed activation test | Owner reports a green retest after Webhooks Read Only was enabled; subscription ID and enabled metadata pending |
@@ -89,3 +89,5 @@ Its local policy, human approval, durable reservation and reconciliation tests p
 | Stable production release | Draft PR only; main untouched |
 
 The real receipt and watcher evidence are valid now. They do not make the unverified gates complete or establish customer traction.
+
+Current source `39d1223`: GitHub run [36934507173](https://github.com/Mabolla/arc-paylink/actions/runs/36934507173), job `110611488312`, and Vercel deployment succeeded. Sanitized [validation](evidence/collections-check-now-validation.json), [hosted acceptance](evidence/collections-check-now-hosted.json) and [sandbox screenshot](evidence/collections-check-now-sandbox.jpg) retain their distinct scopes.

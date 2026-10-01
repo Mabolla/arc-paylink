@@ -39,6 +39,45 @@
   "limitations": [
     "Local signature fixtures are not Circle delivery evidence.",
     "UI lifecycle mocks are not live deployed UI acceptance.",
-    "Existing 0.01-USDC self-test is not external customer traction."
-  ]
+    "Existing 0.01-USDC self-test is not external customer traction.",
+    "The real owner browser did not have a business session; secure authentication is still needed for an actual owner button click. Hosted API acceptance and visible sandbox UI are recorded separately."
+  ],
+  "sourceCommit": "39d1223bf90bcc292d3140abde160779c7115212",
+  "githubCi": {
+    "runId": 36934507173,
+    "jobId": 110611488312,
+    "conclusion": "success",
+    "url": "https://github.com/Mabolla/arc-paylink/actions/runs/36934507173",
+    "checks": [
+      "lint",
+      "application and contract tests",
+      "production build",
+      "historical mainnet deployment verification",
+      "read-only mainnet preflight"
+    ]
+  },
+  "vercel": {
+    "state": "success",
+    "deploymentUrl": "https://vercel.com/mabolla1/arc-paylink/23EryHDn25XnAaMx5XT2F9W5DVkV"
+  },
+  "deployedSandboxUi": {
+    "checkNowPresent": true,
+    "checkNowDisabled": true,
+    "simulatedLabelVisible": true,
+    "screenshot": "collections-check-now-sandbox.jpg"
+  },
+  "hostedOwnerApiAcceptance": {
+    "allChecksPassed": true,
+    "evidence": "collections-check-now-hosted.json",
+    "completedScans": [
+      5,
+      6
+    ],
+    "newReceipts": [
+      0,
+      0
+    ],
+    "temporaryReaderRevoked": true,
+    "revokedReaderHttpStatus": 401
+  }
 }
