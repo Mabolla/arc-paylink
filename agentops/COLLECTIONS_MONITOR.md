@@ -40,7 +40,7 @@ The monitor writes only its own checkpoint and receipt ledger. Business order re
 - Each confirmed event has one immutable ledger entry. The event ID and verified receipt proof are checked on replay; a conflicting proof stops the run.
 - A pass reads receipt pages, then order pages for exact integer USDC aggregation. Partial progress is persisted and resumed by a later authorized invocation. After a complete scan, the next scan starts again and deduplicates already observed receipts.
 
-HTTP execution uses fixed defaults: five combined event/order pages, a 20-second cooperative deadline and a 120-second lease. Pages contain at most 100 records; the summary scan is limited to 10,000 orders. The route's function duration limit is 60 seconds. The cooperative deadline is checked between operations; it is not a promise that an in-flight storage request finishes within 20 seconds.
+HTTP execution uses fixed limits: five combined event/order pages, a 45-second cooperative deadline and a 120-second lease. Pages contain at most 100 records; the summary scan is limited to 10,000 orders. The route's function duration limit is 60 seconds. The cooperative deadline is checked between operations; it cannot abort an in-flight storage request. The core module's standalone default remains 20 seconds.
 
 A run may finish `complete`, return `partial` with resumable progress, or return `busy` while another live lease owns the checkpoint. Failed runs retain recoverable progress and expose a generic failure marker. Expired or replaced runners cannot release another run's lease. Larger workspaces can require multiple invocations; schedule frequency determines how quickly a partial scan can finish.
 

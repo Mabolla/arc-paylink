@@ -83,7 +83,7 @@ export async function monitorStatus(service: CommerceService, principal: Princip
 async function execute(service: CommerceService, readerToken: string, workspaceId: string) {
   const result = await runCollectionsMonitor(service, {
     readerToken, workspaceId, chainId: ARC_CHAIN_ID,
-    maxPages: 5, deadlineMs: Date.now() + 20_000, leaseMs: 120_000,
+    maxPages: 5, deadlineMs: Date.now() + 45_000, leaseMs: 120_000,
   });
   return {
     outcome: result.outcome,

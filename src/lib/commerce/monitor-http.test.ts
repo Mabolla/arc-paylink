@@ -170,8 +170,8 @@ describe("hosted collections monitor HTTP boundaries", () => {
       readerToken: f.reader.token, workspaceId: f.owner.workspace.id, chainId: ARC_CHAIN_ID,
       maxPages: 5, leaseMs: 120_000,
     });
-    expect(options.deadlineMs).toBeGreaterThanOrEqual(started + 20_000);
-    expect(options.deadlineMs).toBeLessThanOrEqual(Date.now() + 20_000);
+    expect(options.deadlineMs).toBeGreaterThanOrEqual(started + 45_000);
+    expect(options.deadlineMs).toBeLessThanOrEqual(Date.now() + 45_000);
     expect(result).toMatchObject({ outcome: "complete", newReceipts: 1 });
     expect(JSON.stringify(result)).not.toContain(f.reader.token);
     expect(JSON.stringify(result)).not.toContain(f.env.CRON_SECRET!);

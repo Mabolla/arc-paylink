@@ -1,4 +1,4 @@
-import { get, list, put } from "@vercel/blob";
+import { get, head, list, put } from "@vercel/blob";
 import { ARC_CHAIN_ID } from "../arc";
 
 export type Versioned<T> = { value: T; version: string };
@@ -19,6 +19,7 @@ export class CommerceError extends Error {
   }
 }
 export const root = `commerce/v1/chain-${ARC_CHAIN_ID}/`;
+const strongVersion = (value: string | undefined) => !!value && !value.startsWith("W/");
 
 export function blobCommerceStore(): CommerceStore {
   const token = process.env.BLOB_READ_WRITE_TOKEN;
@@ -33,14 +34,38 @@ export function blobCommerceStore(): CommerceStore {
         access: "private",
         useCache: false,
         token,
+        headers: { "Accept-Encoding": "identity" },
       });
       if (!result || result.statusCode !== 200) return undefined;
-      return {
-        value: JSON.parse(await new Response(result.stream).text()) as T,
-        version: result.blob.etag,
-      };
+      const value = JSON.parse(await new Response(result.stream).text()) as T;
+      if (strongVersion(result.blob.etag)) return { value, version: result.blob.etag };
+
+      // HTTP content transformations can make a GET ETag weak. Obtain the
+      // authoritative object ETag from the Blob API; never blindly strip W/.
+      const before = await head(root + path, { token });
+      if (!strongVersion(before.etag))
+        throw new CommerceError("Storage cannot provide a conditional record version.", 503);
+      if (result.blob.etag.startsWith("W/") && result.blob.etag.slice(2) === before.etag)
+        return { value, version: before.etag };
+
+      // Unrelated/missing HTTP tags require a consistent body read between two
+      // matching metadata versions. A changed version is a conflict, not permission
+      // to overwrite. All body reads bypass the private Blob CDN cache.
+      const fresh = await get(root + path, {
+        access: "private", useCache: false, token,
+        headers: { "Accept-Encoding": "identity" },
+      });
+      if (!fresh || fresh.statusCode !== 200)
+        throw new CommerceError("This record changed. Refresh and retry.", 409);
+      const currentValue = JSON.parse(await new Response(fresh.stream).text()) as T;
+      const after = await head(root + path, { token });
+      if (!strongVersion(after.etag) || before.etag !== after.etag)
+        throw new CommerceError("This record changed. Refresh and retry.", 409);
+      return { value: currentValue, version: after.etag };
     },
     async write(path, value, version) {
+      if (version !== undefined && !strongVersion(version))
+        throw new CommerceError("Storage cannot provide a conditional record version.", 503);
       try {
         await put(root + path, JSON.stringify(value), {
           token,
