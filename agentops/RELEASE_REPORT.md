@@ -12,7 +12,7 @@ Güncelleme: 1 Ekim 2026 UTC / 2 Ekim 2026 Türkiye saati. Çalışma `feat/tame
 | Müşteri ekranı | Google/Circle hesabı akışı ve mevcut EVM cüzdanı seçeneği; USDC bakiyesi, sabit tutar/alıcı için onay, kesinti sonrası makbuz doğrulama. |
 | Agent bağlantısı | Uzaktan MCP: sipariş listesi/ayrıntısı, tahsilat özeti ve ödeme olayları. Şirkete özel, yalnızca okuyan, iptal edilebilir anahtar. |
 | Veri güvenilirliği | Kalıcı özel kayıtlar, şirket bazlı erişim, atomik ödeme rezervasyonu, mükerrer fatura/işlem engeli ve bağımsız Arc doğrulaması. |
-| Arka plan bildirimi | Circle imzalı webhook doğrulaması ve zincir kontrolü. Hesap sahibi, imza anahtarı okuma iznini düzelttikten sonra aktivasyon testinin yeşile döndüğünü bildirdi; gerçek ödenmiş sipariş bildirimi henüz kabul edilmedi. |
+| Arka plan bildirimi | Circle imzalı webhook doğrulaması ve zincir kontrolü. İzin düzeltmesi sonrası aktivasyon testi yeşile döndü; sunucunun gerçek metadata okuması bu yayına ait etkin outbound aboneliğini doğruladı. Gerçek ödenmiş sipariş bildirimi henüz kabul edilmedi. |
 | Sunucuda takip | Özel kalıcı rapor, kesinti sonrası devam, aynı makbuzu tekrar saymama ve çakışan görev koruması; panelde son rapor, agentte beşinci okuma aracı ve yeni Check now eylemi. Otomatik zamanlama henüz aktif değil. |
 | Önceki AgentOps | Şirket adına insan onayıyla ödeme ve mükerrer transfer yapmadan kurtarma katmanı korundu. |
 
@@ -62,7 +62,7 @@ Cüzdanın USDC ile fonlanması, yeni müşteri siparişinin tam tutar için Cir
 
 Circle bildirim aktivasyonu için yapılan gerçek imzalı testte sunucu HTTP **502** verdi. Sebep, Circle imza anahtarı okuma isteğinin HTTP **403**, sağlayıcı hata kodu **3** ile reddedilmesiydi. Hesap sahibinin gördüğü mevcut mainnet kısıtlı anahtarda Webhooks izni yoktu; Wallets izni Read + Write olarak duruyordu. Hesap sahibi aynı anahtarda yalnızca **Webhooks Read Only** iznini kaydetti; diğer izinleri, anahtarın kendisini ve IP politikasını korudu. Sonrasında aktivasyon testinin yeşile döndüğünü bildirdi.
 
-Bu sonuç hesap sahibinin başarılı aktivasyon testi bildirimidir. Abonelik kimliği ve etkin durum ekranı henüz kanıta alınmadı; tarayıcı kapalıyken gerçek Circle siparişinin ödenmişe dönüşmesi ve aynı bildirimin tekrarında tek makbuz kalması da bekliyor. Aktivasyon testi yeni ödeme veya müşteri anlamına gelmez. Bu adımlarda yeni transfer **0**, doğrulanmış harici müşteri **0**; ham sağlayıcı logu, API anahtarı, anahtar öneki veya hesap ekranı yayımlanmadı.
+İlk sonuç hesap sahibinin başarılı aktivasyon testi bildirimiydi. Sonrasında sunucunun gerçek metadata okuması tam bu yayının callback adresine ait etkin outbound aboneliğini bağımsız doğruladı. Abonelik kimliği ve konsol ekranı saklanmadı; tarayıcı kapalıyken gerçek Circle siparişinin ödenmişe dönüşmesi ve aynı bildirimin tekrarında tek makbuz kalması hâlâ bekliyor. Aktivasyon ve readiness kabulü yeni ödeme veya müşteri anlamına gelmez. Bu adımlarda yeni transfer **0**, doğrulanmış harici müşteri **0**; ham sağlayıcı logu, API anahtarı, anahtar öneki veya hesap ekranı yayımlanmadı.
 
 Önceki Circle Agent Wallet CLI girişini otomatik onay denetimi, kullanım şartlarının kabulü ve telemetri nedeniyle durdurmuştu. Resmî `DO_NOT_TRACK=1` seçeneği adaptöre eklendi; açık şart onayı ve güvenli hesap oturumu olmadan CLI girişi tekrar denenmedi. Ödeme alt süreçleri artık üst ortamdan gelen `CIRCLE_ACCEPT_TERMS` değişkenini de kaldırıyor. Bu ayrı engel şirket paneli ve gömülü müşteri akışının geliştirilmesini durdurmadı.
 
@@ -118,7 +118,7 @@ Geçici ilk sipariş okuma hatasından sonra başarılı sonraki okuma Google gi
 
 Tam yerel doğrulama yeniden geçti: **248 uygulama + 13 sözleşme**, lint ve TypeScript dahil üretim derlemesi. Gerçek bileşen kodu üzerinde **15 mock checkout kontrolü** geçici ilk hata, gecikmiş hata, aktif onay/kurtarma aşamaları, ödeme hatası, ödenmiş/iptal sipariş ve üç çağırıcının sipariş bağını doğruladı. Bu kontroller para, kimlik bilgisi veya gerçek giriş kullanmadı. [Kanıt kapsamı](evidence/collections-checkout-recovery-validation.json).
 
-Owner-only `GET /api/business/checkout-health`, mevcut sunucu anahtarını dışarı çıkarmadan bu yayına ait etkin Circle outbound aboneliğini kontrol ediyor. Yalnız hazırlık boolean’ları ve zaman damgası dönüyor; okuyucu erişimi reddediliyor, eksik anahtar/provider hatası başarı sayılmıyor. Bu eklemeden sonra **270 uygulama + 13 sözleşme testi**, tüm lint, üretim derlemesi ve sağlayıcı okuma mock kontrolü geçti. Canlı readiness çağrısı ve GitHub’daki mevcut sağlayıcı erişimlerinin salt-okuma tanısı yayın sonrası bekliyor. Sağlayıcı izni, para veya eski üretim değişikliği yapılmadı.
+Owner-only `GET /api/business/checkout-health`, mevcut sunucu anahtarını dışarı çıkarmadan bu yayına ait etkin Circle outbound aboneliğini kontrol ediyor. Yalnız hazırlık boolean’ları ve zaman damgası dönüyor; okuyucu erişimi reddediliyor, eksik anahtar/provider hatası başarı sayılmıyor. Bu eklemeden sonra **270 uygulama + 13 sözleşme testi**, tüm lint, üretim derlemesi ve sağlayıcı okuma mock kontrolü geçti. Yayın sonrası canlı readiness çağrısı ve GitHub’daki mevcut sağlayıcı erişimlerinin salt-okuma tanısı tamamlandı; ayrı sonuçları aşağıda kayıtlıdır. Sağlayıcı izni, para veya eski üretim değişikliği yapılmadı.
 
 ## Sunucudan doğrulanan Circle aboneliği
 

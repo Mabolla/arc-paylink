@@ -1,6 +1,6 @@
 # Account configuration and release acceptance
 
-Status observed on 2026-10-01 UTC / 2026-10-02 Europe/Istanbul. Google preview sign-in and Circle wallet readback pass. The account owner also reports a successful Circle subscription activation retest after correcting its signing-key read permission; subscription metadata and real payment notification acceptance are still pending. Existing production and `main` remain unchanged.
+Status observed on 2026-10-01 UTC / 2026-10-02 Europe/Istanbul. Google preview sign-in and Circle wallet readback pass. After the account owner's successful activation retest, the deployed owner-only readiness check independently verified an enabled Circle outbound subscription for the exact preview callback. Real paid-order notification, browser-closed delivery and replay acceptance remain pending. Existing production and `main` remain unchanged.
 
 ## Google / Circle embedded customer checkout
 
@@ -34,7 +34,7 @@ Official sources: [Google OAuth client settings](https://support.google.com/clou
 
 ## Circle signed outbound notifications
 
-Restricted subscription configuration, on the existing owning Wallets API account; actual enabled metadata still needs to be retained:
+Restricted subscription configuration on the existing owning Wallets API account. The deployed readiness check verified matching enabled metadata; the subscription ID is deliberately not exposed or retained:
 
 ```json
 {
@@ -45,13 +45,13 @@ Restricted subscription configuration, on the existing owning Wallets API accoun
 
 List existing subscriptions before creating one; reuse an identical enabled subscription rather than duplicating it. The endpoint must be publicly reachable over HTTPS. It requires Circle's `X-Circle-Key-Id` and `X-Circle-Signature`, verifies the raw body using Circle's public key, matches the reserved wallet/order, then independently verifies the exact Arc transfer. Unsigned requests remain rejected. The account's existing outbound events may include unrelated transactions; these are ignored. Do not broaden the subscription to every event or export the account's API key into public code.
 
-Acceptance: retain the subscription ID and enabled status; complete a Circle-backed internal order with its customer tab closed after submission; observe the signed notification; confirm the order becomes paid without browser polling; replay the notification and confirm one receipt event only. A locally signed fixture or the EOA pilot cannot substitute for Circle's real delivery.
+Enabled status acceptance passed through the owner-only deployed readiness check. Remaining acceptance: complete a Circle-backed internal order with its customer tab closed after submission; observe the signed notification; confirm the order becomes paid without browser polling; replay the notification and confirm one receipt event only. A locally signed fixture or the EOA pilot cannot substitute for Circle's real delivery.
 
 Historical console attempt: Circle Console displayed `This is a protected area` and denied this browser on the initial request and one reload. No alternate route was tried, and the agent created no subscription during that attempt. The browser restriction is specific to this environment; it does not establish that the user's account lacks access.
 
 Later account-owner setup exposed a separate permission issue. The existing mainnet restricted API key showed **Webhooks: No Permissions** and **Wallets: Read + Write**. During an actual signed activation test, the deployed handler returned HTTP **502** because its Circle signing-key lookup (`GET /v2/notifications/publicKey/<key-id>`) returned HTTP **403**, provider error code **3**. The handler did not acknowledge an unverified signature or record a payment.
 
-The account owner then saved **only Webhooks: Read Only** on that same key, preserving Wallets permissions, the key itself and the IP policy. The owner subsequently reported that the activation retest turned green. This is an owner-reported successful activation test; the enabled subscription screenshot and subscription ID have not yet been retained. It does not establish delivery of a paid-order event, browser-independent order completion or live replay deduplication. No key, prefix, raw provider log or console screenshot is included in this record.
+The account owner then saved **only Webhooks: Read Only** on that same key, preserving Wallets permissions, the key itself and the IP policy. The owner subsequently reported that the activation retest turned green. The later deployed readiness check independently verified enabled outbound metadata for the exact callback; no subscription ID or console screenshot was retained. These results do not establish delivery of a paid-order event, browser-independent order completion or live replay deduplication. No key, prefix, raw provider log or console screenshot is included in this record.
 
 Ten additional webhook HTTP tests passed locally. They cover signed activation acknowledgement, unsigned or altered bodies, signing-key permission/not-found/unavailable failures, missing credentials, mismatched key metadata, unsupported algorithms and an unrelated signed outbound sample without inventing a payment. These fixtures validate handler behavior; they are not real Circle delivery evidence. No new funds were transferred during permission troubleshooting; verified external customers remain **0**.
 
@@ -90,13 +90,13 @@ Its local policy, human approval, durable reservation and reconciliation tests p
 
 The real receipt and watcher evidence are valid now. They do not make the unverified gates complete or establish customer traction.
 
-Current source `39d1223`: GitHub run [36934507173](https://github.com/Mabolla/arc-paylink/actions/runs/36934507173), job `110611488312`, and Vercel deployment succeeded. Sanitized [validation](evidence/collections-check-now-validation.json), [hosted acceptance](evidence/collections-check-now-hosted.json) and [sandbox screenshot](evidence/collections-check-now-sandbox.jpg) retain their distinct scopes.
+Earlier source `39d1223`: GitHub run [36934507173](https://github.com/Mabolla/arc-paylink/actions/runs/36934507173), job `110611488312`, and Vercel deployment succeeded. Sanitized [validation](evidence/collections-check-now-validation.json), [hosted acceptance](evidence/collections-check-now-hosted.json) and [sandbox screenshot](evidence/collections-check-now-sandbox.jpg) retain their distinct scopes.
 
 Existing signer recheck on `181eb8e` passed without exporting its key or sending funds: [run 36935708985](https://github.com/Mabolla/arc-paylink/actions/runs/36935708985), job `110615346442`. Confirm mode retained the already-paid order and original receipt, observed nonce 6 and matched the GitHub-configured signer. Full source validation run `36935713582` / job `110615361053` also passed. [Sanitized receipt-only evidence](evidence/collections-existing-key-recheck.json). This does not prove an outbound payment from the separately authenticated Google/Circle wallet.
 
 Final checkout recovery fixes passed 248 application and 13 contract tests, lint and the production build. Fifteen mock checks preserve active approval/payment errors while recovering an initial read failure; each caller now remounts by purchase ID. Missing-challenge attempts beyond the existing 23-hour gate require business review instead of contradictory resume instructions. No transfer or credential was used in those mocks. [Validation scope](evidence/collections-checkout-recovery-validation.json).
 
-An owner-only `GET /api/business/checkout-health` checks the existing server Circle credential against the exact deployment callback and enabled outbound coverage. It exposes readiness flags only; readers are denied before any provider call. Final integration: 270 application tests (including 22 readiness tests), 13 contract tests, lint, production build and account-diagnostic mocks passed. Live readiness and existing GitHub provider-access results remain pending deployment.
+An owner-only `GET /api/business/checkout-health` checks the existing server Circle credential against the exact deployment callback and enabled outbound coverage. It exposes readiness flags only; readers are denied before any provider call. Final integration: 270 application tests (including 22 readiness tests), 13 contract tests, lint, production build and account-diagnostic mocks passed. Deployment and the actual read-only checks completed; the separate results are recorded below.
 
 ## Deployed subscription readiness acceptance
 
