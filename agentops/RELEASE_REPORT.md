@@ -1,6 +1,6 @@
 # Arc PayLink — şirket tahsilatı ve AgentOps teslim raporu
 
-Güncelleme: 1 Ekim 2026. Çalışma `feat/tameion-agentops` dalında, taslak [PR #14](https://github.com/Mabolla/arc-paylink/pull/14) içindedir. Ana canlı ürüne birleştirilmedi.
+Güncelleme: 1 Ekim 2026 UTC / 2 Ekim 2026 Türkiye saati. Çalışma `feat/tameion-agentops` dalında, taslak [PR #14](https://github.com/Mabolla/arc-paylink/pull/14) içindedir. Ana canlı ürüne birleştirilmedi.
 
 ## Eklenen ürün akışı
 
@@ -54,7 +54,11 @@ Bu test, mevcut cüzdanla API üzerinden imza ve ödeme → bağımsız zincir d
 
 ## Gerçek hesap kabulü
 
-Yeni akışta gerçek müşterinin Google/Circle oturumu ile zincirde satın alma henüz yapılmadı. Önizlemede Google girişi `400 redirect_uri_mismatch` verdi; tam `/wallet` callback adresi sağlayıcı izinlerinde henüz kabul edilmiyor. Circle hesabı üzerinden onay ve webhook aboneliği ayrıca doğrulanmalıdır. Kodun bulunması bu dış bağlantıların aktif olduğunu kanıtlamaz. Simülasyon gerçek kullanıcı veya tahsilat hacmi olarak sayılmaz.
+Yeni akışta Google/Circle oturumu ile zincirde satın alma henüz yapılmadı. İlk önizleme denemesinde Google girişi `400 redirect_uri_mismatch` verdi; bu geçmiş hata, hesap sahibinin tam önizleme `/wallet` callback adresini Google OAuth izinlerine eklemesi ve Google girişini onaylaması sonrasında çözüldü.
+
+Son gerçek kabulde önizleme `/wallet` sayfası `Wallet connected. Your balance is read directly from Arc.` mesajını, Circle kullanıcı kontrollü cüzdanı `0xcffc8fee9d782497fdb74909a3843948df34df31` ve Arc üzerinde **0 USDC** bakiyeyi gösterdi. Google girişi, Circle cüzdan bağlantısı ve canlı bakiye okuması geçti. Kanıt: [giriş kabul kaydı](evidence/collections-google-auth.json) ve [bağlı cüzdan ekranı](evidence/collections-google-auth.jpg). Bu adımda yeni transfer yapılmadı; doğrulanmış harici müşteri sayısı **0** olarak kaldı.
+
+Cüzdanın USDC ile fonlanması, yeni müşteri siparişinin tam tutar için Circle üzerinden onaylanması, zincir makbuzu ve gerçek webhook teslimi ayrı kabul adımlarıdır. Başarılı giriş bu ödeme adımlarının tamamlandığı anlamına gelmez. Simülasyon gerçek kullanıcı veya tahsilat hacmi olarak sayılmaz.
 
 Önceki Circle Agent Wallet CLI girişini otomatik onay denetimi, kullanım şartlarının kabulü ve telemetri nedeniyle durdurmuştu. Resmî `DO_NOT_TRACK=1` seçeneği adaptöre eklendi; açık şart onayı ve güvenli hesap oturumu olmadan CLI girişi tekrar denenmedi. Ödeme alt süreçleri artık üst ortamdan gelen `CIRCLE_ACCEPT_TERMS` değişkenini de kaldırıyor. Bu ayrı engel şirket paneli ve gömülü müşteri akışının geliştirilmesini durdurmadı.
 
@@ -86,7 +90,7 @@ Canlı sunucu kabulü artık geçti: iki tamamlanmış tarama, 1 kalıcı makbuz
 
 `42d9584` için doğrulama run `36907479345` ilk denemede yalnızca eski deployment makbuzunun geçici olarak bulunamaması nedeniyle durdu. Aynı kodla yeniden çalıştırılan job `110523348036` tamamen başarılıdır. Bu geçici eksik makbuz hatasına özel, 4 denemeyle sınırlı toplam 7 saniyelik bekleme eklendi; receipt, blok, adres, bytecode ve getter kontrolleri korunuyor. Yerel 208 uygulama + 13 sözleşme testi, lint ve üretim derlemesi geçti.
 
-Google yönetim konsolu bu ortamda `Site Unavailable` verdi; Circle Console erişimi bu tarayıcıya reddetti. Ayarlar değiştirilmedi. Tam callback, kısıtlı webhook aboneliği ve canlı kabul ölçütleri [CONFIGURATION_ACCEPTANCE.md](CONFIGURATION_ACCEPTANCE.md) içinde somutlaştırıldı. Bu iki hesap tarafı kabulü ve sürekli çalışan host kurulmadan sürümün tamamı bitti denmez.
+İlk yönetim konsolu denemesinde Google bu ortamda `Site Unavailable` verdi; Circle Console erişimi bu tarayıcıya reddetti. Agent o denemede ayar değiştirmedi. Sonrasında hesap sahibi Google callback iznini ekledi ve gerçek önizleme girişi ile Circle cüzdan okuması geçti; eski OAuth engeli artık açık değildir. Kısıtlı webhook aboneliği, canlı müşteri satın alma ve diğer kabul ölçütleri [CONFIGURATION_ACCEPTANCE.md](CONFIGURATION_ACCEPTANCE.md) içinde somutlaştırıldı. Gerçek satın alma, bildirim teslimi ve sürekli zamanlama doğrulanmadan sürümün tamamı bitti denmez.
 
 Yeni şirket/müşteri sürümü için `/collections-demo/index.html` ürün turu ve 72 saniyelik İngilizce altyazılı ekran görüntüsü videosu hazırlandı. Video ilk üç sahnede simülasyonu, devamında daha önce tamamlanan gerçek iç test makbuzunu ve okuyucu sonucunu gösterir; canlı Google/Circle onayı kaydı değildir. Kaynak ekran görüntüleri ve kapsam kaydı GitHub’dadır. Ayrıntı: [COLLECTIONS_DEMO.md](COLLECTIONS_DEMO.md).
 

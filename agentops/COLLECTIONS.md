@@ -8,7 +8,7 @@ This extension covers the merchant side of Arc PayLink: a company creates a cust
 - `/checkout/<orderId>`: customer purchase page, Google / Circle onboarding, balance display, exact approval, status recovery and verified receipt.
 - `/business/demo`: interactive browser-only sandbox using the same dashboard component. Sample purchases are explicitly simulated.
 - `/checkout/demo?order=<id>`: sandbox customer checkout. It never calls Circle or submits a transfer.
-- `/api/business/mcp`: authenticated remote Streamable HTTP MCP server. Four read-only collection tools.
+- `/api/business/mcp`: authenticated remote Streamable HTTP MCP server. Five read-only collection tools.
 - `/api/checkout/webhooks/circle`: signed Circle transaction notifications, followed by independent onchain verification.
 
 The main product homepage only receives a link to Business collections. The existing `/wallet` route gains a narrow checkout callback wrapper so Google can return to the already-used `/wallet` redirect path. Without a valid recent checkout return state it renders the original recipient wallet. Existing contracts, request settlement APIs, walletless claims and payment components are unchanged.
@@ -103,7 +103,7 @@ Application commit `98f2880` passed the complete GitHub Actions run 53, includin
 
 ## Observed Google preview configuration blocker
 
-On 2026-10-01, the real preview Google login returned `400 redirect_uri_mismatch` for the preview origin's `/wallet` callback. This is a confirmed OAuth allowlist gap, not a completed customer sign-in. Existing-wallet acceptance cannot prove Google/Circle onboarding or Circle webhook delivery. Production main and its deployment were left unchanged.
+On 2026-10-01, the real preview Google login initially returned `400 redirect_uri_mismatch` for the preview origin's `/wallet` callback. After the account owner added that callback to the OAuth allowlist, Google authentication and Circle wallet read-back passed: the deployed wallet page showed “Wallet connected” and an available balance of 0 USDC. See [Google acceptance evidence](evidence/collections-google-auth.json). This proves authentication and wallet access; a customer checkout payment and real Circle webhook delivery remain pending. Production main and its deployment were left unchanged.
 
 The live preview initially inherited a legacy `NEXT_PUBLIC_ARC_RPC_URL` pointing to testnet while selecting mainnet. The new collection paths now use the canonical RPC for their explicit chain selection and still verify the actual RPC chain ID. This correction is confined to collections; the legacy product deployment and global network module are unchanged. Both network directions have regression coverage.
 

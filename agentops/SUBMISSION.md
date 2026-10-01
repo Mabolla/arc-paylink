@@ -4,7 +4,7 @@
 
 **Arc PayLink — customer payment links with verified collections for companies and their agents.**
 
-Arc PayLink lets a company create a customer purchase link and track its collection through a business dashboard or a scoped MCP agent. Customers can use an existing Arc wallet; a Google / Circle embedded account path is also implemented, with preview OAuth configuration acceptance still pending. The service binds each payment to its order, verifies the exact transfer on Arc, and exposes a durable receipt event to the company and its agent. The read-only merchant agent cannot move funds.
+Arc PayLink lets a company create a customer purchase link and track its collection through a business dashboard or a scoped MCP agent. Customers can use an existing Arc wallet; Google / Circle authentication and wallet read-back have also passed in the preview, while a live embedded customer purchase remains pending. The service binds each payment to its order, verifies the exact transfer on Arc, and exposes a durable receipt event to the company and its agent. The read-only merchant agent cannot move funds.
 
 The separate payer-side AgentOps extension compares invoice evidence with PayLink facts, vendor allowlists, due dates and spending limits. It requests per-payment approval before Circle Agent Wallet submission and reconciliation. This CLI path is distinct from customer collections and has no verified live CLI payment yet.
 
@@ -53,7 +53,7 @@ One internal 0.01-USDC mainnet payment has now completed through existing-wallet
 
 [Public receipt page](https://arc-paylink-git-feat-tameion-agentops-mabolla1.vercel.app/checkout/604c797f-68d3-40bd-a483-bc7a36e7a33c) · [Agent acceptance evidence](evidence/collections-mainnet.json) · [Receipt screenshot](evidence/collections-mainnet.jpg).
 
-This is a self-test between project-controlled accounts, not revenue or an external business pilot. Verified external customers: **0**. The separate Circle Agent Wallet CLI payment path remains unverified. Google preview login currently returns `redirect_uri_mismatch`; Circle approval and background webhook delivery remain acceptance gates.
+This is a self-test between project-controlled accounts, not revenue or an external business pilot. Verified external customers: **0**. The separate Circle Agent Wallet CLI payment path remains unverified. The earlier Google preview `redirect_uri_mismatch` was resolved by the account owner's callback allowlist change; actual Google authentication and Circle wallet read-back then passed ([evidence](evidence/collections-google-auth.json)). This check moved no funds. Embedded customer payment approval and background webhook delivery remain acceptance gates.
 
 ## Browser-independent company reporting
 

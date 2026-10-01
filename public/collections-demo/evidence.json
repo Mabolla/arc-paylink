@@ -93,5 +93,108 @@
     "continuousProcessLeftRunning": false,
     "acceptanceScope": "Two read-only one-shot passes observed an already-paid internal order without a browser. This does not prove a live scheduler or Circle webhook delivery."
   },
-  "scope": "One real 0.01 USDC internal existing-wallet collection and two read-only watcher passes. Interactive sandbox purchases are simulated. Zero verified external customers. Google/Circle payment, Circle webhook delivery and a continuously deployed scheduler are not verified."
+  "hostedMonitor": {
+    "mode": "REAL_HOSTED_INTERNAL_COLLECTIONS_MONITOR_ACCEPTANCE",
+    "baseUrl": "https://arc-paylink-git-feat-tameion-agentops-mabolla1.vercel.app",
+    "workspaceId": "621b6ec6-f181-45c7-942e-ab01dddc407f",
+    "orderId": "604c797f-68d3-40bd-a483-bc7a36e7a33c",
+    "chainId": 5042,
+    "transactionHash": "0x892cee4be94814a5fd0da6fb7408b5811738ce5bfe311ae45e2e87a05e736158",
+    "generatedAt": "2026-10-01T20:18:03.146369+00:00",
+    "newTransfers": 0,
+    "externalCustomers": 0,
+    "scheduledInvocationVerified": false,
+    "allChecksPassed": true,
+    "scans": [
+      {
+        "passes": [
+          {
+            "outcome": "complete",
+            "newReceipts": 0
+          }
+        ],
+        "report": {
+          "outcome": "complete",
+          "chainId": 5042,
+          "trackedReceipts": 1,
+          "completedScans": 3,
+          "lastCompletedAt": "2026-10-01T20:18:33.554Z",
+          "lastStartedAt": "2026-10-01T20:18:26.686Z",
+          "newReceipts": 0,
+          "summaryAsOf": "2026-10-01T20:18:32.667Z",
+          "paidUsdc": "0.01",
+          "outstandingUsdc": "0",
+          "orders": 1,
+          "paidOrders": 1,
+          "processingOrders": 0,
+          "overdueOrders": 0
+        }
+      },
+      {
+        "passes": [
+          {
+            "outcome": "complete",
+            "newReceipts": 0
+          }
+        ],
+        "report": {
+          "outcome": "complete",
+          "chainId": 5042,
+          "trackedReceipts": 1,
+          "completedScans": 4,
+          "lastCompletedAt": "2026-10-01T20:18:49.825Z",
+          "lastStartedAt": "2026-10-01T20:18:42.785Z",
+          "newReceipts": 0,
+          "summaryAsOf": "2026-10-01T20:18:48.723Z",
+          "paidUsdc": "0.01",
+          "outstandingUsdc": "0",
+          "orders": 1,
+          "paidOrders": 1,
+          "processingOrders": 0,
+          "overdueOrders": 0
+        }
+      }
+    ],
+    "lastPassHttpStatus": 200,
+    "lastPassOutcome": "complete",
+    "ownerAndReaderStatusMatched": true,
+    "readerRefreshDenied": true,
+    "remoteMcpMonitorMatched": true,
+    "sourceReceiptUnchanged": true,
+    "unconfiguredCronHttpStatus": 503,
+    "temporaryReaderRevoked": true,
+    "revokedReaderDenied": true
+  },
+  "googleAuthentication": {
+    "schemaVersion": 1,
+    "verifiedAt": "2026-10-01T21:21:19.754903+00:00",
+    "baseUrl": "https://arc-paylink-git-feat-tameion-agentops-mabolla1.vercel.app",
+    "path": "/wallet",
+    "sourceCommit": "05c595a75d8403b56cf31e2d79e3c47b0f814ca6",
+    "scope": "Google authentication and existing Circle wallet read-back only",
+    "acceptance": {
+      "previewRedirectAddedByOwner": true,
+      "priorRedirectUriMismatchResolved": true,
+      "googleAuthenticationCompleted": true,
+      "deviceApprovalCompletedByOwner": true,
+      "targetDomainSignedInSignal": "Wallet connected. Your balance is read directly from Arc.",
+      "provider": "Circle / Google",
+      "networkLabel": "Arc",
+      "walletAddress": "0xcffc8fee9d782497fdb74909a3843948df34df31",
+      "displayedAvailableUsdc": "0"
+    },
+    "newTransfers": 0,
+    "externalCustomers": 0,
+    "customerCheckoutPaymentVerified": false,
+    "signedCircleNotificationDeliveryVerified": false,
+    "scheduledInvocationVerified": false,
+    "circleAgentWalletCliPaymentVerified": false,
+    "screenshot": {
+      "path": "collections-google-auth.jpg",
+      "sha256": "693becd146a826d859b435b315728712757fad8614390094640be14b4f530e95"
+    },
+    "privateCredentialsRecorded": false,
+    "originalProductionChanged": false
+  },
+  "scope": "One real 0.01 USDC internal existing-wallet collection, two read-only reference watcher passes and two recorded hosted server scans. The server and remote MCP returned the same saved monitor report; the original receipt was unchanged and no new funds were sent. A separate later Google authentication and existing Circle wallet read-back passed on /wallet, displaying 0 USDC; this did not approve or send a customer checkout payment. Interactive sandbox purchases are simulated. Zero verified external customers. Customer checkout payment, Circle webhook delivery and automatic scheduling are not verified. Historical acceptance records retain their original Google sign-in status."
 }

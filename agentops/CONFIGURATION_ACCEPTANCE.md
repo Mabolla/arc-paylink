@@ -1,16 +1,16 @@
 # Account configuration and release acceptance
 
-Status observed on 2026-10-01. These are exact proposed settings and acceptance criteria, not a claim that account settings have been applied. Existing production and `main` remain unchanged.
+Status observed on 2026-10-01 UTC / 2026-10-02 Europe/Istanbul. Google preview sign-in and Circle wallet readback now pass; remaining account settings and payment gates are identified separately below. Existing production and `main` remain unchanged.
 
 ## Google / Circle embedded customer checkout
 
-The preview's Google login returned `400 redirect_uri_mismatch`. The current public OAuth client is:
+The preview's Google login initially returned `400 redirect_uri_mismatch`. This historical failure was later resolved after the account owner added the exact preview callback to the Google OAuth redirect allowlist and approved the Google sign-in. The current public OAuth client is:
 
 ```text
 502826689977-dg922ghg177oibp3ep2b5scvmdegafka.apps.googleusercontent.com
 ```
 
-The existing web client needs this additional exact authorized redirect URI:
+The additional exact authorized redirect URI used by the successful preview sign-in is:
 
 ```text
 https://arc-paylink-git-feat-tameion-agentops-mabolla1.vercel.app/wallet
@@ -24,9 +24,11 @@ https://arc-paylink-git-feat-tameion-agentops-mabolla1.vercel.app
 
 Existing entries must be retained. Do not redirect preview authentication through the production wallet page; the order return state belongs to the preview origin. A wildcard is not a valid redirect URI. The same web client ID must be configured in Circle's Wallets → User Controlled → Configurator → Google Client ID (Web). The deployed App ID and server API key must belong to that configuration and support the selected Arc network. A configured environment variable is not proof of account authorization or network support.
 
-Acceptance: open a new preview order; authenticate with the authorized test account; create or recover its Circle user-controlled wallet; confirm the wallet's Arc network and USDC balance; approve the exact order payment; verify the receipt through both the checkout and scoped merchant MCP. A newly created empty wallet cannot buy without USDC. Card/fiat funding is not implemented.
+Passed acceptance: on the actual preview `/wallet` page, the authorized Google account completed sign-in and connected its Circle user-controlled wallet `0xcffc8fee9d782497fdb74909a3843948df34df31`. The page displayed `Wallet connected. Your balance is read directly from Arc.` and an Arc balance of **0 USDC**. This is a real authenticated wallet readback, not a simulated checkout or payment. Evidence: [sanitized Google/Circle sign-in record](evidence/collections-google-auth.json) and [connected wallet screenshot](evidence/collections-google-auth.jpg).
 
-The Google management console returned `Site Unavailable` in this execution environment. No OAuth setting was changed. No credential, token or API key was extracted.
+Remaining payment acceptance: open a new preview order with that authenticated account, fund the customer wallet with sufficient USDC, approve the exact order payment and verify its receipt through both checkout and scoped merchant MCP. No new transfer occurred during the sign-in check, and verified external customers remain **0**. Successful wallet connection alone does not prove a purchase or Circle notification delivery. Card/fiat funding is not implemented.
+
+Historical console attempt: the Google management console returned `Site Unavailable` in this execution environment, and the agent changed no OAuth setting during that attempt. The account owner subsequently added the callback through their own console session; the later successful preview sign-in supersedes the earlier unresolved redirect gate. No credential, token or API key was extracted.
 
 Official sources: [Google OAuth client settings](https://support.google.com/cloud/answer/15549257), [Circle wallet app setup](https://developers.circle.com/wallets/user-controlled/build-a-wallet-app).
 
@@ -66,7 +68,8 @@ Its local policy, human approval, durable reservation and reconciliation tests p
 | Existing-wallet collection → receipt → business → merchant MCP | Passed, one internal 0.01-USDC mainnet payment |
 | Existing-wallet browser approval and recovery | Live extension UI acceptance pending; the real EOA test used the API/GitHub signer |
 | Read-only worker persistence and duplicate suppression | Passed, two actual deployed one-shot reads |
-| Google / Circle authenticated customer payment | Account callback configuration and live acceptance pending |
+| Google sign-in → Circle wallet → Arc balance readback | Passed after the account owner added the preview callback; connected wallet showed 0 USDC |
+| Google / Circle authenticated customer payment | Wallet funding, exact purchase approval and receipt acceptance pending; sign-in is verified separately |
 | Circle notification with customer browser closed | Account subscription and live delivery pending |
 | Continuously scheduled worker | Host provisioning pending |
 | Separate Circle payer extension | Local tests passed; live CLI gate pending |

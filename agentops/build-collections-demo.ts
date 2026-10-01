@@ -15,6 +15,8 @@ async function main() {
   const collection = JSON.parse(await readFile("agentops/evidence/collections-mainnet.json", "utf8"));
   const transfer = JSON.parse(await readFile("agentops/evidence/collections-mainnet-transaction.json", "utf8"));
   const watcher = JSON.parse(await readFile("agentops/evidence/collections-watch.json", "utf8"));
+  const hostedMonitor = JSON.parse(await readFile("agentops/evidence/collections-monitor.json", "utf8"));
+  const googleAuthentication = JSON.parse(await readFile("agentops/evidence/collections-google-auth.json", "utf8"));
 
   assert.equal(collection.mode, "REAL_INTERNAL_MAINNET_COLLECTIONS_ACCEPTANCE");
   assert.equal(collection.orderId, orderId);
@@ -38,6 +40,42 @@ async function main() {
   assert.equal(watcher.circleWebhookDeliveryTested, false);
   assert.equal(collection.googleLoginPassed, false);
   assert.equal(collection.circleApprovalTested, false);
+  assert.equal(hostedMonitor.mode, "REAL_HOSTED_INTERNAL_COLLECTIONS_MONITOR_ACCEPTANCE");
+  assert.equal(hostedMonitor.orderId, collection.orderId);
+  assert.equal(hostedMonitor.workspaceId, collection.workspaceId);
+  assert.equal(hostedMonitor.transactionHash, collection.transactionHash);
+  assert.equal(hostedMonitor.chainId, collection.chainId);
+  assert.equal(hostedMonitor.allChecksPassed, true);
+  assert.equal(hostedMonitor.newTransfers, 0);
+  assert.equal(hostedMonitor.externalCustomers, 0);
+  assert.equal(hostedMonitor.scheduledInvocationVerified, false);
+  assert.equal(hostedMonitor.ownerAndReaderStatusMatched, true);
+  assert.equal(hostedMonitor.readerRefreshDenied, true);
+  assert.equal(hostedMonitor.unconfiguredCronHttpStatus, 503);
+  assert.equal(hostedMonitor.remoteMcpMonitorMatched, true);
+  assert.equal(hostedMonitor.sourceReceiptUnchanged, true);
+  assert.equal(hostedMonitor.temporaryReaderRevoked, true);
+  assert.equal(hostedMonitor.revokedReaderDenied, true);
+  assert.equal(hostedMonitor.scans.length, 2);
+  for (const scan of hostedMonitor.scans) {
+    assert.equal(scan.report.outcome, "complete");
+    assert.equal(scan.report.trackedReceipts, 1);
+    assert.equal(scan.report.paidUsdc, "0.01");
+    assert.equal(scan.report.outstandingUsdc, "0");
+    assert.equal(scan.report.newReceipts, 0);
+  }
+  const monitorReport = hostedMonitor.scans.at(-1).report;
+  assert.equal(googleAuthentication.baseUrl, preview);
+  assert.equal(googleAuthentication.path, "/wallet");
+  assert.equal(googleAuthentication.acceptance.googleAuthenticationCompleted, true);
+  assert.equal(googleAuthentication.acceptance.targetDomainSignedInSignal, "Wallet connected. Your balance is read directly from Arc.");
+  assert.equal(googleAuthentication.acceptance.displayedAvailableUsdc, "0");
+  assert.equal(googleAuthentication.customerCheckoutPaymentVerified, false);
+  assert.equal(googleAuthentication.newTransfers, 0);
+  assert.equal(googleAuthentication.externalCustomers, 0);
+  assert.equal(googleAuthentication.signedCircleNotificationDeliveryVerified, false);
+  assert.equal(googleAuthentication.scheduledInvocationVerified, false);
+  assert.equal(googleAuthentication.privateCredentialsRecorded, false);
 
   const e = escapeHtml;
   const summary = {
@@ -50,7 +88,9 @@ async function main() {
     collection,
     transfer,
     watcher,
-    scope: "One real 0.01 USDC internal existing-wallet collection and two read-only watcher passes. Interactive sandbox purchases are simulated. Zero verified external customers. Google/Circle payment, Circle webhook delivery and a continuously deployed scheduler are not verified.",
+    hostedMonitor,
+    googleAuthentication,
+    scope: "One real 0.01 USDC internal existing-wallet collection, two read-only reference watcher passes and two recorded hosted server scans. The server and remote MCP returned the same saved monitor report; the original receipt was unchanged and no new funds were sent. A separate later Google authentication and existing Circle wallet read-back passed on /wallet, displaying 0 USDC; this did not approve or send a customer checkout payment. Interactive sandbox purchases are simulated. Zero verified external customers. Customer checkout payment, Circle webhook delivery and automatic scheduling are not verified. Historical acceptance records retain their original Google sign-in status.",
   };
   const html = `<!doctype html>
 <html lang="en">
@@ -103,10 +143,15 @@ async function main() {
     </section>
     <section class="section" id="agents" aria-labelledby="agents-title">
       <div class="section-head"><div><p class="kicker">Agents read. Companies stay in control.</p><h2 id="agents-title">A useful interface beyond the dashboard.</h2></div><p>The company's agent connects to an authenticated Streamable HTTP MCP endpoint with a scoped read-only key.</p></div>
-      <div class="agent-box"><div class="agent-main"><h3>Four focused collection tools</h3><p>Orders and references remain scoped to one company. Access can be revoked. These tools cannot sign or send a payment.</p><div class="tools"><div class="tool"><code>list_customer_orders</code><span>Purchase states and private customer references.</span></div><div class="tool"><code>get_customer_order</code><span>One owned order and its verified receipt.</span></div><div class="tool"><code>get_receivables_summary</code><span>Paid, outstanding, overdue and processing totals.</span></div><div class="tool"><code>list_payment_events</code><span>Receipt events with IDs for deduplication.</span></div></div><p><a href="${e(repository)}/blob/feat/tameion-agentops/agentops/COLLECTIONS.md#agent-integration">Read the scoped MCP integration guide ↗</a></p><p class="scope">Endpoint: <code>/api/business/mcp</code><br>Credentials are never embedded in this tour.</p></div><div class="agent-result"><span class="tag">Actual read-only watcher proof</span><h3>Checked without a browser session.</h3><pre aria-label="Recorded real receivables summary"><code>${e(JSON.stringify(summary, null, 2))}</code></pre><div class="watch-results"><div><strong>${e(watcher.firstPassNewEvents)}</strong><span>first-pass new event</span></div><div><strong>${e(watcher.secondPassNewEvents)}</strong><span>second-pass new events</span></div><div><strong>${e(watcher.newTransfers)}</strong><span>new transfers</span></div></div><p class="scope"><strong>Two one-shot reader passes</strong> observed the already-paid internal order and kept one durable receipt. This does not demonstrate an installed production scheduler, a continuously running agent or Circle webhook delivery.</p><a href="${e(repository)}/blob/feat/tameion-agentops/agentops/COLLECTIONS_WATCH.md">Read the watcher setup and limitations ↗</a></div></div>
+      <div class="agent-box"><div class="agent-main"><h3>Five focused collection tools</h3><p>Orders and references remain scoped to one company. Access can be revoked. These tools cannot sign or send a payment.</p><div class="tools"><div class="tool"><code>list_customer_orders</code><span>Purchase states and private customer references.</span></div><div class="tool"><code>get_customer_order</code><span>One owned order and its verified receipt.</span></div><div class="tool"><code>get_receivables_summary</code><span>Paid, outstanding, overdue and processing totals.</span></div><div class="tool"><code>list_payment_events</code><span>Receipt events with IDs for deduplication.</span></div><div class="tool"><code>get_collections_monitor</code><span>The latest saved server report; reading it does not start a scan.</span></div></div><p><a href="${e(repository)}/blob/feat/tameion-agentops/agentops/COLLECTIONS.md#agent-integration">Read the scoped MCP integration guide ↗</a></p><p class="scope">Endpoint: <code>/api/business/mcp</code><br>Credentials are never embedded in this tour.</p></div><div class="agent-result"><span class="tag">Actual read-only watcher proof</span><h3>Checked without a browser session.</h3><pre aria-label="Recorded real receivables summary"><code>${e(JSON.stringify(summary, null, 2))}</code></pre><div class="watch-results"><div><strong>${e(watcher.firstPassNewEvents)}</strong><span>first-pass new event</span></div><div><strong>${e(watcher.secondPassNewEvents)}</strong><span>second-pass new events</span></div><div><strong>${e(watcher.newTransfers)}</strong><span>new transfers</span></div></div><p class="scope"><strong>Two one-shot reader passes</strong> observed the already-paid internal order and kept one durable receipt. This does not demonstrate an installed production scheduler, a continuously running agent or Circle webhook delivery.</p><a href="${e(repository)}/blob/feat/tameion-agentops/agentops/COLLECTIONS_WATCH.md">Read the watcher setup and limitations ↗</a></div></div>
     </section>
-    <section class="section" aria-labelledby="video-title"><div class="section-head"><div><p class="kicker">72-second screenshot walkthrough</p><h2 id="video-title">See the company and customer screens.</h2></div><p>Captioned still screenshots: simulated UI first, then the saved real internal receipt and watcher results. This is not a live signing recording.</p></div><video controls preload="none" poster="frames/business-sandbox.jpg" style="display:block;width:100%;max-width:100%;border-radius:16px;background:#10243a" aria-label="Captioned company collections walkthrough"><source src="walkthrough.mp4" type="video/mp4"><track kind="captions" src="captions.vtt" srclang="en" label="English captions">Your browser cannot play this video. <a href="walkthrough.mp4">Download the walkthrough</a>.</video></section>
-    <section class="section" aria-labelledby="scope-title"><div class="status"><div><div class="status-title"><span class="dot" aria-hidden="true"></span><h3 id="scope-title">What this preview demonstrates</h3></div><p>Company orders, interactive sandbox checkout, a real internal existing-wallet payment, verified receipts, scoped remote MCP reading and durable watcher deduplication. The original production branch remains separate.</p></div><div><div class="status-title"><span class="dot pending" aria-hidden="true"></span><h3>What remains unverified</h3></div><p>Google/Circle customer sign-in and payment approval, signed Circle webhook delivery and a deployed recurring watcher. Verified external customers: zero. A USDC balance is required; card or fiat checkout is not included.</p></div></div></section>
+    <section class="section" aria-labelledby="monitor-title">
+      <div class="section-head"><div><p class="kicker">Recorded hosted server acceptance</p><h2 id="monitor-title">A saved report beyond the browser.</h2></div><p>Two bounded server scans observed the same existing internal payment. Automatic scheduling has not been activated or verified.</p></div>
+      <div class="agent-box"><div class="agent-main"><span class="tag">Actual server checks</span><h3>Private checkpoints and one receipt.</h3><p>The hosted monitor retained one receipt across both recorded scans. The owner, scoped reader and remote MCP returned the same saved report; reader refresh was denied and the temporary reader was revoked.</p><div class="watch-results"><div><strong>${e(hostedMonitor.scans.length)}</strong><span>recorded server scans</span></div><div><strong>${e(monitorReport.trackedReceipts)}</strong><span>tracked receipt</span></div><div><strong>${e(hostedMonitor.newTransfers)}</strong><span>new transfers</span></div></div><p class="scope">Report completed at ${e(monitorReport.lastCompletedAt)}. These totals are a saved, paginated observation of the internal workspace, not a live balance snapshot or customer revenue.</p><a href="${e(repository)}/blob/feat/tameion-agentops/agentops/COLLECTIONS_MONITOR.md">Read the hosted monitor design and activation gates ↗</a></div><div class="agent-result"><span class="tag neutral">Automatic schedule unverified</span><h3>The recorded server report</h3><pre aria-label="Saved real hosted collections monitor report"><code>${e(JSON.stringify({ outcome: monitorReport.outcome, trackedReceipts: monitorReport.trackedReceipts, paidUsdc: monitorReport.paidUsdc, outstandingUsdc: monitorReport.outstandingUsdc, newReceipts: monitorReport.newReceipts, chainId: monitorReport.chainId }, null, 2))}</code></pre><p class="scope"><strong>Server refresh acceptance is complete.</strong> The deployed cron endpoint remains unconfigured. This does not prove a recurring scheduler, a continuously running agent or Circle webhook delivery.</p><a href="evidence.json">Inspect the recorded monitor acceptance ↗</a></div></div>
+    </section>
+    <section class="section" aria-labelledby="google-auth-title"><div class="status"><div><div class="status-title"><span class="dot" aria-hidden="true"></span><h3 id="google-auth-title">Google sign-in and wallet read-back verified</h3></div><p>A separate later acceptance at <code>/wallet</code> completed Google authentication through Circle and displayed the existing Arc wallet with ${e(googleAuthentication.acceptance.displayedAvailableUsdc)} USDC available. Verified at ${e(googleAuthentication.verifiedAt)}. No new transfer was sent.</p></div><div><div class="status-title"><span class="dot pending" aria-hidden="true"></span><h3>Customer payment acceptance remains pending</h3></div><p>This proves authentication and wallet read-back only. A customer checkout approval, funded embedded payment, signed Circle notification delivery and automatic scheduling are still unverified. <a href="evidence.json">Inspect the separate Google authentication record</a>.</p></div></div></section>
+    <section class="section" aria-labelledby="video-title"><div class="section-head"><div><p class="kicker">72-second screenshot walkthrough</p><h2 id="video-title">See the company and customer screens.</h2></div><p>Captioned still screenshots: simulated UI first, then the saved real internal receipt and watcher results. This is not a live signing recording. It was recorded before the later Google authentication acceptance shown above; its pending labels reflect that earlier recording.</p></div><video controls preload="none" poster="frames/business-sandbox.jpg" style="display:block;width:100%;max-width:100%;border-radius:16px;background:#10243a" aria-label="Captioned company collections walkthrough"><source src="walkthrough.mp4" type="video/mp4"><track kind="captions" src="captions.vtt" srclang="en" label="English captions">Your browser cannot play this video. <a href="walkthrough.mp4">Download the walkthrough</a>.</video></section>
+    <section class="section" aria-labelledby="scope-title"><div class="status"><div><div class="status-title"><span class="dot" aria-hidden="true"></span><h3 id="scope-title">What this preview demonstrates</h3></div><p>Company orders, interactive sandbox checkout, a real internal existing-wallet payment, verified receipts, scoped remote MCP reading, durable watcher deduplication, two recorded hosted server scans and separate Google authentication with existing wallet read-back. The original production branch remains separate.</p></div><div><div class="status-title"><span class="dot pending" aria-hidden="true"></span><h3>What remains unverified</h3></div><p>Google/Circle customer checkout payment approval, signed Circle webhook delivery and a deployed recurring watcher. Verified external customers: zero. A USDC balance is required; card or fiat checkout is not included.</p></div></div></section>
   </main>
   <footer><div class="wrap footer-row"><p>Arc PayLink · Business collections preview<br>Evidence scope: internal acceptance, not customer traction.</p><div class="small-links"><a href="${e(repository)}/blob/feat/tameion-agentops/agentops/RELEASE_REPORT.md">Release report</a><a href="https://arc-paylink-two.vercel.app">Original product ↗</a><a href="${e(repository)}">GitHub ↗</a></div></div></footer>
 </body>
@@ -116,7 +161,7 @@ async function main() {
   await writeFile("public/collections-demo/index.html", html);
   await writeFile("public/collections-demo/evidence.json", `${JSON.stringify(evidence, null, 2)}\n`);
   await copyFile("agentops/evidence/collections-mainnet.jpg", "public/collections-demo/receipt.jpg");
-  console.log("Built public/collections-demo from recorded internal mainnet and read-only watcher evidence. No network requests or transfers were made.");
+  console.log("Built public/collections-demo from recorded internal mainnet, read-only watcher, hosted monitor and Google authentication evidence. No network requests or transfers were made.");
 }
 
 void main().catch((error: unknown) => { console.error(error); process.exitCode = 1; });
