@@ -18,6 +18,19 @@ The demo runs the real MCP server, decision engine, audit journal, CLI adapter, 
 
 Saved output: [local-rehearsal.json](evidence/local-rehearsal.json). Delivery report: [RELEASE_REPORT.md](RELEASE_REPORT.md). Submission material: [SUBMISSION.md](SUBMISSION.md).
 
+## Visual demo and recording
+
+The feature branch includes an isolated static replay at `/agentops-demo/index.html`. It works on mobile, exposes all seven recorded tool results and provides a downloadable evidence file. It does not call a wallet, RPC or PayLink API. The installed main application routes are unchanged.
+
+An [84-second captioned video](../public/agentops-demo/rehearsal.mp4) shows seven actual screenshots of this working replay. Its persistent simulation label distinguishes the fixture transaction from a real payment. This is a silent recording with English captions. The public artifacts can be regenerated from the current rehearsal:
+
+```sh
+npm run agentops:demo -- --output agentops/evidence/local-rehearsal.json
+npm run agentops:demo:build
+```
+
+Optional recording tooling is `node agentops/record-demo.mjs`; the rendering environment needs Playwright, Chromium and ffmpeg. `ARCPAYLINK_DEMO_CHROMIUM_PATH` can identify an installed renderer. Those tools are only used to capture the local demo page and are not payment-server dependencies.
+
 ## MCP tools
 
 | Tool | Behavior |

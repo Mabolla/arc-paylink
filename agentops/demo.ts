@@ -102,6 +102,7 @@ async function main() {
       return body;
     }
     await call("inspect_paylink", { requestId });
+    assert.equal((await call("evaluate_invoice", { requestId, invoice: { ...invoice, amount: "4.99" } })).decision.outcome, "review");
     assert.equal((await call("evaluate_invoice", { requestId, invoice })).decision.outcome, "payable");
     assert.equal((await call("pay_approved_invoice", { requestId, invoice })).state, "sync-required");
     assert.equal((await call("pay_approved_invoice", { requestId, invoice: { ...invoice, invoiceId: "DEMO-ALIAS" } })).state, "blocked");
@@ -115,7 +116,7 @@ async function main() {
     const evidence = {
       mode: "SIMULATED — NO REAL PAYMENT, USER OR BUSINESS ACTIVITY", generatedAt: new Date().toISOString(),
       exercised: ["MCP SDK client/server", "exact approval form", "real policy and durable audit", "child-process CLI adapter with simulated executable", "local HTTP PayLink adapter with simulated service", "real viem decoding against simulated Arc RPC", "no-resend recovery"],
-      checks: { singleTransfer: true, aliasRetryBlocked: true, statusRecovered: true, auditIntegrityVerified: true },
+      checks: { amountMismatchBlocked: true, singleTransfer: true, aliasRetryBlocked: true, statusRecovered: true, auditIntegrityVerified: true },
       simulatedTransferCount: transfers.length, settlementHttpCalls: settlementCalls, approvals, transferArguments: transfers, transcript,
     };
     const outputIndex = process.argv.indexOf("--output");

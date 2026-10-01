@@ -11,6 +11,7 @@
     "test:app": "vitest run",
     "agentops": "node --import tsx agentops/server.ts",
     "agentops:demo": "node --import tsx agentops/demo.ts",
+    "agentops:demo:build": "node --import tsx agentops/build-demo.ts",
     "agentops:test": "vitest run agentops",
     "contracts:compile": "hardhat compile",
     "contracts:test": "hardhat test",

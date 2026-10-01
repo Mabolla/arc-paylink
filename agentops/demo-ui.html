@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Arc PayLink AgentOps · Recorded demo</title>
+<meta name="description" content="Replay an actual local MCP integration test: invoice checks, exact approval, one simulated transfer, and recovery without paying twice.">
+<meta name="robots" content="noindex">
+<style>
+:root{color-scheme:dark;--bg:#080f16;--panel:#101b25;--line:#263442;--text:#eff5fa;--muted:#9aaebd;--lime:#c4f874;--amber:#ffc477;--red:#ff9c91;--blue:#9cc7ff}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 70% 0,#173027 0,transparent 47%),var(--bg);font:15px/1.55 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--text)}a{color:inherit}button{font:inherit;cursor:pointer}button:focus-visible,a:focus-visible{outline:3px solid var(--lime);outline-offset:4px}button:disabled{opacity:.3;cursor:default}.wrap{max-width:1280px;margin:auto;padding:28px 40px 30px}.top{display:flex;justify-content:space-between;align-items:center;gap:16px}.brand{display:flex;align-items:center;gap:12px;font-weight:650;font-size:19px;letter-spacing:-.6px}.brand svg{width:34px;height:34px}.brand span{font-weight:400;color:var(--muted)}.top a{font-size:12px;color:var(--muted);text-decoration:none}.simulation{font-size:10px;font-weight:750;letter-spacing:1.2px;padding:7px 12px;border:1px solid #66563d;background:#292319;border-radius:30px;color:var(--amber);white-space:nowrap}.intro{margin:36px 0 24px;display:flex;align-items:end;justify-content:space-between;gap:24px}.eyebrow{color:var(--lime);letter-spacing:2px;font-size:10px;font-weight:700;text-transform:uppercase}h1{font-size:clamp(29px,3.4vw,43px);line-height:1.1;letter-spacing:-1.7px;margin:10px 0 12px;font-weight:600}.intro p{margin:0;color:var(--muted);max-width:680px;font-size:14px}.intro-right{text-align:right;min-width:170px;color:var(--muted);font-size:11px}.intro-right strong{display:block;color:var(--text);font-size:14px;font-weight:500}.workspace{display:grid;grid-template-columns:235px minmax(0,1fr);gap:18px}.sidebar{border:1px solid var(--line);background:#0d171fd9;border-radius:16px;padding:21px 13px}.sidebar-heading{padding:0 9px 13px;color:var(--muted);font-size:10px;font-weight:700;letter-spacing:1.5px}.step{position:relative;display:flex;align-items:center;gap:11px;width:100%;text-align:left;border:1px solid transparent;background:none;color:var(--muted);padding:11px 9px;border-radius:10px;margin:2px 0;font-size:12px}.step .num{width:24px;height:24px;display:grid;place-items:center;border-radius:50%;border:1px solid var(--line);font-size:10px;flex-shrink:0}.step.active{background:#20352a;border-color:#405b39;color:var(--lime)}.step.active .num{background:var(--lime);color:#192113;border-color:var(--lime)}.step.done .num{color:var(--lime);border-color:#46623d}.sidebar-note{padding:20px 9px 0;margin:15px 0 0;border-top:1px solid var(--line);color:var(--muted);font-size:11px;line-height:1.7}.main{min-width:0}.card{background:linear-gradient(135deg,#14232d,#111b24);border:1px solid var(--line);border-radius:16px;padding:24px 27px}.card-top{display:flex;align-items:center;justify-content:space-between;gap:16px;color:var(--muted);font:11px ui-monospace,SFMono-Regular,Consolas,monospace}.badge{font:10px system-ui;letter-spacing:.7px;text-transform:uppercase;padding:5px 9px;background:#213629;color:var(--lime);border:1px solid #43603c;border-radius:6px}.badge.warn{background:#352a1c;border-color:#725432;color:var(--amber)}.badge.blocked{background:#392626;border-color:#67413c;color:var(--red)}h2{font-size:26px;letter-spacing:-.8px;line-height:1.18;margin:19px 0 10px;font-weight:550}#explanation{color:var(--muted);font-size:13px;margin:0;min-height:41px;max-width:750px}.facts{display:grid;grid-template-columns:1fr 1fr 1.5fr;gap:16px;margin-top:24px;padding-top:18px;border-top:1px solid var(--line)}.label{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1.2px}.value{font-size:18px;font-weight:550;margin-top:5px;letter-spacing:-.4px}.mono{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:12px;letter-spacing:0;overflow-wrap:anywhere}.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px}.metric{border:1px solid var(--line);background:#0d171f;border-radius:12px;padding:16px 20px}.metric .value{font-size:27px;line-height:1.2}.metric .sub{font-size:10px;color:var(--muted);margin-top:5px}.proof{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:19px}.proof div{padding:9px 10px;border:1px solid var(--line);color:#8498a8;border-radius:7px;font-size:10px}.proof div.ok{border-color:#405637;background:#19281c;color:var(--lime)}.proof div.wait{border-color:#745331;background:#2d241a;color:var(--amber)}.controls{display:flex;justify-content:space-between;align-items:center;margin-top:18px;gap:12px}.buttons{display:flex;gap:9px}.btn{border:1px solid #344552;background:#18252e;color:var(--text);border-radius:7px;padding:9px 14px;font-size:11px}.primary{background:var(--lime);border-color:var(--lime);color:#142011;font-weight:650}.counter{font-size:11px;color:var(--muted)}.progress{height:3px;margin-top:16px;background:#233240;border-radius:3px;overflow:hidden}#progress-fill{height:100%;background:var(--lime);transition:width .3s}details{margin-top:18px;border:1px solid var(--line);border-radius:11px;background:#0d171f}summary{padding:13px 16px;font-size:11px;color:var(--muted);cursor:pointer}pre{margin:0;padding:16px;max-height:320px;overflow:auto;font:11px/1.7 ui-monospace,SFMono-Regular,Consolas,monospace;color:#b9cdde;border-top:1px solid var(--line);white-space:pre-wrap;overflow-wrap:anywhere}.footer{margin:25px 0 0;display:flex;justify-content:space-between;gap:20px;font-size:10px;color:var(--muted)}.footer p{margin:0;max-width:760px}.footer a{white-space:nowrap}.links{display:flex;gap:17px}.video{margin-top:20px;display:none}.video.open{display:block}.video video{width:100%;max-height:75vh;border:1px solid var(--line);border-radius:12px;background:#000}body.recording .wrap{padding-top:24px}body.recording .intro{margin:27px 0 20px}body.recording details,body.recording .footer,body.recording #video-toggle{display:none}body.recording .sidebar-note{font-size:10px}body.recording h1{font-size:38px}
+@media(max-width:760px){.wrap{padding:20px}.top{flex-wrap:wrap}.top>a{display:none}.simulation{font-size:8px}.brand{font-size:17px}.intro{margin:28px 0 22px}.intro-right{display:none}h1{letter-spacing:-1px}.workspace{grid-template-columns:1fr}.sidebar{padding:12px;display:flex;overflow:auto;gap:4px;border-radius:12px}.sidebar-heading,.sidebar-note{display:none}.step{width:auto;white-space:nowrap;padding:7px 9px;font-size:10px;gap:7px}.step .num{width:20px;height:20px}.card{padding:21px}.card-top{font-size:9px;align-items:start}.badge{font-size:8px}h2{font-size:25px}.facts{grid-template-columns:1fr 1fr;gap:14px}.facts>div:last-child{grid-column:1/-1}.metrics{gap:7px}.metric{padding:13px 11px}.metric .value{font-size:25px}.label{font-size:8px}.proof{grid-template-columns:repeat(2,1fr)}.controls{align-items:start;flex-wrap:wrap}.buttons{gap:6px}.btn{padding:10px 12px}.footer{flex-direction:column;font-size:11px}#explanation{min-height:64px}.card-top code{max-width:60%;overflow-wrap:anywhere}}
+@media(max-width:760px){#steps{display:flex;width:max-content}.sidebar{overflow-x:auto}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top">
+  <div class="brand"><svg viewBox="0 0 40 40" role="img" aria-label="Arc PayLink"><rect width="40" height="40" rx="12" fill="#c4f874"/><path d="M11 27 20 11l9 16M15 22h10" fill="none" stroke="#152313" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>Arc PayLink <span>/ AgentOps</span></div>
+  <span class="simulation">SIMULATED · NO REAL FUNDS</span>
+  <a href="https://github.com/Mabolla/arc-paylink/pull/14" target="_blank" rel="noopener">Source &amp; review ↗</a>
+</header>
+<section class="intro">
+ <div><div class="eyebrow">Invoice → decision → verified settlement</div><h1>One obligation. One payment.</h1><p>Replay the actual local integration run: catch a mismatch, verify a payment,<br class="desktop"> and recover an outage without sending twice.</p></div>
+ <div class="intro-right">RECORDED MCP REHEARSAL<strong>7 steps · 5 agent tools</strong><span id="run-date"></span></div>
+</section>
+<div class="workspace">
+ <aside class="sidebar" aria-label="Rehearsal steps"><div class="sidebar-heading">FOLLOW THE DECISION</div><div id="steps"></div><p class="sidebar-note">Recorded results from the real MCP workflow.<br><br>Wallet, invoice, approval and RPC responses are test fixtures. This page cannot send funds.</p></aside>
+ <main class="main">
+  <section class="card" aria-live="polite" aria-atomic="true">
+    <div class="card-top"><code id="tool"></code><span class="badge" id="badge"></span></div>
+    <h2 id="headline"></h2><p id="explanation"></p>
+    <div class="facts"><div><div class="label">PayLink amount</div><div class="value">5.00 <span style="color:var(--muted);font-size:12px">USDC</span></div></div><div><div class="label">Invoice evidence</div><div class="value" id="invoice-amount"></div></div><div><div class="label">Canonical obligation</div><div class="value mono">DEMO-INV-42</div><div class="label" style="margin-top:6px">Arc Testnet · fixture</div></div></div>
+    <div class="proof" aria-label="Payment lifecycle"><div id="proof-reserved">01 · Reserved</div><div id="proof-submitted">02 · Submitted</div><div id="proof-verified">03 · Arc verified</div><div id="proof-synced">04 · PayLink synced</div></div>
+  </section>
+  <div class="metrics"><div class="metric"><div class="label">Simulated transfers</div><div class="value" id="transfers">0</div><div class="sub">One invocation only</div></div><div class="metric"><div class="label">Status write attempts</div><div class="value" id="writes">0</div><div class="sub">Retry status, not money</div></div><div class="metric"><div class="label">Audit integrity</div><div class="value" id="integrity" style="font-size:19px;line-height:1.7">Pending</div><div class="sub" id="audit-count">Hash-linked local evidence</div></div></div>
+  <div class="controls"><div class="buttons"><button class="btn" id="previous" aria-label="Previous step">← Back</button><button class="btn primary" id="play">Play recorded run</button><button class="btn" id="next" aria-label="Next step">Next →</button></div><span class="counter" id="counter"></span></div><div class="progress" role="progressbar" aria-label="Rehearsal progress" aria-valuemin="1" aria-valuemax="7" aria-valuenow="1"><div id="progress-fill"></div></div>
+  <details><summary>Inspect the actual MCP result</summary><pre id="raw-result"></pre></details>
+ </main>
+</div>
+<footer class="footer"><p>Local controls and real receipt decoding; simulated external services. This is an evidence replay, not a live wallet console. No customer usage or payment volume is claimed.</p><div class="links"><a href="evidence.json" download>Download evidence</a><a href="rehearsal.mp4" id="video-toggle">Watch 84-second video</a></div></footer>
+<div class="video" id="video"><video controls preload="none" playsinline poster="poster.png" aria-label="Simulated AgentOps rehearsal recording"><source src="rehearsal.mp4" type="video/mp4"><track kind="captions" src="captions.vtt" srclang="en" label="English" default></video></div>
+</div>
+<script id="evidence-data" type="application/json">__EVIDENCE_JSON__</script>
+<script>
+const evidence = JSON.parse(document.getElementById('evidence-data').textContent);
+const stages = [
+ {label:'Read the obligation',title:'Start with the original PayLink.',status:'Pending',description:'The agent reads the request, exact recipient, amount and invoice obligation. No wallet is called.'},
+ {label:'Catch a mismatch',title:'4.99 is not 5.00.',status:'Review required',tone:'warn',description:'Invoice evidence disagrees with the PayLink by 0.01 USDC. The decision routes it to review; no funds move.'},
+ {label:'Check the policy',title:'The correct invoice clears policy.',status:'Payable',description:'The corrected amount, obligation, approved payee, due date and budget match. Payment still needs exact client approval.'},
+ {label:'Submit once',title:'Payment verified. Status write failed.',status:'Sync required',tone:'warn',description:'After simulated approval, one transfer is reserved and submitted. The Arc fixture verifies; the first PayLink status write returns HTTP 503.'},
+ {label:'Block the duplicate',title:'A different name cannot pay it again.',status:'Retry blocked',tone:'blocked',description:'A retry uses invoice name DEMO-ALIAS. The original PayLink and obligation remain reserved, so the wallet is not called again.'},
+ {label:'Recover the record',title:'Recover the record. Keep one transfer.',status:'Settled',description:'Reconciliation rechecks the saved hash and retries only the status update. PayLink now reports the same transaction as settled.'},
+ {label:'Inspect the evidence',title:'A trace from decision to settlement.',status:'Integrity verified',description:'The journal links decisions, reservation, submitted hash, receipt and repaired settlement. Its hash chain verifies; it is not an independently signed ledger.'}
+];
+let index=0,timer=null;
+const byId=id=>document.getElementById(id);
+byId('run-date').textContent=new Date(evidence.generatedAt).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric',timeZone:'UTC'});
+stages.forEach((stage,i)=>{const button=document.createElement('button');button.className='step';button.innerHTML='<span class="num"></span><span></span>';button.firstElementChild.textContent=String(i+1).padStart(2,'0');button.lastElementChild.textContent=stage.label;button.addEventListener('click',()=>{pause();render(i)});byId('steps').append(button)});
+function render(i){
+ index=Math.max(0,Math.min(stages.length-1,i));const stage=stages[index];
+ byId('tool').textContent=evidence.transcript[index].tool;
+ byId('headline').textContent=stage.title;byId('explanation').textContent=stage.description;
+ byId('badge').textContent=stage.status;byId('badge').className='badge '+(stage.tone||'');
+ byId('invoice-amount').textContent=index===1?'4.99 USDC':'5.00 USDC';byId('invoice-amount').style.color=index===1?'var(--amber)':'var(--text)';
+ byId('transfers').textContent=index>=3?String(evidence.simulatedTransferCount):'0';
+ byId('writes').textContent=index>=5?String(evidence.settlementHttpCalls):index>=3?'1':'0';
+ byId('integrity').textContent=index===6?'Verified':'Pending';byId('integrity').style.color=index===6?'var(--lime)':'var(--muted)';
+ byId('audit-count').textContent=index===6?evidence.transcript[6].result.count+' journal entries':'Hash-linked local evidence';
+ ['reserved','submitted','verified'].forEach(name=>byId('proof-'+name).className=index>=3?'ok':'');
+ byId('proof-synced').className=index>=5?'ok':index>=3?'wait':'';
+ byId('proof-synced').textContent=index>=5?'04 · PayLink synced':'04 · Sync pending';
+ byId('raw-result').textContent=JSON.stringify(evidence.transcript[index].result,null,2);
+ [...document.querySelectorAll('.step')].forEach((step,n)=>{step.className='step'+(n===index?' active':n<index?' done':'');if(n===index)step.setAttribute('aria-current','step');else step.removeAttribute('aria-current')});
+ if(window.innerWidth<=760){const sidebar=document.querySelector('.sidebar'),active=document.querySelector('.step.active');sidebar.scrollLeft=active.offsetLeft-sidebar.offsetLeft-sidebar.clientWidth/2+active.clientWidth/2;}
+ byId('previous').disabled=index===0;byId('next').disabled=index===stages.length-1;
+ byId('counter').textContent='STEP '+String(index+1).padStart(2,'0')+' / 07';
+ byId('progress-fill').style.width=((index+1)/stages.length*100)+'%';document.querySelector('[role=progressbar]').setAttribute('aria-valuenow',String(index+1));
+ if(index===stages.length-1&&timer)pause();
+ if(!timer)byId('play').textContent=index===stages.length-1?'Replay recorded run':'Play recorded run';
+}
+function pause(){if(timer)clearInterval(timer);timer=null;byId('play').textContent=index===stages.length-1?'Replay recorded run':'Play recorded run'}
+byId('play').addEventListener('click',()=>{if(timer){pause();return}if(index===stages.length-1)render(0);byId('play').textContent='Pause playback';timer=setInterval(()=>render(index+1),6000)});
+byId('previous').addEventListener('click',()=>{pause();render(index-1)});byId('next').addEventListener('click',()=>{pause();render(index+1)});
+byId('video-toggle').addEventListener('click',event=>{event.preventDefault();byId('video').classList.toggle('open');if(byId('video').classList.contains('open'))byId('video').scrollIntoView({behavior:'smooth'})});
+if(new URLSearchParams(location.search).has('recording'))document.body.classList.add('recording');
+window.agentopsReplay={show:render,stageCount:stages.length,evidence};render(0);
+</script>
+</body>
+</html>
