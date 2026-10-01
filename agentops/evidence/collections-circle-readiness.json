@@ -1,0 +1,15 @@
+{
+  "sourceCommit": "20e61cf87a0c5db723206b7393a20ad5fa35d492",
+  "checkedAt": "2026-10-01T23:12:02.839745+00:00",
+  "mode": "REAL_DEPLOYED_CIRCLE_SUBSCRIPTION_READINESS",
+  "newTransfers": 0,
+  "providerMutations": 0,
+  "circlePaidOutboundVerified": false,
+  "subscriptionIdRetained": false,
+  "httpStatus": 200,
+  "readiness": {
+    "embeddedWalletReady": true,
+    "notificationSubscriptionReady": true,
+    "checkedAt": "2026-10-01T23:12:12.269Z"
+  }
+}

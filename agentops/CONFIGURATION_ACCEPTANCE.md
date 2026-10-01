@@ -82,7 +82,7 @@ Its local policy, human approval, durable reservation and reconciliation tests p
 | Company panel Check now | Deployed; local lifecycle and hosted owner API acceptance passed, sandbox visibility verified; actual owner browser click pending |
 | Google sign-in → Circle wallet → Arc balance readback | Passed after the account owner added the preview callback; connected wallet showed 0 USDC |
 | Google / Circle authenticated customer payment | Wallet funding, exact purchase approval and receipt acceptance pending; sign-in is verified separately |
-| Circle signed activation test | Owner reports a green retest after Webhooks Read Only was enabled; subscription ID and enabled metadata pending |
+| Circle signed activation test / subscription | Owner-reported green test; deployed owner health independently verifies enabled outbound subscription. Subscription ID not retained; paid delivery pending |
 | Circle notification with customer browser closed | Real paid-order notification and live replay acceptance pending; activation success alone is insufficient |
 | Continuously scheduled worker | Host provisioning pending |
 | Separate Circle payer extension | Local tests passed; live CLI gate pending |
@@ -97,3 +97,11 @@ Existing signer recheck on `181eb8e` passed without exporting its key or sending
 Final checkout recovery fixes passed 248 application and 13 contract tests, lint and the production build. Fifteen mock checks preserve active approval/payment errors while recovering an initial read failure; each caller now remounts by purchase ID. Missing-challenge attempts beyond the existing 23-hour gate require business review instead of contradictory resume instructions. No transfer or credential was used in those mocks. [Validation scope](evidence/collections-checkout-recovery-validation.json).
 
 An owner-only `GET /api/business/checkout-health` checks the existing server Circle credential against the exact deployment callback and enabled outbound coverage. It exposes readiness flags only; readers are denied before any provider call. Final integration: 270 application tests (including 22 readiness tests), 13 contract tests, lint, production build and account-diagnostic mocks passed. Live readiness and existing GitHub provider-access results remain pending deployment.
+
+## Deployed subscription readiness acceptance
+
+Source `20e61cf`: real authenticated owner `GET /api/business/checkout-health` returned HTTP 200 with `embeddedWalletReady: true` and `notificationSubscriptionReady: true`. The deployed server therefore read valid Circle metadata and found an enabled outbound subscription for its exact callback. This verifies enabled readiness independently of the earlier owner-reported green test; it does not prove a paid-order delivery or expose/retain a subscription ID. No provider mutation or transfer occurred. [Sanitized live proof](evidence/collections-circle-readiness.json).
+
+GitHub-only account diagnosis ran separately: its existing `CIRCLE_API_KEY` was present but its read received HTTP 401; `VERCEL_TOKEN` was absent. This does not describe the working deployed server credential. Vercel management UI remained unreadable due to a browser runtime timeout. No recurring schedule or new hosting project was created. [Sanitized provider-access scope](evidence/collections-provider-access.json).
+
+Final source validation passed on GitHub run [36939330362](https://github.com/Mabolla/arc-paylink/actions/runs/36939330362), job `110626897319`: 270 application tests, 13 contract tests, lint, production build, historical mainnet deployment verification and read-only mainnet preflight. Vercel succeeded.

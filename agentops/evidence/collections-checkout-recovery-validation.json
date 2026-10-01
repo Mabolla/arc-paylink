@@ -26,5 +26,16 @@
     "Checkout lifecycle checks mocked checkout GET requests only.",
     "Existing-key acceptance retained the previously paid internal order; it did not send a new payment.",
     "Actual owner browser click, Circle outbound payment notification and recurring schedule remain separate acceptance gates."
-  ]
+  ],
+  "sourceCommit": "20e61cf87a0c5db723206b7393a20ad5fa35d492",
+  "githubCi": {
+    "runId": 36939330362,
+    "jobId": 110626897319,
+    "conclusion": "success"
+  },
+  "vercel": {
+    "state": "success",
+    "deploymentUrl": "https://vercel.com/mabolla1/arc-paylink/A7LFi1vqgg7whxNWaZ3hTFSxHwYy"
+  },
+  "liveSubscriptionReadinessVerified": true
 }

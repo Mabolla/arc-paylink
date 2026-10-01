@@ -20,9 +20,9 @@ The existing payment-link product now has persistent company workspaces, fixed-a
 
 One internal **0.01-USDC Arc mainnet** payment passed order, receipt and merchant-agent verification. Repeated hosted scans retained one receipt with no additional transfer. Google/Circle sign-in and a live zero-USDC wallet balance are verified. **External customers: zero.** Sample dashboard amounts are simulated.
 
-The existing-key receipt-only [run 36935708985](https://github.com/Mabolla/arc-paylink/actions/runs/36935708985) and full [source verification run 36935713582](https://github.com/Mabolla/arc-paylink/actions/runs/36935713582) passed on `181eb8e`. Additional checkout recovery fixes passed **270 application tests, 13 contract tests and 15 mocked checkout checks** locally; publication verification is still pending.
+The existing-key receipt-only [run 36935708985](https://github.com/Mabolla/arc-paylink/actions/runs/36935708985) and full [source verification run 36935713582](https://github.com/Mabolla/arc-paylink/actions/runs/36935713582) passed on `181eb8e`. Additional checkout recovery fixes passed **270 application tests, 13 contract tests and 15 mocked checkout checks** locally. Final publication checks also passed on [run 36939330362](https://github.com/Mabolla/arc-paylink/actions/runs/36939330362), source `20e61cf`.
 
-The owner reports a green Circle activation test. Actual paid-order notification delivery with the customer browser closed, live replay acceptance and recurring scheduling remain unverified; automatic scheduling is inactive. Sign-in acceptance is separate from a completed embedded-wallet purchase.
+The deployed owner readiness check independently confirms an enabled Circle outbound subscription. Actual paid-order notification delivery with the customer browser closed, live replay acceptance and recurring scheduling remain unverified; automatic scheduling is inactive. Sign-in acceptance is separate from a completed embedded-wallet purchase.
 
 ## Proposed use of support
 
@@ -41,4 +41,4 @@ Release context: original production and `main` remain unchanged.
 
 ## Türkçe durum
 
-Mevcut Microgrants kaydını güçlendirecek metin hazırlandı; başvuru henüz düzenlenmedi veya gönderilmedi. Şirket tahsilatı, beş salt-okuma agent aracı ve sunucuda kontrol çalışan ürün kapsamına yazıldı. Gerçek 0,01 USDC iç test ile Google/Circle giriş kanıtı açık; örnek rakamlar müşteri veya gelir sayılmadı. Son ödeme ekranı düzeltmeleri yerelde doğrulandı, yayımlama kabulü bekliyor. Circle üzerinden gerçek satın alma/bildirim ve otomatik zamanlama tamamlanmadan tamamlandı iddiası yapılmıyor.
+Mevcut Microgrants kaydını güçlendirecek metin hazırlandı; başvuru henüz düzenlenmedi veya gönderilmedi. Şirket tahsilatı, beş salt-okuma agent aracı ve sunucuda kontrol çalışan ürün kapsamına yazıldı. Gerçek 0,01 USDC iç test ile Google/Circle giriş kanıtı açık; örnek rakamlar müşteri veya gelir sayılmadı. Son ödeme ekranı düzeltmeleri yerelde doğrulandı, yayın kontrolleri de geçti. Etkin Circle bildirim aboneliği sunucudan doğrulandı. Circle üzerinden gerçek satın alma/bildirim ve otomatik zamanlama tamamlanmadan tamamlandı iddiası yapılmıyor.
