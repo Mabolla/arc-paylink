@@ -16,7 +16,7 @@ This is an isolated extension to the existing Arc PayLink product. The walletles
 - Reproducible offline demo: `npm run agentops:demo`.
 - Mobile-friendly evidence replay: `/agentops-demo/index.html` on this branch's preview deployment.
 - [84-second captioned video](../public/agentops-demo/rehearsal.mp4): actual screenshots of the working evidence replay, with simulated external payment activity clearly labeled throughout. Silent, with English captions.
-- 39 AgentOps tests; 164 total application tests; 13 escrow contract tests.
+- 39 payer AgentOps tests; 24 business collections tests; 188 total application tests; 13 escrow contract tests.
 - Current AgentOps business pilots: **0 verified**. Current AgentOps real transfer volume: **0 verified**. Simulation results are excluded.
 - Existing product: https://arc-paylink-two.vercel.app — this is the existing PayLink mainnet pilot, not a deployed AgentOps demo.
 
@@ -34,3 +34,13 @@ This is an isolated extension to the existing Arc PayLink product. The walletles
 The delivered video uses the seven-step replay in 84 seconds, with “SIMULATED · NO REAL FUNDS” visible throughout and the simulation stated in its opening caption. It is a visual replay of recorded local integration results, not a live financial transaction recording. Replace the synthetic transaction segment only after real testnet evidence exists. Registration/acceptance and final submission status have not been verified.
 
 Before submission, include the actual recording URL and accurate business-use evidence. The [official event page](https://tameion.thecanteenapp.com/) supplies the submission form and current requirements.
+
+## Customer collections extension (2026-10-01)
+
+The feature branch now also includes a company dashboard, persistent tenant-scoped orders and access keys, Google / Circle embedded customer checkout, exact onchain receipt verification, signed inbound Circle notifications and a remote read-only MCP server for company agents. See [COLLECTIONS.md](COLLECTIONS.md).
+
+- Real workspace: https://arc-paylink-git-feat-tameion-agentops-mabolla1.vercel.app/business
+- Interactive sandbox: https://arc-paylink-git-feat-tameion-agentops-mabolla1.vercel.app/business/demo
+- Remote merchant MCP: `/api/business/mcp`, with a scoped Bearer key.
+
+The sandbox is explicitly simulated and uses browser-local data. Embedded checkout code is implemented; a real Google-authenticated customer purchase and the deployed Circle webhook subscription still need acceptance. A new empty embedded wallet requires funding with USDC; this version does not offer card/fiat checkout. Do not describe sandbox purchases as users, traction, revenue or onchain volume.

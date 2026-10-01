@@ -1,0 +1,9 @@
+{
+  "mode": "SIMULATED_UI_ACCEPTANCE",
+  "generatedAt": "2026-10-01T17:29:01.170Z",
+  "sandboxCreateCheckoutPayTrack": true,
+  "agentSummary": true,
+  "mobileNoOverflow": true,
+  "existingWalletFallback": true,
+  "pageErrors": []
+}

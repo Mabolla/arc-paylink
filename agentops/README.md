@@ -1,6 +1,6 @@
 # Arc PayLink AgentOps 0.2
 
-A local MCP add-on for a business agent to check invoice obligations, request approval, pay through a Circle Agent Wallet, verify Arc USDC settlement, and recover a failed status update without paying twice. The existing PayLink application and escrow contracts are unchanged.
+A local MCP add-on for a business agent to check invoice obligations, request approval, pay through a Circle Agent Wallet, verify Arc USDC settlement, and recover a failed status update without paying twice. The escrow contracts and existing payment APIs remain unchanged. For the added customer purchase flow, company dashboard and remote read-only agent tools, see [Business collections](COLLECTIONS.md).
 
 **Status:** locally verified prototype, including an offline integration rehearsal. No real AgentOps payment or business pilot is claimed. This is a tool layer for an MCP host, not a continuously running autonomous finance operator.
 
@@ -20,7 +20,7 @@ Saved output: [local-rehearsal.json](evidence/local-rehearsal.json). Delivery re
 
 ## Visual demo and recording
 
-The feature branch includes an isolated static replay at `/agentops-demo/index.html`. It works on mobile, exposes all seven recorded tool results and provides a downloadable evidence file. It does not call a wallet, RPC or PayLink API. The installed main application routes are unchanged.
+The feature branch includes an isolated static replay at `/agentops-demo/index.html`. It works on mobile, exposes all seven recorded tool results and provides a downloadable evidence file. It does not call a wallet, RPC or PayLink API. This replay is separate from the new `/business` and `/checkout` application routes.
 
 An [84-second captioned video](../public/agentops-demo/rehearsal.mp4) shows seven actual screenshots of this working replay. Its persistent simulation label distinguishes the fixture transaction from a real payment. This is a silent recording with English captions. The public artifacts can be regenerated from the current rehearsal:
 
@@ -87,6 +87,6 @@ The default journal is `~/.local/state/arc-paylink-agentops/<chainId>/audit.json
 
 This supports one business on one local filesystem, not multiple tenants or replicas. The journal detects ordinary edits but is not signed/WORM evidence: an operator who rewrites the entire file can recompute its hashes. Protect the filesystem and back up evidence under separate control; do not restore an older journal and resume payments. These are local application controls, not guarantees against another tool independently spending from the wallet.
 
-There is no tenant invoice inbox, email/PDF ingestion, accounting connector, sanctions-screening service, webhook delivery, background schedule, or walletless-claim agent workflow. The existing UUID-based PayLink API is not a tenant authorization system. The CLI's wallet resolver can fall back to a local wallet; hence the dedicated runtime without imported local keys requirement, plus agent-wallet preflight. CLI output/errors are not exposed verbatim to the MCP host.
+This local payer process has no tenant invoice inbox, email/PDF ingestion, accounting connector, sanctions-screening service, webhook delivery, background schedule, or walletless-claim agent workflow. The separate [business collections module](COLLECTIONS.md) adds tenant authorization, customer purchases, embedded checkout, signed inbound Circle notifications and read-only remote MCP tools. The existing UUID-based PayLink API is not a tenant authorization system. The CLI's wallet resolver can fall back to a local wallet; hence the dedicated runtime without imported local keys requirement, plus agent-wallet preflight. CLI output/errors are not exposed verbatim to the MCP host.
 
 Mainnet has not been validated for this prototype's pilot. Before enabling it, verify Circle-enforced wallet policies, account authorization, independent audit retention and genuine business evidence. See [Circle CLI docs](https://developers.circle.com/agent-stack/circle-cli) and the [published 1.1.4 package](https://www.npmjs.com/package/@circle-fin/cli/v/1.1.4). The adapter was checked against that package's `transfer`, `list`, `resolve` and output code, not just example commands.
