@@ -1,0 +1,32 @@
+{
+  "observedDate": "2026-10-04",
+  "timezone": "Europe/Istanbul",
+  "project": "arc-paylink-collections-pilot",
+  "branch": "deploy/collections-pilot",
+  "testedCommit": "659392847fe6d8fe5631e66d6ebca645e4184aa7",
+  "deployment": "7GZnH1LoGv4S9wXfzjig721W6eJQ",
+  "orderId": "e6679899-b04a-4f81-af8d-ad252e43fb17",
+  "reference": "PILOT-VALIDATION-20261004",
+  "amountUsdc": "0.01",
+  "sender": "0xcFFC8feE9d782497fdb74909a3843948DF34df31",
+  "recipient": "0x94705A9d675daa924F9190Eca4c05ED6B12d5345",
+  "transactionHash": "0x045031831a68f210ff2eb29da5ffd0a6a54e5550f1ef7642cb0c63780c95d36a",
+  "blockNumber": "24127126",
+  "confirmedAt": "2026-10-03T23:22:35.297Z",
+  "customerCheckout": "paid",
+  "businessDashboard": "Paid",
+  "persistedAfterReload": true,
+  "serverReport": {
+    "receiptsTracked": 1,
+    "collectedUsdc": "0.01",
+    "outstandingUsdc": "0",
+    "completed": "2026-10-03T23:23Z",
+    "persistedAfterReload": true
+  },
+  "limitations": [
+    "Internal acceptance payment, not external customer adoption.",
+    "Report was manually triggered with Check now; automatic scheduling remains inactive.",
+    "No separate conversational LLM agent client was verified.",
+    "Browser-closed settlement and webhook-only causality were not established."
+  ]
+}
