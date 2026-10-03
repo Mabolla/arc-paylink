@@ -1,0 +1,33 @@
+{
+  "checkedAt": "2026-10-03T12:50:14.680027+00:00",
+  "workspace": "9f91cab5-93b7-4834-aea5-c13643713b5d",
+  "order": "27c0ecd3-0bdf-4ef3-a300-250b7df1c7e1",
+  "monitor": {
+    "monitor": {
+      "outcome": "complete",
+      "chainId": 5042,
+      "trackedReceipts": 0,
+      "completedScans": 2,
+      "lastCompletedAt": "2026-10-03T12:49:40.649Z",
+      "lastStartedAt": "2026-10-03T12:49:34.962Z",
+      "newReceipts": 0,
+      "summaryAsOf": "2026-10-03T12:49:39.572Z",
+      "paidUsdc": "0",
+      "outstandingUsdc": "0.01",
+      "orders": 1,
+      "paidOrders": 0,
+      "processingOrders": 0,
+      "overdueOrders": 0
+    },
+    "schedulingConfigured": true
+  },
+  "temporaryCheckKeysActive": 0,
+  "newTransfers": 0,
+  "circlePaidCheckoutVerified": false,
+  "originalProductionChanged": false,
+  "productionDeployment": "7fY5KTNLPjbNwKXMDLLt93m6AWnX",
+  "schedule": "0 5 * * *",
+  "providerEnabled": true,
+  "providerRunButtonClicked": true,
+  "naturalScheduledInvocationVerified": false
+}
