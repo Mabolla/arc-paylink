@@ -189,8 +189,6 @@ export function CollectionsMonitorStatus({
     };
 
     queueMicrotask(() => void refresh());
-    const interval = window.setInterval(() => void refresh(), 30000);
-    const onVisible = () => void refresh();
     const onPageHide = () => {
       pageLeaving.current = true;
       const task = checkTask.current;
@@ -200,8 +198,6 @@ export function CollectionsMonitorStatus({
       }
     };
     const onPageShow = () => { pageLeaving.current = false; };
-    document.addEventListener("visibilitychange", onVisible);
-    window.addEventListener("focus", onVisible);
     window.addEventListener("pagehide", onPageHide);
     window.addEventListener("pageshow", onPageShow);
     return () => {
@@ -209,9 +205,6 @@ export function CollectionsMonitorStatus({
       mounted.current = false;
       onPageHide();
       controller?.abort();
-      window.clearInterval(interval);
-      document.removeEventListener("visibilitychange", onVisible);
-      window.removeEventListener("focus", onVisible);
       window.removeEventListener("pagehide", onPageHide);
       window.removeEventListener("pageshow", onPageShow);
     };
@@ -401,7 +394,13 @@ export function CollectionsMonitorStatus({
         >
           {checking ? "Checking…" : "Check now"}
         </button>
+        <button type="button" className={styles.button}
+          disabled={demo || disabled || checking}
+          onClick={() => void reloadStatus()}>
+          Refresh saved report
+        </button>
       </div>
+      <p className={styles.note}>Report loads when opened. Refresh to see later updates.</p>
       {notice && <p className={styles.notice} role="status">{notice}</p>}
       {checkError && <p className={styles.error} role="alert">{checkError}</p>}
       {cleanup && (

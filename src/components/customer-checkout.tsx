@@ -22,6 +22,7 @@ import { demoOrders, demoPay } from "@/lib/commerce/demo-client";
 import type { PublicOrder } from "@/lib/commerce/types";
 import styles from "./business.module.css";
 import { ExternalCheckout } from "./external-checkout";
+import { startCheckoutPolling } from "@/lib/commerce/checkout-polling";
 
 export const CHECKOUT_RETURN = "arcpaylink.checkout.return";
 type Login = { userToken: string; encryptionKey: string };
@@ -197,14 +198,15 @@ export function CustomerCheckout({
       })().catch((e) => {
         setError(messageOf(e));
       });
-    const interval = setInterval(() => {
-      if (!document.hidden) void refresh().catch(() => {});
-    }, 10000);
     return () => {
       active.current = false;
-      clearInterval(interval);
     };
   }, [demo, refresh, loadWallet]);
+  useEffect(() => {
+    if (demo || order?.status !== "processing") return;
+    return startCheckoutPolling(refresh, () => !document.hidden);
+  }, [demo, order?.status, refresh]);
+
   async function signIn() {
     const sdk = sdkRef.current;
     if (!sdk) {
@@ -498,6 +500,10 @@ export function CustomerCheckout({
                   <span>Get a receipt after Arc confirms the transfer.</span>
                 </div>
               </div>
+              <button type="button" className={styles.secondary} disabled={busy}
+                onClick={() => void refresh().catch((e) => setError(messageOf(e)))}>
+                Refresh payment status
+              </button>
               {(error || initialLoadError) && (
                 <div className={styles.alert} role="alert">
                   {error || initialLoadError}

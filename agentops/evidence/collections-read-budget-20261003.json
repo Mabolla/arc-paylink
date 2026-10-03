@@ -1,0 +1,27 @@
+{
+  "scope": "Reduce recurring browser reads; no storage migration or provider change",
+  "changes": [
+    "Business dashboard: load on open and existing explicit actions; remove timer and focus refresh",
+    "Saved monitor report: load on open, after Check now, or explicit Refresh saved report",
+    "Checkout: poll only processing orders; 15 second delay after completed request, max 20 reads; hidden tabs skipped; stop on error or non-processing response",
+    "Manual payment status refresh remains available, including initial read recovery"
+  ],
+  "validation": {
+    "command": "node agentops/checkout-polling.node-test.mjs",
+    "passed": 5,
+    "cases": [
+      "paid/cancelled stop",
+      "hidden tab and bounded budget",
+      "error stops retries",
+      "no overlap and in-flight cleanup",
+      "unmount before first tick"
+    ],
+    "diffCheck": "passed",
+    "fullBuild": "pending CI; dependencies not installed locally"
+  },
+  "liveBlobRequests": 0,
+  "newTransfers": 0,
+  "cron": "remains paused",
+  "originalProductionModified": false,
+  "step2Complete": false
+}

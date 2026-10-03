@@ -163,17 +163,6 @@ export function BusinessDashboard({ demo = false }: { demo?: boolean }) {
           setEmbeddedReady(c.embeddedWalletReady);
         })
         .catch(() => {});
-    const id = setInterval(() => {
-      if (!document.hidden) void refresh().catch(() => {});
-    }, 30000);
-    const onFocus = () => {
-      void refresh().catch(() => {});
-    };
-    window.addEventListener("focus", onFocus);
-    return () => {
-      clearInterval(id);
-      window.removeEventListener("focus", onFocus);
-    };
   }, [refresh, demo]);
   async function act(fn: () => Promise<void>) {
     if (busy) return;
