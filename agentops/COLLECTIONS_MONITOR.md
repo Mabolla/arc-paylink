@@ -2,7 +2,7 @@
 
 The hosted monitor observes a company's existing orders and confirmed payment events without requiring an open browser. It records a durable private receipt ledger and a resumable receivables report. It does not approve or send payments, create orders, unlock payment attempts or mark an unconfirmed purchase as paid.
 
-The hosted implementation passed real manual server acceptance on the isolated feature preview. Two complete scans retained one internal 0.01-USDC receipt; replay found zero new receipts. Owner and reader status, the remote MCP report, read-only restrictions and temporary key revocation passed. No new transfer was made. No provider schedule is active or verified. The local reader proof in `evidence/collections-watch.json` is separate from this hosted acceptance.
+The hosted implementation passed real manual server acceptance on the isolated feature preview. Two complete scans retained one internal 0.01-USDC receipt; replay found zero new receipts. Owner and reader status, the remote MCP report, read-only restrictions and temporary key revocation passed. No new transfer was made. On 2026-10-03 a separate mainnet Vercel project became Ready and its daily schedule registration was verified; execution is paused pending private-store access approval and scoped credentials. No successful provider-originated monitor run is verified. The local reader proof in `evidence/collections-watch.json` is separate from this hosted acceptance.
 
 ## Endpoints and access
 

@@ -1,6 +1,6 @@
 # Arc PayLink — şirket tahsilatı ve AgentOps teslim raporu
 
-Güncelleme: 1 Ekim 2026 UTC / 2 Ekim 2026 Türkiye saati. Çalışma `feat/tameion-agentops` dalında, taslak [PR #14](https://github.com/Mabolla/arc-paylink/pull/14) içindedir. Ana canlı ürüne birleştirilmedi.
+Güncelleme: 3 Ekim 2026. Uygulama çalışması `feat/tameion-agentops` dalında, taslak [PR #14](https://github.com/Mabolla/arc-paylink/pull/14) içindedir. Ayrı takip projesinin dağıtım dalı `deploy/collections-monitor` olarak oluşturuldu. Ana canlı ürüne birleştirilmedi.
 
 ## Eklenen ürün akışı
 
@@ -127,3 +127,9 @@ Owner-only `GET /api/business/checkout-health`, mevcut sunucu anahtarını dış
 Ayrı GitHub sağlayıcı kontrolünde kayıtlı Circle anahtarı vardı fakat HTTP 401 aldı; Vercel yönetim tokenı yoktu. Çalışan sunucu anahtarının durumu bundan ayrıdır. Vercel yönetim sayfası da runtime zaman aşımıyla okunamadı. Otomatik zamanlama açılmış sayılmadı. [Erişim kanıtı](evidence/collections-provider-access.json).
 
 Son kaynak için GitHub run [36939330362](https://github.com/Mabolla/arc-paylink/actions/runs/36939330362), job `110626897319`, **270 uygulama + 13 sözleşme**, lint, derleme ve mainnet salt-okuma/deployment kontrollerinde tamamen başarılı. Vercel yayını başarılı; main hâlâ orijinal `e82173d7580f1698f503d544202b986c143fd2a9`. Microgrants güncelleme metni [hazırlandı](MICROGRANTS_UPGRADE_DRAFT.md); dış başvuru düzenlenmedi/gönderilmedi.
+
+## Ayrı takip projesinin kurulması — 3 Ekim
+
+Vercel yönetim ekranı bu devam çalışmasında erişilebilir oldu. `arc-paylink-collections-monitor` adlı ayrı proje kuruldu; üretim dalı yalnız `deploy/collections-monitor`, kaynak `82faa61`. Mainnet ayarlı son dağıtım Ready. Günlük `/api/cron/collections` görevi `0 5 * * *` UTC ile Vercel'de kayıtlıdır; özel depo, şirkete ait okuyucu ve ayrı cron secret henüz bağlanmadığı için görev duraklatıldı. Yetkisiz gerçek HTTP kontrolü 503 ve yapılandırma eksik yanıtı verdi. Başarılı görev çalıştırması veya otomatik tahsilat kabulü yapılmış sayılmadı.
+
+Yeni projeye `arc-paylink-blob` okuma/yazma erişimi verecek bağlantı ekranı hazır; erişim değişikliği henüz onaylanmadı ve uygulanmadı. Eski proje, ana dal ve canlı üretim korunuyor. Yeni transfer **0**. Google/Circle gerçek satın alma/bildirim ve gerçek owner oturumunda düğme kontrolü hâlâ ayrı kabul adımlarıdır. [Kurulum kanıtı](evidence/collections-monitor-provisioning.json).

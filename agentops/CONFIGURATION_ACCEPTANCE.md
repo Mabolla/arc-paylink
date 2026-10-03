@@ -1,6 +1,6 @@
 # Account configuration and release acceptance
 
-Status observed on 2026-10-01 UTC / 2026-10-02 Europe/Istanbul. Google preview sign-in and Circle wallet readback pass. After the account owner's successful activation retest, the deployed owner-only readiness check independently verified an enabled Circle outbound subscription for the exact preview callback. Real paid-order notification, browser-closed delivery and replay acceptance remain pending. Existing production and `main` remain unchanged.
+Status updated on 2026-10-03. The earlier Google preview sign-in, Circle wallet readback and deployed subscription readiness passed. Real paid-order notification, browser-closed delivery and replay acceptance remain pending. The separate mainnet monitor project is now Ready and its daily cron is registered but paused pending private-store access approval and scoped credentials. Existing production and `main` remain unchanged.
 
 ## Google / Circle embedded customer checkout
 
@@ -84,7 +84,7 @@ Its local policy, human approval, durable reservation and reconciliation tests p
 | Google / Circle authenticated customer payment | Wallet funding, exact purchase approval and receipt acceptance pending; sign-in is verified separately |
 | Circle signed activation test / subscription | Owner-reported green test; deployed owner health independently verifies enabled outbound subscription. Subscription ID not retained; paid delivery pending |
 | Circle notification with customer browser closed | Real paid-order notification and live replay acceptance pending; activation success alone is insufficient |
-| Continuously scheduled worker | Host provisioning pending |
+| Continuously scheduled worker | Separate Vercel mainnet project Ready; daily cron registered and paused. Private-store connection, scoped credentials and successful provider invocation pending |
 | Separate Circle payer extension | Local tests passed; live CLI gate pending |
 | Stable production release | Draft PR only; main untouched |
 
@@ -105,3 +105,9 @@ Source `20e61cf`: real authenticated owner `GET /api/business/checkout-health` r
 GitHub-only account diagnosis ran separately: its existing `CIRCLE_API_KEY` was present but its read received HTTP 401; `VERCEL_TOKEN` was absent. This does not describe the working deployed server credential. Vercel management UI remained unreadable due to a browser runtime timeout. No recurring schedule or new hosting project was created. [Sanitized provider-access scope](evidence/collections-provider-access.json).
 
 Final source validation passed on GitHub run [36939330362](https://github.com/Mabolla/arc-paylink/actions/runs/36939330362), job `110626897319`: 270 application tests, 13 contract tests, lint, production build, historical mainnet deployment verification and read-only mainnet preflight. Vercel succeeded.
+
+## Isolated monitor provisioning, 2026-10-03
+
+Vercel management access worked on this continuation. New project `arc-paylink-collections-monitor` tracks only `deploy/collections-monitor`, source `82faa61`, with its own production domain. A mainnet-configured deployment is Ready and Vercel registered `/api/cron/collections` at `0 5 * * *` UTC. Cron is deliberately paused while no private store, scoped reader or separate cron secret is configured. An unauthenticated live request returned 503, `Automatic collection checks are not configured.` No monitor run or new transfer was invented.
+
+The `arc-paylink-blob` connection is prepared for review but not granted; it would give the new project private-store read/write access and requires action-time confirmation under the browser access policy. The original project and production branch were not changed. [Sanitized provisioning proof](evidence/collections-monitor-provisioning.json). Actual Google/Circle purchase and owner-browser button acceptance remain separate; the current browser has no business owner session.
