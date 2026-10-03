@@ -1,0 +1,55 @@
+{
+  "mode": "REAL_DEPLOYED_PREVIEW_ACCEPTANCE",
+  "applicationCommit": "fd72e54592f0940318f97b43d505f3f6761b6ec6",
+  "applicationTree": "38a3465214b6ddcf95d89ef27080069b8151a542",
+  "githubActionsRun": 36911279409,
+  "githubActionsJob": 110534241970,
+  "githubActionsConclusion": "success",
+  "applicationTests": 208,
+  "contractTests": 13,
+  "lintPassed": true,
+  "buildPassed": true,
+  "historicalDeploymentVerified": true,
+  "readOnlyMainnetPreflightPassed": true,
+  "vercelStatus": "success",
+  "deployedAssets": [
+    {
+      "path": "/collections-demo/index.html",
+      "status": 200,
+      "bytes": 19758,
+      "exactLocalBytesMatched": true
+    },
+    {
+      "path": "/collections-demo/evidence.json",
+      "status": 200,
+      "bytes": 4094,
+      "exactLocalBytesMatched": true
+    },
+    {
+      "path": "/collections-demo/walkthrough.mp4",
+      "status": 200,
+      "bytes": 467008,
+      "exactLocalBytesMatched": true
+    },
+    {
+      "path": "/collections-demo/captions.vtt",
+      "status": 200,
+      "bytes": 994,
+      "exactLocalBytesMatched": true
+    }
+  ],
+  "browserTourObserved": true,
+  "horizontalOverflow": false,
+  "receiptImageLoaded": true,
+  "browserViewportWidth": 1348,
+  "videoDurationSeconds": 72,
+  "videoStyle": "captioned still screenshot walkthrough",
+  "originalMainCommit": "e82173d7580f1698f503d544202b986c143fd2a9",
+  "mainUnchanged": true,
+  "googleCirclePurchaseVerified": false,
+  "circleWebhookDeliveryVerified": false,
+  "productionSchedulerInstalled": false,
+  "circleAgentWalletCliPaymentVerified": false,
+  "externalWalletBrowserApprovalVerified": false,
+  "externalCustomers": 0
+}

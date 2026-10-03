@@ -1,0 +1,200 @@
+{
+  "collection": {
+    "mode": "REAL_INTERNAL_MAINNET_COLLECTIONS_ACCEPTANCE",
+    "generatedAt": "2026-10-01T18:27:51.221571+00:00",
+    "orderId": "604c797f-68d3-40bd-a483-bc7a36e7a33c",
+    "workspaceId": "621b6ec6-f181-45c7-942e-ab01dddc407f",
+    "chainId": 5042,
+    "amountUsdc": "0.01",
+    "transactionHash": "0x892cee4be94814a5fd0da6fb7408b5811738ce5bfe311ae45e2e87a05e736158",
+    "receipt": {
+      "transactionHash": "0x892cee4be94814a5fd0da6fb7408b5811738ce5bfe311ae45e2e87a05e736158",
+      "sender": "0xE7be265f2301E08a6EaE5Cfd0C1113a7Cd35b3dd",
+      "blockNumber": "23751439",
+      "confirmedAt": "2026-10-01T18:25:41.141Z"
+    },
+    "merchantPaid": true,
+    "remoteMcpReceiptMatched": true,
+    "remoteMcpSummary": {
+      "count": 1,
+      "paidCount": 1,
+      "processing": 0,
+      "overdue": 0,
+      "paidUsdc": "0.01",
+      "outstandingUsdc": "0",
+      "chainId": 5042,
+      "asOf": "2026-10-01T18:27:20.581Z"
+    },
+    "receiptEventsAfterRetry": 1,
+    "readerWriteDenied": true,
+    "temporaryReaderRevoked": true,
+    "externalCustomers": 0,
+    "googleLoginPassed": false,
+    "googleBlocker": "preview redirect_uri_mismatch",
+    "circleApprovalTested": false,
+    "circleWebhookSubscriptionVerified": false,
+    "mainUnchanged": "e82173d7580f1698f503d544202b986c143fd2a9"
+  },
+  "transfer": {
+    "mode": "execute",
+    "internalAcceptance": true,
+    "externalCustomers": 0,
+    "amountUsdc": "0.01",
+    "maxGasUsdc": "0.01",
+    "generatedAt": "2026-10-01T18:25:36.302Z",
+    "sourceCommit": "b6e788551888a94045ec4920198916d771375403",
+    "signerConfigured": true,
+    "payer": "0xE7be265f2301E08a6EaE5Cfd0C1113a7Cd35b3dd",
+    "recipient": "0xE8E330061433e0Ba3111ED804EEE0Bf0717da32B",
+    "recipientDerivation": "ArcPayLink/internal-collections-recipient/v1",
+    "chainId": 5042,
+    "nonce": 5,
+    "gasLimit": "89776",
+    "maxFeePerGas": "24000000346",
+    "maximumGasUsdc": "0.002154624031062496",
+    "balanceSufficient": true,
+    "keyMatched": true,
+    "orderId": "604c797f-68d3-40bd-a483-bc7a36e7a33c",
+    "checkout": "https://arc-paylink-git-feat-tameion-agentops-mabolla1.vercel.app/checkout/604c797f-68d3-40bd-a483-bc7a36e7a33c",
+    "transactionHash": "0x892cee4be94814a5fd0da6fb7408b5811738ce5bfe311ae45e2e87a05e736158",
+    "stage": "recorded-paid",
+    "blockNumber": "23751439",
+    "actualGasUsdc": "0.001478760025582548",
+    "receipt": {
+      "transactionHash": "0x892cee4be94814a5fd0da6fb7408b5811738ce5bfe311ae45e2e87a05e736158",
+      "sender": "0xE7be265f2301E08a6EaE5Cfd0C1113a7Cd35b3dd",
+      "blockNumber": "23751439",
+      "confirmedAt": "2026-10-01T18:25:41.141Z"
+    },
+    "realTransfers": 1
+  },
+  "watcher": {
+    "mode": "REAL_READ_ONLY_BROWSER_INDEPENDENT_COLLECTIONS_WATCH",
+    "generatedAt": "2026-10-01T18:46:46.378Z",
+    "deploymentOrigin": "https://arc-paylink-git-feat-tameion-agentops-mabolla1.vercel.app",
+    "workspaceId": "621b6ec6-f181-45c7-942e-ab01dddc407f",
+    "orderId": "604c797f-68d3-40bd-a483-bc7a36e7a33c",
+    "chainId": 5042,
+    "transactionHash": "0x892cee4be94814a5fd0da6fb7408b5811738ce5bfe311ae45e2e87a05e736158",
+    "pilotAmountUsdc": "0.01",
+    "firstPassNewEvents": 1,
+    "secondPassNewEvents": 0,
+    "durableReceiptCount": 1,
+    "exactReceiptMatched": true,
+    "paidUsdc": "0.01",
+    "outstandingUsdc": "0",
+    "noBrowserSessionUsed": true,
+    "allWatcherRequestsReadOnly": true,
+    "temporaryReaderRevoked": true,
+    "newTransfers": 0,
+    "externalCustomers": 0,
+    "circleWebhookDeliveryTested": false,
+    "productionSchedulerInstalled": false,
+    "continuousProcessLeftRunning": false,
+    "acceptanceScope": "Two read-only one-shot passes observed an already-paid internal order without a browser. This does not prove a live scheduler or Circle webhook delivery."
+  },
+  "hostedMonitor": {
+    "mode": "REAL_HOSTED_INTERNAL_COLLECTIONS_MONITOR_ACCEPTANCE",
+    "baseUrl": "https://arc-paylink-git-feat-tameion-agentops-mabolla1.vercel.app",
+    "workspaceId": "621b6ec6-f181-45c7-942e-ab01dddc407f",
+    "orderId": "604c797f-68d3-40bd-a483-bc7a36e7a33c",
+    "chainId": 5042,
+    "transactionHash": "0x892cee4be94814a5fd0da6fb7408b5811738ce5bfe311ae45e2e87a05e736158",
+    "generatedAt": "2026-10-01T20:18:03.146369+00:00",
+    "newTransfers": 0,
+    "externalCustomers": 0,
+    "scheduledInvocationVerified": false,
+    "allChecksPassed": true,
+    "scans": [
+      {
+        "passes": [
+          {
+            "outcome": "complete",
+            "newReceipts": 0
+          }
+        ],
+        "report": {
+          "outcome": "complete",
+          "chainId": 5042,
+          "trackedReceipts": 1,
+          "completedScans": 3,
+          "lastCompletedAt": "2026-10-01T20:18:33.554Z",
+          "lastStartedAt": "2026-10-01T20:18:26.686Z",
+          "newReceipts": 0,
+          "summaryAsOf": "2026-10-01T20:18:32.667Z",
+          "paidUsdc": "0.01",
+          "outstandingUsdc": "0",
+          "orders": 1,
+          "paidOrders": 1,
+          "processingOrders": 0,
+          "overdueOrders": 0
+        }
+      },
+      {
+        "passes": [
+          {
+            "outcome": "complete",
+            "newReceipts": 0
+          }
+        ],
+        "report": {
+          "outcome": "complete",
+          "chainId": 5042,
+          "trackedReceipts": 1,
+          "completedScans": 4,
+          "lastCompletedAt": "2026-10-01T20:18:49.825Z",
+          "lastStartedAt": "2026-10-01T20:18:42.785Z",
+          "newReceipts": 0,
+          "summaryAsOf": "2026-10-01T20:18:48.723Z",
+          "paidUsdc": "0.01",
+          "outstandingUsdc": "0",
+          "orders": 1,
+          "paidOrders": 1,
+          "processingOrders": 0,
+          "overdueOrders": 0
+        }
+      }
+    ],
+    "lastPassHttpStatus": 200,
+    "lastPassOutcome": "complete",
+    "ownerAndReaderStatusMatched": true,
+    "readerRefreshDenied": true,
+    "remoteMcpMonitorMatched": true,
+    "sourceReceiptUnchanged": true,
+    "unconfiguredCronHttpStatus": 503,
+    "temporaryReaderRevoked": true,
+    "revokedReaderDenied": true
+  },
+  "googleAuthentication": {
+    "schemaVersion": 1,
+    "verifiedAt": "2026-10-01T21:21:19.754903+00:00",
+    "baseUrl": "https://arc-paylink-git-feat-tameion-agentops-mabolla1.vercel.app",
+    "path": "/wallet",
+    "sourceCommit": "05c595a75d8403b56cf31e2d79e3c47b0f814ca6",
+    "scope": "Google authentication and existing Circle wallet read-back only",
+    "acceptance": {
+      "previewRedirectAddedByOwner": true,
+      "priorRedirectUriMismatchResolved": true,
+      "googleAuthenticationCompleted": true,
+      "deviceApprovalCompletedByOwner": true,
+      "targetDomainSignedInSignal": "Wallet connected. Your balance is read directly from Arc.",
+      "provider": "Circle / Google",
+      "networkLabel": "Arc",
+      "walletAddress": "0xcffc8fee9d782497fdb74909a3843948df34df31",
+      "displayedAvailableUsdc": "0"
+    },
+    "newTransfers": 0,
+    "externalCustomers": 0,
+    "customerCheckoutPaymentVerified": false,
+    "signedCircleNotificationDeliveryVerified": false,
+    "scheduledInvocationVerified": false,
+    "circleAgentWalletCliPaymentVerified": false,
+    "screenshot": {
+      "path": "collections-google-auth.jpg",
+      "sha256": "693becd146a826d859b435b315728712757fad8614390094640be14b4f530e95"
+    },
+    "privateCredentialsRecorded": false,
+    "originalProductionChanged": false
+  },
+  "scope": "One real 0.01 USDC internal existing-wallet collection, two read-only reference watcher passes and two recorded hosted server scans. The server and remote MCP returned the same saved monitor report; the original receipt was unchanged and no new funds were sent. A separate later Google authentication and existing Circle wallet read-back passed on /wallet, displaying 0 USDC; this did not approve or send a customer checkout payment. Interactive sandbox purchases are simulated. Zero verified external customers. Customer checkout payment, Circle webhook delivery and automatic scheduling are not verified. Historical acceptance records retain their original Google sign-in status."
+}

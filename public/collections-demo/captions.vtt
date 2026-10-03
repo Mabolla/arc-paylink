@@ -1,0 +1,25 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:12.000
+SIMULATED UI · Company creates purchase links and tracks orders.
+Sample totals here are local demo data, not customer revenue.
+
+00:00:12.000 --> 00:00:24.000
+SIMULATED UI · Customer reviews the fixed amount and recipient.
+This walkthrough does not authenticate with Google or send funds.
+
+00:00:24.000 --> 00:00:36.000
+SIMULATED UI · Example approval updates the local order and receipt.
+The sample transaction hash is not a blockchain payment.
+
+00:00:36.000 --> 00:00:48.000
+REAL INTERNAL TEST · Earlier 0.01-USDC EOA payment on Arc mainnet.
+This is a saved receipt screenshot, not a live signing recording.
+
+00:00:48.000 --> 00:01:00.000
+REAL READ-ONLY CHECK · Two worker passes observed this saved receipt.
+First pass: 1 new event. Second: 0. No new transfer or browser used.
+
+00:01:00.000 --> 00:01:12.000
+PENDING · Google/Circle purchase, Circle webhook delivery, worker host.
+Zero verified external customers. Original production is unchanged.

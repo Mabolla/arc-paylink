@@ -1,0 +1,33 @@
+{
+  "mode": "REAL_EXISTING_KEY_RECEIPT_ONLY_ACCEPTANCE",
+  "sourceCommit": "181eb8e99aaf27233d3dcaba6310b0d59e1e0171",
+  "network": "Arc Mainnet",
+  "chainId": 5042,
+  "workflowRunId": 36935708985,
+  "workflowJobId": 110615346442,
+  "workflowConclusion": "success",
+  "validationRunId": 36935713582,
+  "validationJobId": 110615361053,
+  "validationConclusion": "success",
+  "githubConfiguredSignerMatched": true,
+  "payer": "0xE7be265f2301E08a6EaE5Cfd0C1113a7Cd35b3dd",
+  "recipient": "0xE8E330061433e0Ba3111ED804EEE0Bf0717da32B",
+  "orderId": "604c797f-68d3-40bd-a483-bc7a36e7a33c",
+  "transactionHash": "0x892cee4be94814a5fd0da6fb7408b5811738ce5bfe311ae45e2e87a05e736158",
+  "blockNumber": "23751439",
+  "originalPaymentConfirmedAt": "2026-10-01T18:25:41.141Z",
+  "verificationRecordedAt": "2026-10-01T22:34:18.342Z",
+  "configuredMode": "confirm",
+  "alreadyPaid": true,
+  "observedPayerNonce": 6,
+  "newTransfers": 0,
+  "externalCustomers": 0,
+  "circleOutboundPaymentVerified": false,
+  "userProvidedReferenceWallet": "0x94705a9d675daa924f9190eca4c05ed6b12d5345",
+  "referenceWalletWasUsedForThisAcceptance": false,
+  "limitations": [
+    "Receipt-only recheck of the existing internal payment; no new customer purchase.",
+    "The project EOA key cannot sign for the separately authenticated Google/Circle wallet.",
+    "No credential was exported from GitHub or entered into the browser."
+  ]
+}

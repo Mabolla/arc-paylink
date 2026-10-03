@@ -1,0 +1,159 @@
+.card {
+  background: #fff;
+  border: 1px solid #dfe5e9;
+  border-radius: 12px;
+  color: #182431;
+  padding: 22px 26px;
+  margin: 0 0 22px;
+  min-width: 0;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.card h2 {
+  font-size: 18px;
+  letter-spacing: -0.35px;
+  margin: 0;
+}
+
+.badge {
+  border-radius: 30px;
+  padding: 6px 10px;
+  font-size: 11px;
+  background: #edf1f4;
+  color: #526270;
+}
+
+.badge[data-outcome="complete"] {
+  background: #e4f5eb;
+  color: #137b5b;
+}
+
+.badge[data-outcome="partial"],
+.badge[data-outcome="sample"] {
+  background: #fff5da;
+  color: #775b14;
+}
+
+.badge[data-outcome="busy"] {
+  background: #eaf0fb;
+  color: #375787;
+}
+
+.badge[data-outcome="failed"] {
+  background: #fbeaea;
+  color: #9f3d3d;
+}
+
+.note,
+.sample,
+.error {
+  font-size: 13px;
+  line-height: 1.65;
+  margin: 0 0 8px;
+  color: #677481;
+}
+
+.sample {
+  color: #775b14;
+}
+
+.error {
+  color: #9f3d3d;
+}
+
+.notice {
+  font-size: 13px;
+  line-height: 1.65;
+  color: #137b5b;
+  margin: 0 0 8px;
+}
+
+.check {
+  margin: 18px 0;
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  border-radius: 7px;
+  border: 1px solid #182431;
+  padding: 10px 16px;
+  background: #182431;
+  color: #fff;
+  font: 600 13px Arial, Helvetica, sans-serif;
+  cursor: pointer;
+}
+
+.button:hover:not(:disabled) {
+  background: #304659;
+}
+
+.button:focus-visible {
+  outline: 3px solid #137b5b;
+  outline-offset: 3px;
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.cleanup {
+  background: #fff5da;
+  border: 1px solid #ead89c;
+  border-radius: 8px;
+  padding: 12px;
+  color: #775b14;
+  margin-bottom: 16px;
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.cleanup p {
+  margin: 0 0 12px;
+}
+
+.details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 30px;
+  margin: 18px 0 0;
+}
+
+.details div {
+  min-width: 100px;
+}
+
+.details dt {
+  font-size: 11px;
+  color: #677481;
+  margin-bottom: 6px;
+}
+
+.details dd {
+  font-size: 13px;
+  line-height: 1.5;
+  font-weight: 600;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 600px) {
+  .card {
+    padding: 20px;
+  }
+
+  .details {
+    gap: 16px 20px;
+  }
+}

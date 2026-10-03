@@ -1,0 +1,22 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:12.000
+SIMULATED REHEARSAL. No real funds or customer activity. The agent reads the original invoice obligation.
+
+00:00:12.000 --> 00:00:24.000
+A 4.99 USDC invoice does not match the 5.00 USDC PayLink. The decision requires review.
+
+00:00:24.000 --> 00:00:36.000
+The corrected invoice clears policy. Exact client approval is still required before submission.
+
+00:00:36.000 --> 00:00:48.000
+After simulated approval, one transfer is verified. The first status write fails with HTTP 503.
+
+00:00:48.000 --> 00:01:00.000
+An alias retry is blocked by the original PayLink and obligation identities. No second transfer.
+
+00:01:00.000 --> 00:01:12.000
+Reconcile rechecks the saved hash and repairs only the status record. Transfer count stays at one.
+
+00:01:12.000 --> 00:01:24.000
+The local audit chain verifies. This is a tool-layer prototype; a real wallet and business pilot remain pending.

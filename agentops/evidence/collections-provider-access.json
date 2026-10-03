@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "mode": "READ_ONLY_PROVIDER_ACCOUNT_DIAGNOSTIC",
+  "generatedAt": "2026-10-01T23:10:29.356Z",
+  "sourceCommit": "20e61cf87a0c5db723206b7393a20ad5fa35d492",
+  "circle": {
+    "keyConfigured": true,
+    "status": "http_error",
+    "httpStatus": 401,
+    "matchingSubscriptions": []
+  },
+  "vercel": {
+    "tokenConfigured": false,
+    "status": "not_configured",
+    "httpStatus": null,
+    "projects": []
+  },
+  "workflowRunId": 36939324889,
+  "workflowJobId": 110626881493,
+  "workflowConclusion": "success",
+  "newTransfers": 0,
+  "providerMutations": 0,
+  "scope": "Existing named GitHub arc-mainnet provider credentials only; diagnostic completion is not provider access acceptance",
+  "deployedServerCircleKeyStatus": "Separately verified through owner-only checkout-health, with both readiness flags true."
+}

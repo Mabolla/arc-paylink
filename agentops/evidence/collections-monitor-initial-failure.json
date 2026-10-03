@@ -1,0 +1,25 @@
+{
+  "mode": "REAL_HOSTED_INTERNAL_COLLECTIONS_MONITOR_ACCEPTANCE",
+  "baseUrl": "https://arc-paylink-git-feat-tameion-agentops-mabolla1.vercel.app",
+  "workspaceId": "621b6ec6-f181-45c7-942e-ab01dddc407f",
+  "orderId": "604c797f-68d3-40bd-a483-bc7a36e7a33c",
+  "chainId": 5042,
+  "transactionHash": "0x892cee4be94814a5fd0da6fb7408b5811738ce5bfe311ae45e2e87a05e736158",
+  "generatedAt": "2026-10-01T19:59:11.475080+00:00",
+  "newTransfers": 0,
+  "externalCustomers": 0,
+  "scheduledInvocationVerified": false,
+  "allChecksPassed": false,
+  "scans": [],
+  "lastPassHttpStatus": 409,
+  "lastPassOutcome": null,
+  "lastPassError": "This record changed. Refresh and retry.",
+  "failedCheck": "Hosted observation pass failed.",
+  "temporaryReaderRevoked": true,
+  "revokedReaderDenied": true,
+  "diagnosis": {
+    "checkpointVersionKind": "weak",
+    "safeStorageCheckPassed": true,
+    "fix": "Use authoritative Blob metadata ETag with consistent body/version binding; retain conditional updates."
+  }
+}

@@ -1,0 +1,297 @@
+{
+  "mode": "SIMULATED — NO REAL PAYMENT, USER OR BUSINESS ACTIVITY",
+  "generatedAt": "2026-10-01T16:28:42.455Z",
+  "exercised": [
+    "MCP SDK client/server",
+    "exact approval form",
+    "real policy and durable audit",
+    "child-process CLI adapter with simulated executable",
+    "local HTTP PayLink adapter with simulated service",
+    "real viem decoding against simulated Arc RPC",
+    "no-resend recovery"
+  ],
+  "checks": {
+    "amountMismatchBlocked": true,
+    "singleTransfer": true,
+    "aliasRetryBlocked": true,
+    "statusRecovered": true,
+    "auditIntegrityVerified": true
+  },
+  "simulatedTransferCount": 1,
+  "settlementHttpCalls": 2,
+  "approvals": [
+    "Approve 5 USDC on Arc chain 5042002, from 0x0000000000000000000000000000000000000002 to 0x0000000000000000000000000000000000000001, invoice DEMO-INV-42, obligation DEMO-INV-42, PayLink 3a6f27e8-f6bd-43b2-9921-8b26e8b60890?"
+  ],
+  "transferArguments": [
+    [
+      "wallet",
+      "transfer",
+      "0x0000000000000000000000000000000000000001",
+      "--amount",
+      "5",
+      "--address",
+      "0x0000000000000000000000000000000000000002",
+      "--chain",
+      "ARC-TESTNET",
+      "--token",
+      "0x3600000000000000000000000000000000000000",
+      "--idempotency-key",
+      "5e2be8f4-79f9-446c-968f-807f4850389c",
+      "--output",
+      "json"
+    ]
+  ],
+  "transcript": [
+    {
+      "tool": "inspect_paylink",
+      "result": {
+        "requestId": "3a6f27e8-f6bd-43b2-9921-8b26e8b60890",
+        "request": {
+          "title": "SIMULATED supplier invoice",
+          "amount": "5",
+          "recipient": "0x0000000000000000000000000000000000000001",
+          "route": "arc",
+          "chainId": 5042002,
+          "obligation": {
+            "kind": "invoice",
+            "id": "DEMO-INV-42"
+          }
+        },
+        "createdAt": "2026-09-30T00:00:00.000Z",
+        "status": "pending"
+      }
+    },
+    {
+      "tool": "evaluate_invoice",
+      "result": {
+        "decision": {
+          "outcome": "review",
+          "reasons": [
+            "Invoice amount differs from the exact PayLink amount."
+          ],
+          "invoiceId": "DEMO-INV-42",
+          "requestId": "3a6f27e8-f6bd-43b2-9921-8b26e8b60890",
+          "amount": "5",
+          "recipient": "0x0000000000000000000000000000000000000001"
+        },
+        "paymentPossible": false
+      }
+    },
+    {
+      "tool": "evaluate_invoice",
+      "result": {
+        "decision": {
+          "outcome": "payable",
+          "reasons": [
+            "Invoice ID, obligation, recipient, amount, due date, Arc route, duplicate history, and policy checks pass."
+          ],
+          "invoiceId": "DEMO-INV-42",
+          "requestId": "3a6f27e8-f6bd-43b2-9921-8b26e8b60890",
+          "amount": "5",
+          "recipient": "0x0000000000000000000000000000000000000001"
+        },
+        "paymentPossible": true
+      }
+    },
+    {
+      "tool": "pay_approved_invoice",
+      "result": {
+        "state": "sync-required",
+        "paymentSent": true,
+        "chainVerified": true,
+        "paylinkStatus": "sync-required",
+        "transactionHash": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "error": "PayLink service returned HTTP 503.",
+        "instruction": "Payment is confirmed. Use reconcile_payment to retry only verification and status synchronization."
+      }
+    },
+    {
+      "tool": "pay_approved_invoice",
+      "result": {
+        "state": "blocked",
+        "paymentSent": false,
+        "decision": {
+          "outcome": "reject",
+          "reasons": [
+            "This PayLink, invoice or obligation already has a recorded payment attempt; reconcile before retrying."
+          ],
+          "invoiceId": "DEMO-ALIAS",
+          "requestId": "3a6f27e8-f6bd-43b2-9921-8b26e8b60890",
+          "amount": "5",
+          "recipient": "0x0000000000000000000000000000000000000001"
+        }
+      }
+    },
+    {
+      "tool": "reconcile_payment",
+      "result": {
+        "state": "settled",
+        "paymentSent": true,
+        "chainVerified": true,
+        "paylinkStatus": "settled",
+        "transactionHash": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      }
+    },
+    {
+      "tool": "read_agent_audit",
+      "result": {
+        "integrity": "verified",
+        "count": 9,
+        "entries": [
+          {
+            "schemaVersion": 1,
+            "sequence": 1,
+            "previousHash": "0000000000000000000000000000000000000000000000000000000000000000",
+            "event": "decision",
+            "at": "2026-10-01T10:00:00.000Z",
+            "requestId": "3a6f27e8-f6bd-43b2-9921-8b26e8b60890",
+            "invoiceId": "DEMO-INV-42",
+            "amount": "5",
+            "recipient": "0x0000000000000000000000000000000000000001",
+            "details": {
+              "outcome": "review",
+              "obligationId": "DEMO-INV-42",
+              "reasons": "Invoice amount differs from the exact PayLink amount."
+            },
+            "hash": "7075ea2f1144d12a39600278449f327af239e6c4201a589548497b168d3ac090"
+          },
+          {
+            "schemaVersion": 1,
+            "sequence": 2,
+            "previousHash": "7075ea2f1144d12a39600278449f327af239e6c4201a589548497b168d3ac090",
+            "event": "decision",
+            "at": "2026-10-01T10:00:00.000Z",
+            "requestId": "3a6f27e8-f6bd-43b2-9921-8b26e8b60890",
+            "invoiceId": "DEMO-INV-42",
+            "amount": "5",
+            "recipient": "0x0000000000000000000000000000000000000001",
+            "details": {
+              "outcome": "payable",
+              "obligationId": "DEMO-INV-42",
+              "reasons": "Invoice ID, obligation, recipient, amount, due date, Arc route, duplicate history, and policy checks pass."
+            },
+            "hash": "1e196ec61f069490c8d9a674b1a00399d719076bd07fffb325bb522b454815d6"
+          },
+          {
+            "schemaVersion": 1,
+            "sequence": 3,
+            "previousHash": "1e196ec61f069490c8d9a674b1a00399d719076bd07fffb325bb522b454815d6",
+            "event": "decision",
+            "at": "2026-10-01T10:00:00.000Z",
+            "requestId": "3a6f27e8-f6bd-43b2-9921-8b26e8b60890",
+            "invoiceId": "DEMO-INV-42",
+            "amount": "5",
+            "recipient": "0x0000000000000000000000000000000000000001",
+            "details": {
+              "outcome": "payable",
+              "obligationId": "DEMO-INV-42",
+              "reasons": "Invoice ID, obligation, recipient, amount, due date, Arc route, duplicate history, and policy checks pass."
+            },
+            "hash": "d14e18264d3ba5e69e26d415d856fbbf9ed9d1cd5d5c81ec8d8fd3e28e7ba585"
+          },
+          {
+            "schemaVersion": 1,
+            "sequence": 4,
+            "previousHash": "d14e18264d3ba5e69e26d415d856fbbf9ed9d1cd5d5c81ec8d8fd3e28e7ba585",
+            "event": "payment_started",
+            "at": "2026-10-01T10:00:00.000Z",
+            "requestId": "3a6f27e8-f6bd-43b2-9921-8b26e8b60890",
+            "invoiceId": "DEMO-INV-42",
+            "amount": "5",
+            "recipient": "0x0000000000000000000000000000000000000001",
+            "details": {
+              "obligationId": "DEMO-INV-42",
+              "amountBaseUnits": "5000000",
+              "walletAddress": "0x0000000000000000000000000000000000000002",
+              "chainId": 5042002,
+              "idempotencyKey": "5e2be8f4-79f9-446c-968f-807f4850389c"
+            },
+            "hash": "78bff2092771ee00a76d69e0b43a31629c436146a3e92347f1f565a3de554f67"
+          },
+          {
+            "schemaVersion": 1,
+            "sequence": 5,
+            "previousHash": "78bff2092771ee00a76d69e0b43a31629c436146a3e92347f1f565a3de554f67",
+            "event": "payment_submitted",
+            "at": "2026-10-01T10:00:00.000Z",
+            "requestId": "3a6f27e8-f6bd-43b2-9921-8b26e8b60890",
+            "invoiceId": "DEMO-INV-42",
+            "amount": "5",
+            "recipient": "0x0000000000000000000000000000000000000001",
+            "details": {
+              "transactionHash": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            },
+            "hash": "d0d724d782b59e85ecdedfcd6836514eea0504c84064b3b66bc24e196e00fa5d"
+          },
+          {
+            "schemaVersion": 1,
+            "sequence": 6,
+            "previousHash": "d0d724d782b59e85ecdedfcd6836514eea0504c84064b3b66bc24e196e00fa5d",
+            "event": "payment_verified",
+            "at": "2026-10-01T10:00:00.000Z",
+            "requestId": "3a6f27e8-f6bd-43b2-9921-8b26e8b60890",
+            "invoiceId": "DEMO-INV-42",
+            "amount": "5",
+            "recipient": "0x0000000000000000000000000000000000000001",
+            "details": {
+              "transactionHash": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "amountBaseUnits": "5000000",
+              "blockNumber": "123",
+              "blockTimestamp": "1790848802"
+            },
+            "hash": "50926e4b810913f19b5c721ea530e037b4b32dda1a6e7a39bbaa61a2b2447c39"
+          },
+          {
+            "schemaVersion": 1,
+            "sequence": 7,
+            "previousHash": "50926e4b810913f19b5c721ea530e037b4b32dda1a6e7a39bbaa61a2b2447c39",
+            "event": "settlement_sync_failed",
+            "at": "2026-10-01T10:00:00.000Z",
+            "requestId": "3a6f27e8-f6bd-43b2-9921-8b26e8b60890",
+            "invoiceId": "DEMO-INV-42",
+            "amount": "5",
+            "recipient": "0x0000000000000000000000000000000000000001",
+            "details": {
+              "transactionHash": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "reconciliationRequired": true
+            },
+            "hash": "c7556e30529ed7f63cdda0ac20dadc4f751bb8a365120cf6e752f9fc19de3355"
+          },
+          {
+            "schemaVersion": 1,
+            "sequence": 8,
+            "previousHash": "c7556e30529ed7f63cdda0ac20dadc4f751bb8a365120cf6e752f9fc19de3355",
+            "event": "decision",
+            "at": "2026-10-01T10:00:00.000Z",
+            "requestId": "3a6f27e8-f6bd-43b2-9921-8b26e8b60890",
+            "invoiceId": "DEMO-ALIAS",
+            "amount": "5",
+            "recipient": "0x0000000000000000000000000000000000000001",
+            "details": {
+              "outcome": "reject",
+              "obligationId": "DEMO-INV-42",
+              "reasons": "This PayLink, invoice or obligation already has a recorded payment attempt; reconcile before retrying."
+            },
+            "hash": "0d545be182ca11aff255bba39e3c4de9c162ec2d599881c23001941c731f3ce4"
+          },
+          {
+            "schemaVersion": 1,
+            "sequence": 9,
+            "previousHash": "0d545be182ca11aff255bba39e3c4de9c162ec2d599881c23001941c731f3ce4",
+            "event": "settlement_synced",
+            "at": "2026-10-01T10:00:00.000Z",
+            "requestId": "3a6f27e8-f6bd-43b2-9921-8b26e8b60890",
+            "invoiceId": "DEMO-INV-42",
+            "amount": "5",
+            "recipient": "0x0000000000000000000000000000000000000001",
+            "details": {
+              "transactionHash": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "paylinkStatus": "settled"
+            },
+            "hash": "87c3c0bd5fc86227ea0cf058635383692fe3a84da868a2d7bac960252f310fdc"
+          }
+        ]
+      }
+    }
+  ]
+}

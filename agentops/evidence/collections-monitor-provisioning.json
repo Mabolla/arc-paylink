@@ -1,0 +1,46 @@
+{
+  "mode": "ISOLATED_VERCEL_MONITOR_PROVISIONED_NOT_ACTIVATED",
+  "observedAt": "2026-10-03T12:02:16.999664+00:00",
+  "applicationSource": "93a401e64c62b5cf68760943c8132c5a1b62671f",
+  "deploymentSource": "82faa61b657a6e996d5dcf4838f53778bde642b5",
+  "project": "arc-paylink-collections-monitor",
+  "productionBranch": "deploy/collections-monitor",
+  "productionUrl": "https://arc-paylink-collections-monitor.vercel.app",
+  "latestMainnetDeployment": "https://vercel.com/mabolla1/arc-paylink-collections-monitor/G9vzUxFE3wqGnruBy3nVD8jytseb",
+  "deploymentState": "Ready",
+  "publicNetworkConfiguration": "mainnet",
+  "cron": {
+    "path": "/api/cron/collections",
+    "expression": "0 5 * * *",
+    "timezone": "UTC",
+    "providerRegistered": true,
+    "providerEnabled": false,
+    "authenticatedRuntimeAcceptance": false,
+    "naturalScheduledInvocationVerified": false
+  },
+  "access": {
+    "blobConnected": false,
+    "readerConfigured": false,
+    "cronSecretConfigured": false,
+    "connectionApprovalPending": true,
+    "requestedStore": "arc-paylink-blob"
+  },
+  "unauthenticatedRuntimeCheck": {
+    "httpStatus": 503,
+    "error": "Automatic collection checks are not configured."
+  },
+  "originalMainCommit": "e82173d7580f1698f503d544202b986c143fd2a9",
+  "newTransfers": 0,
+  "circlePurchaseVerifiedThisRun": false,
+  "currentBusinessBrowserSession": false,
+  "proof": [
+    "collections-cron-paused-20261003.jpg",
+    "collections-store-approval-20261003.jpg"
+  ],
+  "limits": [
+    "Provider registration and a Ready deployment do not prove a working authenticated monitor run.",
+    "Paused pending private-store access approval and scoped credentials.",
+    "The unchanged Google/Circle customer purchase and owner UI acceptance remain separate gates.",
+    "No provider API key or wallet signing key was exported."
+  ]
+}

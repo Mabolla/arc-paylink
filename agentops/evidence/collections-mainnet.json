@@ -1,0 +1,36 @@
+{
+  "mode": "REAL_INTERNAL_MAINNET_COLLECTIONS_ACCEPTANCE",
+  "generatedAt": "2026-10-01T18:27:51.221571+00:00",
+  "orderId": "604c797f-68d3-40bd-a483-bc7a36e7a33c",
+  "workspaceId": "621b6ec6-f181-45c7-942e-ab01dddc407f",
+  "chainId": 5042,
+  "amountUsdc": "0.01",
+  "transactionHash": "0x892cee4be94814a5fd0da6fb7408b5811738ce5bfe311ae45e2e87a05e736158",
+  "receipt": {
+    "transactionHash": "0x892cee4be94814a5fd0da6fb7408b5811738ce5bfe311ae45e2e87a05e736158",
+    "sender": "0xE7be265f2301E08a6EaE5Cfd0C1113a7Cd35b3dd",
+    "blockNumber": "23751439",
+    "confirmedAt": "2026-10-01T18:25:41.141Z"
+  },
+  "merchantPaid": true,
+  "remoteMcpReceiptMatched": true,
+  "remoteMcpSummary": {
+    "count": 1,
+    "paidCount": 1,
+    "processing": 0,
+    "overdue": 0,
+    "paidUsdc": "0.01",
+    "outstandingUsdc": "0",
+    "chainId": 5042,
+    "asOf": "2026-10-01T18:27:20.581Z"
+  },
+  "receiptEventsAfterRetry": 1,
+  "readerWriteDenied": true,
+  "temporaryReaderRevoked": true,
+  "externalCustomers": 0,
+  "googleLoginPassed": false,
+  "googleBlocker": "preview redirect_uri_mismatch",
+  "circleApprovalTested": false,
+  "circleWebhookSubscriptionVerified": false,
+  "mainUnchanged": "e82173d7580f1698f503d544202b986c143fd2a9"
+}

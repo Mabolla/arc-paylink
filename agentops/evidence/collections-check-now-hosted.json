@@ -1,0 +1,84 @@
+{
+  "mode": "REAL_HOSTED_INTERNAL_COLLECTIONS_MONITOR_ACCEPTANCE",
+  "baseUrl": "https://arc-paylink-git-feat-tameion-agentops-mabolla1.vercel.app",
+  "workspaceId": "621b6ec6-f181-45c7-942e-ab01dddc407f",
+  "orderId": "604c797f-68d3-40bd-a483-bc7a36e7a33c",
+  "chainId": 5042,
+  "transactionHash": "0x892cee4be94814a5fd0da6fb7408b5811738ce5bfe311ae45e2e87a05e736158",
+  "generatedAt": "2026-10-01T22:22:57.667653+00:00",
+  "newTransfers": 0,
+  "externalCustomers": 0,
+  "scheduledInvocationVerified": false,
+  "allChecksPassed": true,
+  "scans": [
+    {
+      "passes": [
+        {
+          "outcome": "complete",
+          "newReceipts": 0
+        }
+      ],
+      "report": {
+        "outcome": "complete",
+        "chainId": 5042,
+        "trackedReceipts": 1,
+        "completedScans": 5,
+        "lastCompletedAt": "2026-10-01T22:23:28.702Z",
+        "lastStartedAt": "2026-10-01T22:23:21.890Z",
+        "newReceipts": 0,
+        "summaryAsOf": "2026-10-01T22:23:27.753Z",
+        "paidUsdc": "0.01",
+        "outstandingUsdc": "0",
+        "orders": 1,
+        "paidOrders": 1,
+        "processingOrders": 0,
+        "overdueOrders": 0
+      }
+    },
+    {
+      "passes": [
+        {
+          "outcome": "complete",
+          "newReceipts": 0
+        }
+      ],
+      "report": {
+        "outcome": "complete",
+        "chainId": 5042,
+        "trackedReceipts": 1,
+        "completedScans": 6,
+        "lastCompletedAt": "2026-10-01T22:23:42.495Z",
+        "lastStartedAt": "2026-10-01T22:23:35.777Z",
+        "newReceipts": 0,
+        "summaryAsOf": "2026-10-01T22:23:41.397Z",
+        "paidUsdc": "0.01",
+        "outstandingUsdc": "0",
+        "orders": 1,
+        "paidOrders": 1,
+        "processingOrders": 0,
+        "overdueOrders": 0
+      }
+    }
+  ],
+  "lastPassHttpStatus": 200,
+  "lastPassOutcome": "complete",
+  "ownerAndReaderStatusMatched": true,
+  "readerRefreshDenied": true,
+  "remoteMcpMonitorMatched": true,
+  "sourceReceiptUnchanged": true,
+  "unconfiguredCronHttpStatus": 503,
+  "temporaryReaderRevoked": true,
+  "revokedReaderDenied": true,
+  "sourceCommit": "39d1223bf90bcc292d3140abde160779c7115212",
+  "deploymentAnchor": "Vercel feature preview for source commit 39d1223bf90bcc292d3140abde160779c7115212",
+  "trigger": "owner-authenticated POST /api/business/monitor/refresh",
+  "browserCheckNowClickTested": false,
+  "recurringScheduleConfigured": false,
+  "recurringScheduleInvocationTested": false,
+  "noBrowserAuthenticationUsed": true,
+  "cleanupHttpResults": {
+    "temporaryReaderRevoke": 200,
+    "revokedReaderStatusRead": 401
+  },
+  "acceptanceScope": "Existing internal 0.01-USDC receipt; two hosted API refresh scans, owner/reader status and read-only MCP report. No browser Check now click, new transfer or scheduled invocation."
+}

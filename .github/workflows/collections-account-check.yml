@@ -1,0 +1,39 @@
+name: Arc PayLink read-only provider account check
+on:
+  push:
+    branches: [feat/tameion-agentops]
+    paths:
+      - scripts/collections-account-check.mjs
+      - .github/workflows/collections-account-check.yml
+permissions:
+  contents: read
+concurrency:
+  group: arc-paylink-read-only-provider-account-check
+  cancel-in-progress: false
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    environment: arc-mainnet
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Verify diagnostic mock boundaries
+        run: node scripts/collections-account-check.mjs --self-test
+      - name: Check existing named provider credentials using read-only API calls
+        run: node scripts/collections-account-check.mjs
+        env:
+          CIRCLE_API_KEY: ${{ secrets.CIRCLE_API_KEY }}
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      - name: Preserve sanitized account check
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: collections-account-check-${{ github.run_id }}
+          path: account-evidence/collections-account-check.json
+          if-no-files-found: warn
+          retention-days: 90

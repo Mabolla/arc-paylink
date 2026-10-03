@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "verifiedAt": "2026-10-01T21:21:19.754903+00:00",
+  "baseUrl": "https://arc-paylink-git-feat-tameion-agentops-mabolla1.vercel.app",
+  "path": "/wallet",
+  "sourceCommit": "05c595a75d8403b56cf31e2d79e3c47b0f814ca6",
+  "scope": "Google authentication and existing Circle wallet read-back only",
+  "acceptance": {
+    "previewRedirectAddedByOwner": true,
+    "priorRedirectUriMismatchResolved": true,
+    "googleAuthenticationCompleted": true,
+    "deviceApprovalCompletedByOwner": true,
+    "targetDomainSignedInSignal": "Wallet connected. Your balance is read directly from Arc.",
+    "provider": "Circle / Google",
+    "networkLabel": "Arc",
+    "walletAddress": "0xcffc8fee9d782497fdb74909a3843948df34df31",
+    "displayedAvailableUsdc": "0"
+  },
+  "newTransfers": 0,
+  "externalCustomers": 0,
+  "customerCheckoutPaymentVerified": false,
+  "signedCircleNotificationDeliveryVerified": false,
+  "scheduledInvocationVerified": false,
+  "circleAgentWalletCliPaymentVerified": false,
+  "screenshot": {
+    "path": "collections-google-auth.jpg",
+    "sha256": "693becd146a826d859b435b315728712757fad8614390094640be14b4f530e95"
+  },
+  "privateCredentialsRecorded": false,
+  "originalProductionChanged": false
+}

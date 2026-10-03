@@ -1,0 +1,19 @@
+{
+  "mode": "DEPLOYED_NO_FUNDS_API_ACCEPTANCE",
+  "generatedAt": "2026-10-01T17:34:10.056307+00:00",
+  "deployment": "https://arc-paylink-git-feat-tameion-agentops-mabolla1.vercel.app",
+  "commit": "98f28801f47fc112892924c69f13163e1ba6216b",
+  "storageReady": true,
+  "embeddedWalletConfigured": true,
+  "workspaceCreated": true,
+  "orderPersisted": true,
+  "publicCheckoutExcludesPrivateFields": true,
+  "readOnlyAgentAllowedReadDeniedWrite": true,
+  "remoteMcpSummaryMatched": true,
+  "agentRevoked": true,
+  "testOrderCancelled": true,
+  "realPayments": 0,
+  "googleLoginTested": false,
+  "circleApprovalTested": false,
+  "webhookSubscriptionVerified": false
+}

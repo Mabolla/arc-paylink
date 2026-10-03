@@ -1,0 +1,89 @@
+{
+  "checkedAt": "2026-10-03T14:58:01.465081+00:00",
+  "mode": "REAL_INTERNAL_GOOGLE_CIRCLE_PAYMENT",
+  "externalCustomers": 0,
+  "workspace": "9f91cab5-93b7-4834-aea5-c13643713b5d",
+  "order": {
+    "id": "27c0ecd3-0bdf-4ef3-a300-250b7df1c7e1",
+    "merchantName": "Mabolla internal collections verification",
+    "reference": "MONITOR-20261003-001",
+    "title": "Internal unpaid monitor acceptance - not a customer sale",
+    "amount": "0.01",
+    "recipient": "0xE8E330061433e0Ba3111ED804EEE0Bf0717da32B",
+    "chainId": 5042,
+    "createdAt": "2026-10-03T12:46:51.631Z",
+    "status": "paid",
+    "receipt": {
+      "transactionHash": "0x4bba266b5cd86ee09ab45acbb157ecb10f6138355b5cde75c9ba937f9d822bc7",
+      "sender": "0xcFFC8feE9d782497fdb74909a3843948DF34df31",
+      "blockNumber": "24066926",
+      "confirmedAt": "2026-10-03T14:53:34.085Z"
+    },
+    "customerReference": "Internal verification",
+    "paymentStartedAt": "2026-10-03T14:51:59.404Z"
+  },
+  "readerMonitor": {
+    "monitor": {
+      "outcome": "complete",
+      "chainId": 5042,
+      "trackedReceipts": 1,
+      "completedScans": 4,
+      "lastCompletedAt": "2026-10-03T14:56:39.014Z",
+      "lastStartedAt": "2026-10-03T14:56:32.492Z",
+      "newReceipts": 0,
+      "summaryAsOf": "2026-10-03T14:56:38.138Z",
+      "paidUsdc": "0.01",
+      "outstandingUsdc": "0",
+      "orders": 1,
+      "paidOrders": 1,
+      "processingOrders": 0,
+      "overdueOrders": 0
+    },
+    "schedulingConfigured": true
+  },
+  "readerEvents": {
+    "events": [
+      {
+        "eventId": "27c0ecd3-0bdf-4ef3-a300-250b7df1c7e1:0x4bba266b5cd86ee09ab45acbb157ecb10f6138355b5cde75c9ba937f9d822bc7",
+        "type": "payment.confirmed",
+        "order": {
+          "id": "27c0ecd3-0bdf-4ef3-a300-250b7df1c7e1",
+          "merchantName": "Mabolla internal collections verification",
+          "reference": "MONITOR-20261003-001",
+          "title": "Internal unpaid monitor acceptance - not a customer sale",
+          "amount": "0.01",
+          "recipient": "0xE8E330061433e0Ba3111ED804EEE0Bf0717da32B",
+          "chainId": 5042,
+          "createdAt": "2026-10-03T12:46:51.631Z",
+          "status": "paid",
+          "receipt": {
+            "transactionHash": "0x4bba266b5cd86ee09ab45acbb157ecb10f6138355b5cde75c9ba937f9d822bc7",
+            "sender": "0xcFFC8feE9d782497fdb74909a3843948DF34df31",
+            "blockNumber": "24066926",
+            "confirmedAt": "2026-10-03T14:53:34.085Z"
+          }
+        }
+      }
+    ],
+    "delivery": "Poll with the returned cursor; deduplicate by eventId. Restart a scan after cursor is absent."
+  },
+  "circleSignedWebhookDelivery": {
+    "verified": true,
+    "host": "arc-paylink-git-feat-tameion-agentops-mabolla1.vercel.app",
+    "path": "/api/checkout/webhooks/circle",
+    "status": 200,
+    "requestTimesUtc": [
+      "2026-10-03T14:53:29.902Z",
+      "2026-10-03T14:53:30.080Z",
+      "2026-10-03T14:53:30.963Z",
+      "2026-10-03T14:53:33.053Z"
+    ],
+    "specificNotificationPayloadCaptured": false,
+    "browserClosedBeforeSettlementProven": false
+  },
+  "authenticatedMonitorRunsThisAcceptance": 2,
+  "independentRpcRead": "HTTP 403; server-verified receipt retained",
+  "naturalDailyInvocationVerified": false,
+  "newTransfersByAgentThisRun": 0,
+  "originalProductionChanged": false
+}

@@ -2,6 +2,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const { createPublicClient, getAddress, http, parseAbi } = require("viem");
 const { arc } = require("viem/chains");
+const { readDeploymentReceipt } = require("./lib/read-deployment-receipt.cjs");
 
 const root = path.join(__dirname, "..");
 const deploymentFilename = process.env.ARC_MAINNET_DEPLOYMENT_FILE || "arc-mainnet-escrow-v2.json";
@@ -85,7 +86,11 @@ async function main() {
     await Promise.all([
       client.getCode({ address: factory }),
       client.getCode({ address: implementation }),
-      client.getTransactionReceipt({ hash: deployment.transactionHash }),
+      readDeploymentReceipt(client, deployment.transactionHash, {
+        onRetry: ({ attempt, delayMs }) => {
+          console.warn(`Historical deployment receipt unavailable; retry ${attempt}/4 in ${delayMs}ms`);
+        },
+      }),
       client.readContract({
         address: factory,
         abi: parseAbi(["function implementation() view returns (address)"]),

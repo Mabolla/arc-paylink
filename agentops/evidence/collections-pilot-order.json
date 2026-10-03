@@ -1,0 +1,11 @@
+{
+  "mode": "INTERNAL_ACCEPTANCE_ORDER",
+  "createdAt": "2026-10-01T18:22:16.969196+00:00",
+  "orderId": "604c797f-68d3-40bd-a483-bc7a36e7a33c",
+  "workspaceId": "621b6ec6-f181-45c7-942e-ab01dddc407f",
+  "recipient": "0xE8E330061433e0Ba3111ED804EEE0Bf0717da32B",
+  "amount": "0.01",
+  "chainId": 5042,
+  "checkout": "https://arc-paylink-git-feat-tameion-agentops-mabolla1.vercel.app/checkout/604c797f-68d3-40bd-a483-bc7a36e7a33c",
+  "externalCustomers": 0
+}
