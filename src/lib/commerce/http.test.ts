@@ -61,6 +61,18 @@ describe("business HTTP and remote agent boundaries", () => {
     const principal = await context.service!.authorize(owner.token);
     const agent = await context.service!.issueReader(principal, "Revoked agent");
     expect((await POST(request("owner-key/prepare", {}, agent.token), route(["owner-key", "prepare"]))).status).toBe(403);
+    const orderInput = { reference: "READ-ONLY", title: "Reader boundary", amount: "1", idempotencyKey: randomUUID() };
+    const order = await context.service!.createOrder(principal, orderInput);
+    for (const [path, body] of [
+      ["orders", orderInput],
+      [`orders/${order.id}/cancel`, {}],
+      ["keys", { name: "Forbidden extra key" }],
+      [`keys/${agent.key.id}/revoke`, {}],
+    ] as const) {
+      expect((await POST(request(path, body, agent.token), route(path.split("/")))).status).toBe(403);
+    }
+    expect((await context.service!.order(principal, order.id)).status).toBe("pending");
+    expect((await context.service!.keys(principal)).filter(key => key.role === "reader")).toHaveLength(1);
     await context.service!.revokeKey(principal, agent.key.id);
     expect((await GET(request("orders", undefined, agent.token), route(["orders"]))).status).toBe(401);
     expect((await mcpPost(request("mcp", { jsonrpc: "2.0", id: 1, method: "tools/list" }, agent.token))).status).toBe(401);

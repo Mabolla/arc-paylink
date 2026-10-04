@@ -1,0 +1,17 @@
+{
+  "checkedAt": "2026-10-04",
+  "scope": "Reader permission and revocation review",
+  "result": "PASS_FOR_REVIEWED_BOUNDARIES",
+  "newValidation": "Targeted HTTP test passed: reader denied order creation, cancellation, reader issuance and key revocation; revoked reader rejected at HTTP and MCP entry points",
+  "existingEvidenceReviewed": [
+    "Monitor reauthorizes before checkpoints and rejects revoked reader without appending events",
+    "Merchant MCP exposes five read-only tools and requires explicit Bearer authentication",
+    "Public business JSON responses disable caching; provider errors are sanitized",
+    "Signed webhook replay is idempotent in existing commerce test"
+  ],
+  "limitations": [
+    "Local integration tests and code review, not independent security audit",
+    "Natural scheduled invocation remains unverified; manual background run is not sufficient proof"
+  ],
+  "uiClarification": "Saved totals may differ from current orders; background completion can include a manually initiated run."
+}

@@ -441,7 +441,7 @@ export function CollectionsMonitorStatus({
           <p className={styles.note}>
             {current.schedulingConfigured
               ? monitor?.lastCronCompletedAt
-                ? "Automatic checks are configured. A background check has completed."
+                ? "Automatic checks are configured. A background run has completed; this can include a manually started run."
                 : "Automatic checks are configured. No completed background check is recorded yet."
               : "Automatic checks are not active."}
             {!demo && !current.schedulingConfigured && outcome === "complete" &&
@@ -452,7 +452,7 @@ export function CollectionsMonitorStatus({
               {monitor.summaryAsOf && (
                 <p className={styles.note}>
                   Collected and outstanding totals reflect the scan recorded
-                  below.
+                  below and may differ from current orders.
                 </p>
               )}
               <dl className={styles.details}>
