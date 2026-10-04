@@ -1,0 +1,14 @@
+{
+  "checkedAt": "2026-10-04",
+  "scope": "Collections customer-reference disclosure and retention",
+  "findings": [
+    "Customer reference is returned to the workspace owner and authorized reader agents; the prior placeholder omitted agent access.",
+    "CommerceStore has read, write and list operations but no deletion operation. No automatic retention purge or self-service deletion flow was found."
+  ],
+  "change": "Dashboard copy now names authorized agents, recommends customer codes instead of personal details and discloses the pilot's lack of automatic or self-service deletion.",
+  "limitations": [
+    "Copy clarification does not implement deletion or a formal retention period.",
+    "No data was deleted and no access permissions were changed.",
+    "Lint passed for the changed dashboard; this copy change is not a full privacy or legal review."
+  ]
+}

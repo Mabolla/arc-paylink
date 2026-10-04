@@ -504,10 +504,16 @@ export function BusinessDashboard({ demo = false }: { demo?: boolean }) {
                     Internal customer reference (optional)
                     <input
                       name="customerReference"
-                      placeholder="ACME-042 · visible only to your business"
+                      placeholder="ACME-042 · your business and authorized agents"
                       maxLength={100}
                     />
                   </label>
+                  <p className={styles.note}>
+                    Use a customer code instead of personal details. Your business
+                    and its authorized read-only agents can read this reference.
+                    Order records remain stored in this pilot; automatic deletion
+                    and a self-service deletion flow are not available yet.
+                  </p>
                   <p className={styles.note}>
                     Receiving address: {workspace.recipient}. The customer
                     cannot change the amount or destination.

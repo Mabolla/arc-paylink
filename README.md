@@ -4,7 +4,7 @@ Arc PayLink lets a sender fund an isolated USDC escrow on Arc and deliver a priv
 
 Business collections are available at `/business`, with an interactive sandbox at `/business/demo`. Companies create customer payment links, customers use existing Arc wallets or the Google / Circle embedded checkout path, and scoped read-only agents follow orders and chain-verified receipts over remote MCP. See [integration and acceptance details](agentops/COLLECTIONS.md). No real customer purchase is claimed by the sandbox.
 
-The [collections watcher](agentops/COLLECTIONS_WATCH.md) also reads receipts without a browser, with a durable ledger and duplicate suppression. Two deployed one-shot passes verified the internal mainnet receipt; a production schedule has not been installed. The new product/evidence tour is at `/collections-demo/index.html`.
+The [collections watcher](agentops/COLLECTIONS_WATCH.md) also reads receipts without a browser, with a durable ledger and duplicate suppression. A daily pilot schedule is configured; natural scheduled execution remains unverified. See the [current release gates](agentops/COLLECTIONS_CURRENT_STATUS.md) for the latest mainnet checkout, webhook and monitor status. The product/evidence tour is at `/collections-demo/index.html`; its sandbox screens remain simulated.
 
 The [hosted collections monitor](agentops/COLLECTIONS_MONITOR.md) adds private server checkpoints, interrupted-run recovery and a recorded report in the business dashboard. The fifth read-only merchant tool, `get_collections_monitor`, exposes that report without starting work. A separate cron endpoint and isolated-deployment template are ready; automatic scheduling requires independent provider activation and acceptance.
 
