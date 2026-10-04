@@ -36,8 +36,10 @@ export class CheckoutPayments {
     uuid.parse(walletId);
     const wallet = await this.provider.wallet(userToken, walletId);
     let saved = await this.commerce.checkout(id);
-    if (saved.value.status === "paid")
+    if (saved.value.status === "paid") {
+      await this.publishReceipt(saved.value);
       return { order: publicOrder(saved.value) };
+    }
     if (saved.value.status === "cancelled")
       throw new CommerceError("This payment link has been cancelled.", 409);
     if (saved.value.attempt?.provider === "external")
@@ -72,6 +74,13 @@ export class CheckoutPayments {
         409,
       );
     let challengeId = saved.value.attempt!.challengeId;
+    if (challengeId) {
+      // A lost response or delayed webhook must not reopen an already completed approval.
+      // Provider/RPC outages fail closed; the customer can check the same attempt later.
+      const completedHash = await this.provider.transaction(userToken, saved.value);
+      if (completedHash)
+        return { order: await this.confirm(id, completedHash) };
+    }
     if (!challengeId) {
       if (recoveryWindowExpired(saved.value.attempt!.startedAt, this.commerce.now()))
         throw new CommerceError(expiredPaymentMessage, 409);
@@ -80,8 +89,10 @@ export class CheckoutPayments {
       );
       // Concurrent retries get the same provider idempotency key and challenge.
       const fresh = await this.commerce.checkout(id);
-      if (fresh.value.status === "paid")
+      if (fresh.value.status === "paid") {
+        await this.publishReceipt(fresh.value);
         return { order: publicOrder(fresh.value) };
+      }
       if (!fresh.value.attempt?.challengeId)
         await this.commerce.store.write(
           path,

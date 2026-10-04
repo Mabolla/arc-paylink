@@ -1,0 +1,30 @@
+{
+  "date": "2026-10-04",
+  "branch": "deploy/collections-pilot",
+  "changes": [
+    "Before returning a saved Circle approval, look up the same attempt and verify any completed transfer.",
+    "On resuming a paid order, repair a missing receipt event without preparing another transfer."
+  ],
+  "verification": {
+    "applicationTests": 284,
+    "testFiles": 50,
+    "addedRecoveryTests": 7,
+    "eslint": "passed",
+    "typescript": "passed",
+    "productionBuild": "passed",
+    "coveredScenarios": [
+      "Completed approval resume returns paid without another approval",
+      "Pending approval resume reuses the same challenge",
+      "Circle or RPC outage blocks approval reopening",
+      "Lost challenge write retains original provider idempotency key",
+      "Webhook refId settles after provider response loss without browser calls",
+      "Missing receipt event repaired on paid-order resume",
+      "Paid-order write failure recovered after transfer claim reservation"
+    ]
+  },
+  "limits": [
+    "Failure injection uses a simulated provider and in-memory store.",
+    "New live payment with customer checkout closed remains pending.",
+    "Existing live payment alone does not establish webhook-only settlement."
+  ]
+}

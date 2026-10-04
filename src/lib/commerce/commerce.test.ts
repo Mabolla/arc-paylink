@@ -375,3 +375,100 @@ describe("company agent and signed background updates", () => {
     expect(s.provider.prepare).toHaveBeenCalledTimes(1);
   });
 });
+
+describe("interrupted checkout recovery", () => {
+  it("checks a completed saved approval before returning another approval to the customer", async () => {
+    const s = await setup();
+    await s.payments.prepare(s.order.id, "session", walletId);
+    const resumed = await s.payments.prepare(s.order.id, "session", walletId);
+    expect(resumed.order.status).toBe("paid");
+    expect(resumed).not.toHaveProperty("challengeId");
+    expect(s.provider.prepare).toHaveBeenCalledTimes(1);
+    expect((await s.service.events(s.principal)).events).toHaveLength(1);
+  });
+  it("returns the same pending approval without creating a second transfer", async () => {
+    const s = await setup();
+    vi.mocked(s.provider.transaction).mockResolvedValue(undefined);
+    const first = await s.payments.prepare(s.order.id, "session", walletId);
+    const resumed = await s.payments.prepare(s.order.id, "session", walletId);
+    expect(resumed.challengeId).toBe(first.challengeId);
+    expect(resumed.order.status).toBe("processing");
+    expect(s.provider.prepare).toHaveBeenCalledTimes(1);
+  });
+  it("does not expose an approval when saved-payment lookup or receipt verification fails", async () => {
+    const s = await setup();
+    await s.payments.prepare(s.order.id, "session", walletId);
+    vi.mocked(s.provider.transaction).mockRejectedValueOnce(new Error("Circle unavailable"));
+    await expect(s.payments.prepare(s.order.id, "session", walletId)).rejects.toThrow("Circle unavailable");
+    vi.mocked(s.provider.verify).mockRejectedValueOnce(new Error("RPC unavailable"));
+    await expect(s.payments.prepare(s.order.id, "session", walletId)).rejects.toThrow("RPC unavailable");
+    expect(s.provider.prepare).toHaveBeenCalledTimes(1);
+    expect((await s.service.checkout(s.order.id)).value.status).toBe("processing");
+  });
+  it("recovers a lost challenge write with the original provider idempotency key", async () => {
+    const s = await setup();
+    const write = s.store.write.bind(s.store);
+    let fail = true;
+    vi.spyOn(s.store, "write").mockImplementation(async (path, value, version) => {
+      if (path === orderPath(s.order.merchantId, s.order.id) && (value as Order).attempt?.challengeId && fail) {
+        fail = false;
+        throw new Error("Lost challenge write");
+      }
+      return write(path, value, version);
+    });
+    await expect(s.payments.prepare(s.order.id, "session", walletId)).rejects.toThrow("Lost challenge write");
+    const resumed = await new CheckoutPayments(new CommerceService(s.store, () => now), s.provider).prepare(s.order.id, "session", walletId);
+    expect(resumed.challengeId).toBe(challengeId);
+    const calls = vi.mocked(s.provider.prepare).mock.calls;
+    expect(calls).toHaveLength(2);
+    expect(calls[0][1].attempt!.idempotencyKey).toBe(calls[1][1].attempt!.idempotencyKey);
+  });
+  it("settles from a webhook refId after a lost provider response, without any browser recovery call", async () => {
+    const s = await setup();
+    vi.mocked(s.provider.prepare).mockRejectedValueOnce(new Error("Response lost after provider accepted"));
+    await expect(s.payments.prepare(s.order.id, "session", walletId)).rejects.toThrow();
+    const restarted = new CheckoutPayments(new CommerceService(s.store, () => now), s.provider);
+    const event = {
+      notificationId: randomUUID(), notificationType: "transactions.outbound",
+      notification: { id: txId, walletId, blockchain: IS_ARC_MAINNET ? "ARC" : "ARC-TESTNET", state: "COMPLETE", txHash: hash, refId: `apc:${s.order.id}` },
+    };
+    await applyCircleNotification(event, restarted);
+    await applyCircleNotification(event, restarted);
+    expect((await s.service.checkout(s.order.id)).value.status).toBe("paid");
+    expect((await s.service.events(s.principal)).events).toHaveLength(1);
+    expect(s.provider.transaction).not.toHaveBeenCalled();
+    expect(s.provider.prepare).toHaveBeenCalledTimes(1);
+  });
+  it("repairs a missing receipt event on resume without reopening the paid approval", async () => {
+    const s = await setup();
+    await s.payments.prepare(s.order.id, "session", walletId);
+    const write = s.store.write.bind(s.store);
+    let fail = true;
+    vi.spyOn(s.store, "write").mockImplementation(async (path, value, version) => {
+      if (path.includes("/receipts/") && fail) { fail = false; throw new Error("Receipt outage"); }
+      return write(path, value, version);
+    });
+    await expect(s.payments.confirm(s.order.id, hash)).rejects.toThrow("Receipt outage");
+    const resumed = await s.payments.prepare(s.order.id, "session", walletId);
+    expect(resumed.order.status).toBe("paid");
+    expect(resumed).not.toHaveProperty("challengeId");
+    expect((await s.service.events(s.principal)).events).toHaveLength(1);
+    expect(s.provider.prepare).toHaveBeenCalledTimes(1);
+  });
+  it("recovers after transfer reservation succeeds but the paid-order write fails", async () => {
+    const s = await setup();
+    await s.payments.prepare(s.order.id, "session", walletId);
+    const write = s.store.write.bind(s.store);
+    let fail = true;
+    vi.spyOn(s.store, "write").mockImplementation(async (path, value, version) => {
+      if (path === orderPath(s.order.merchantId, s.order.id) && (value as Order).status === "paid" && fail) { fail = false; throw new Error("Paid record outage"); }
+      return write(path, value, version);
+    });
+    await expect(s.payments.confirm(s.order.id, hash)).rejects.toThrow("Paid record outage");
+    expect((await s.service.checkout(s.order.id)).value.status).toBe("processing");
+    await new CheckoutPayments(new CommerceService(s.store, () => now), s.provider).confirm(s.order.id, hash);
+    expect((await s.service.checkout(s.order.id)).value.status).toBe("paid");
+    expect((await s.service.events(s.principal)).events).toHaveLength(1);
+    expect(s.provider.prepare).toHaveBeenCalledTimes(1);
+  });
+});

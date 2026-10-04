@@ -1,0 +1,12 @@
+{
+  "date": "2026-10-04",
+  "verifiedBy": "User performed login in an incognito window and supplied a screenshot reviewed by assistant.",
+  "observed": {
+    "workspace": "Arc PayLink Pilot Validation",
+    "orderCount": 1,
+    "collectedUsdc": "0.01",
+    "orderPaid": true
+  },
+  "scope": "Independent cookie context login using the saved replacement owner key.",
+  "secretsIncluded": false
+}
