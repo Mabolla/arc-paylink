@@ -76,6 +76,6 @@ export async function applyCircleNotification(
       409,
     );
   // A valid Circle signature is only a trigger. Arc receipt verification remains mandatory.
-  await payments.confirm(orderId, tx.txHash);
+  await payments.confirm(orderId, tx.txHash, "circle-webhook");
   return { accepted: true };
 }

@@ -1,0 +1,22 @@
+{
+  "date": "2026-10-04",
+  "scope": "deploy/collections-pilot",
+  "changes": [
+    "Optional receipt.confirmationSource records the first successful settlement writer.",
+    "Later webhook or customer checks do not rewrite the first source.",
+    "Historical receipts keep their source absent.",
+    "Customer automatic status checks can be disabled after wallet login; SDK completion then sends no reconciliation request."
+  ],
+  "verification": {
+    "applicationTests": 288,
+    "testFiles": 50,
+    "sourceTests": 4,
+    "eslint": "passed",
+    "productionBuild": "passed"
+  },
+  "liveAcceptance": "pending",
+  "limits": [
+    "New Circle-webhook-only live settlement has not yet been observed.",
+    "The source identifies the server confirmation trigger, not the exact instant a browser was closed."
+  ]
+}

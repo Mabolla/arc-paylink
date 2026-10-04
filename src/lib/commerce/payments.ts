@@ -161,7 +161,7 @@ export class CheckoutPayments {
     return this.confirm(id, hash);
   }
 
-  async confirm(id: string, hash: Hash) {
+  async confirm(id: string, hash: Hash, source?: NonNullable<Order["receipt"]>["confirmationSource"]) {
     if (!isHash(hash)) throw new CommerceError("Invalid transaction hash.");
     const saved = await this.commerce.checkout(id);
     const order = saved.value;
@@ -214,6 +214,7 @@ export class CheckoutPayments {
         sender: proof.sender,
         blockNumber: proof.blockNumber,
         confirmedAt: this.commerce.now(),
+        confirmationSource: source ?? (order.attempt.provider === "external" ? "external-wallet" : "customer-reconcile"),
       },
     };
     try {

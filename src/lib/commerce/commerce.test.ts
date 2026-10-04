@@ -472,3 +472,51 @@ describe("interrupted checkout recovery", () => {
     expect(s.provider.prepare).toHaveBeenCalledTimes(1);
   });
 });
+
+describe("first settlement confirmation source", () => {
+  async function event(s: Awaited<ReturnType<typeof setup>>) {
+    return {
+      notificationId: randomUUID(), notificationType: "transactions.outbound",
+      notification: { id: txId, walletId, blockchain: IS_ARC_MAINNET ? "ARC" : "ARC-TESTNET", state: "COMPLETE", txHash: hash, refId: `apc:${s.order.id}` },
+    };
+  }
+  it("records browser-independent webhook settlement and preserves it on later customer checks", async () => {
+    const s = await setup();
+    await s.payments.prepare(s.order.id, "session", walletId);
+    await applyCircleNotification(await event(s), s.payments);
+    expect((await s.service.checkout(s.order.id)).value.receipt?.confirmationSource).toBe("circle-webhook");
+    await s.payments.reconcile(s.order.id, "session", walletId);
+    await applyCircleNotification(await event(s), s.payments);
+    expect((await s.service.checkout(s.order.id)).value.receipt?.confirmationSource).toBe("circle-webhook");
+    expect((await s.service.events(s.principal)).events).toHaveLength(1);
+    expect(s.provider.prepare).toHaveBeenCalledTimes(1);
+  });
+  it("does not let a later webhook rewrite a customer-confirmed receipt", async () => {
+    const s = await setup();
+    await s.payments.prepare(s.order.id, "session", walletId);
+    await s.payments.reconcile(s.order.id, "session", walletId);
+    await applyCircleNotification(await event(s), s.payments);
+    expect((await s.service.checkout(s.order.id)).value.receipt?.confirmationSource).toBe("customer-reconcile");
+  });
+  it("keeps one consistent first source across concurrent customer and webhook confirmation", async () => {
+    const s = await setup();
+    await s.payments.prepare(s.order.id, "session", walletId);
+    await Promise.all([s.payments.confirm(s.order.id, hash, "circle-webhook"),s.payments.reconcile(s.order.id, "session", walletId)]);
+    const receipt = (await s.service.checkout(s.order.id)).value.receipt!;
+    expect(["circle-webhook", "customer-reconcile"]).toContain(receipt.confirmationSource);
+    const recorded = await s.service.events(s.principal);
+    expect(recorded.events).toHaveLength(1);
+    expect(JSON.stringify(recorded.events)).toContain(receipt.confirmationSource!);
+  });
+  it("keeps historical paid receipts compatible without inventing their source", async () => {
+    const s = await setup();
+    await s.payments.prepare(s.order.id, "session", walletId);
+    await s.payments.confirm(s.order.id, hash);
+    const saved = await s.service.checkout(s.order.id);
+    delete saved.value.receipt!.confirmationSource;
+    await s.store.write(orderPath(s.order.merchantId, s.order.id), saved.value, saved.version);
+    const checked = await s.payments.reconcile(s.order.id, "session", walletId);
+    expect(checked.status).toBe("paid");
+    expect(checked.receipt).not.toHaveProperty("confirmationSource");
+  });
+});

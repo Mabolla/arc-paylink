@@ -46,6 +46,7 @@ export type Order = {
     sender: `0x${string}`;
     blockNumber: string;
     confirmedAt: string;
+    confirmationSource?: "circle-webhook" | "customer-reconcile" | "external-wallet";
   };
 };
 export type PublicOrder = Pick<

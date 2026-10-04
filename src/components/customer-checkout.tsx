@@ -64,6 +64,7 @@ export function CustomerCheckout({
 }) {
   const [order, setOrder] = useState<PublicOrder>();
   const [error, setError] = useState("");
+  const [automaticStatus, setAutomaticStatus] = useState(true);
   const [initialLoadError, setInitialLoadError] = useState("");
   const [message, setMessage] = useState(
     "Sign in to pay without a wallet extension.",
@@ -203,9 +204,9 @@ export function CustomerCheckout({
     };
   }, [demo, refresh, loadWallet]);
   useEffect(() => {
-    if (demo || order?.status !== "processing") return;
+    if (demo || !automaticStatus || order?.status !== "processing") return;
     return startCheckoutPolling(refresh, () => !document.hidden);
-  }, [demo, order?.status, refresh]);
+  }, [demo, automaticStatus, order?.status, refresh]);
 
   async function signIn() {
     const sdk = sdkRef.current;
@@ -353,7 +354,12 @@ export function CustomerCheckout({
         setStage("resume");
         return;
       }
-      void reconcile();
+      if (automaticStatus) {
+        void reconcile();
+      } else {
+        setStage("resume");
+        setMessage("Approval submitted. Use Refresh payment status to see the recorded result.");
+      }
     });
   }
   const busy = ["loading", "working", "checking"].includes(stage);
@@ -624,6 +630,15 @@ export function CustomerCheckout({
                 </>
               )}
               <div className={styles.divider} />
+              {!demo && order && wallet && (
+                <label className={styles.note}>
+                  <input type="checkbox" checked={automaticStatus} disabled={busy}
+                    onChange={(event) => setAutomaticStatus(event.target.checked)} />
+                  Check payment status automatically
+                  <br />
+                  When off, use Refresh payment status after approval.
+                </label>
+              )}
               {!demo && order && <ExternalCheckout order={order} onPaid={setOrder} />}
               <p className={styles.muted}>
                 Your account remains under your control. Arc PayLink does not
