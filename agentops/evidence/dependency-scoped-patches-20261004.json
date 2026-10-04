@@ -1,0 +1,25 @@
+{
+  "checkedAt": "2026-10-04",
+  "status": "VALIDATED_WITH_REMAINING_UPSTREAM_FINDINGS",
+  "change": "Parent-scoped npm overrides patch Firebase's pinned Node dependencies without changing Firebase or Circle SDK major versions.",
+  "resolved": {
+    "firebaseUndici": "6.28.1",
+    "firestoreGrpc": "1.13.6"
+  },
+  "before": { "critical": 0, "high": 12, "moderate": 20, "low": 8, "total": 40 },
+  "after": { "critical": 0, "high": 9, "moderate": 12, "low": 8, "total": 29 },
+  "validation": {
+    "applicationTestsPassed": 294,
+    "productionBuildPassed": true,
+    "typescriptPassedInBuild": true,
+    "firebaseNodeModuleLoadPassed": true,
+    "allFiveFirebaseParentsResolvePatchedUndici": true,
+    "firestoreResolvesPatchedGrpc": true
+  },
+  "limitations": [
+    "Overrides intentionally replace upstream exact/minor pins; keep them documented and review when upgrading the parent SDK.",
+    "Module loading and application tests are not live Firebase/gRPC functional acceptance.",
+    "Remaining TOML/Anchor/Circle propagation and other warnings still require review. A clean audit is not claimed.",
+    "No major version force fix, live exploit reproduction, new payment or original-main change was performed."
+  ]
+}

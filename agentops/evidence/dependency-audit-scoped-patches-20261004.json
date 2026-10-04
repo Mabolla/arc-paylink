@@ -1,0 +1,684 @@
+{
+  "auditReportVersion": 2,
+  "vulnerabilities": {
+    "@circle-fin/adapter-viem-v2": {
+      "name": "@circle-fin/adapter-viem-v2",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "@ethersproject/abi",
+        "@solana/web3.js"
+      ],
+      "effects": [],
+      "range": "*",
+      "nodes": [
+        "node_modules/@circle-fin/adapter-viem-v2"
+      ],
+      "fixAvailable": false
+    },
+    "@circle-fin/app-kit": {
+      "name": "@circle-fin/app-kit",
+      "severity": "high",
+      "isDirect": true,
+      "via": [
+        "@circle-fin/borrow-kit",
+        "@circle-fin/bridge-kit",
+        "@circle-fin/earn-kit",
+        "@circle-fin/provider-gateway-v1",
+        "@circle-fin/swap-kit",
+        "@circle-fin/unified-balance-kit",
+        "@coral-xyz/anchor",
+        "@ethersproject/abi",
+        "@solana/web3.js"
+      ],
+      "effects": [],
+      "range": "*",
+      "nodes": [
+        "node_modules/@circle-fin/app-kit"
+      ],
+      "fixAvailable": {
+        "name": "@circle-fin/app-kit",
+        "version": "1.8.1",
+        "isSemVerMajor": true
+      }
+    },
+    "@circle-fin/borrow-kit": {
+      "name": "@circle-fin/borrow-kit",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "@circle-fin/provider-borrow-service",
+        "@ethersproject/abi",
+        "@solana/web3.js"
+      ],
+      "effects": [
+        "@circle-fin/app-kit"
+      ],
+      "range": "*",
+      "nodes": [
+        "node_modules/@circle-fin/borrow-kit"
+      ],
+      "fixAvailable": {
+        "name": "@circle-fin/app-kit",
+        "version": "1.8.1",
+        "isSemVerMajor": true
+      }
+    },
+    "@circle-fin/bridge-kit": {
+      "name": "@circle-fin/bridge-kit",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@circle-fin/provider-cctp-v2",
+        "@circle-fin/provider-cctpx",
+        "@circle-fin/provider-fee-v1",
+        "@ethersproject/abi",
+        "@solana/web3.js"
+      ],
+      "effects": [
+        "@circle-fin/app-kit"
+      ],
+      "range": "*",
+      "nodes": [
+        "node_modules/@circle-fin/bridge-kit"
+      ],
+      "fixAvailable": {
+        "name": "@circle-fin/app-kit",
+        "version": "1.8.1",
+        "isSemVerMajor": true
+      }
+    },
+    "@circle-fin/earn-kit": {
+      "name": "@circle-fin/earn-kit",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "@circle-fin/provider-earn-service",
+        "@ethersproject/abi",
+        "@solana/web3.js"
+      ],
+      "effects": [
+        "@circle-fin/app-kit"
+      ],
+      "range": "*",
+      "nodes": [
+        "node_modules/@circle-fin/earn-kit"
+      ],
+      "fixAvailable": {
+        "name": "@circle-fin/app-kit",
+        "version": "1.8.1",
+        "isSemVerMajor": true
+      }
+    },
+    "@circle-fin/provider-borrow-service": {
+      "name": "@circle-fin/provider-borrow-service",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "@ethersproject/abi",
+        "@solana/web3.js"
+      ],
+      "effects": [],
+      "range": "*",
+      "nodes": [
+        "node_modules/@circle-fin/provider-borrow-service"
+      ],
+      "fixAvailable": true
+    },
+    "@circle-fin/provider-cctp-v2": {
+      "name": "@circle-fin/provider-cctp-v2",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@coral-xyz/anchor",
+        "@ethersproject/abi",
+        "@solana/web3.js"
+      ],
+      "effects": [
+        "@circle-fin/unified-balance-kit"
+      ],
+      "range": "*",
+      "nodes": [
+        "node_modules/@circle-fin/provider-cctp-v2"
+      ],
+      "fixAvailable": true
+    },
+    "@circle-fin/provider-cctpx": {
+      "name": "@circle-fin/provider-cctpx",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "@ethersproject/abi",
+        "@solana/web3.js"
+      ],
+      "effects": [
+        "@circle-fin/bridge-kit"
+      ],
+      "range": "*",
+      "nodes": [
+        "node_modules/@circle-fin/provider-cctpx"
+      ],
+      "fixAvailable": {
+        "name": "@circle-fin/app-kit",
+        "version": "1.8.1",
+        "isSemVerMajor": true
+      }
+    },
+    "@circle-fin/provider-earn-service": {
+      "name": "@circle-fin/provider-earn-service",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "@ethersproject/abi",
+        "@solana/web3.js"
+      ],
+      "effects": [],
+      "range": "*",
+      "nodes": [
+        "node_modules/@circle-fin/provider-earn-service"
+      ],
+      "fixAvailable": true
+    },
+    "@circle-fin/provider-fee-v1": {
+      "name": "@circle-fin/provider-fee-v1",
+      "severity": "low",
+      "isDirect": false,
+      "via": [
+        "@ethersproject/abi"
+      ],
+      "effects": [
+        "@circle-fin/bridge-kit"
+      ],
+      "range": "*",
+      "nodes": [
+        "node_modules/@circle-fin/provider-fee-v1"
+      ],
+      "fixAvailable": {
+        "name": "@circle-fin/app-kit",
+        "version": "1.8.1",
+        "isSemVerMajor": true
+      }
+    },
+    "@circle-fin/provider-gateway-v1": {
+      "name": "@circle-fin/provider-gateway-v1",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@coral-xyz/anchor",
+        "@ethersproject/abi",
+        "@solana/web3.js"
+      ],
+      "effects": [],
+      "range": "*",
+      "nodes": [
+        "node_modules/@circle-fin/provider-gateway-v1"
+      ],
+      "fixAvailable": true
+    },
+    "@circle-fin/provider-stablecoin-service-swap": {
+      "name": "@circle-fin/provider-stablecoin-service-swap",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@coral-xyz/anchor",
+        "@solana/web3.js"
+      ],
+      "effects": [],
+      "range": "*",
+      "nodes": [
+        "node_modules/@circle-fin/provider-stablecoin-service-swap"
+      ],
+      "fixAvailable": true
+    },
+    "@circle-fin/swap-kit": {
+      "name": "@circle-fin/swap-kit",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@circle-fin/provider-stablecoin-service-swap",
+        "@coral-xyz/anchor",
+        "@ethersproject/abi",
+        "@solana/web3.js"
+      ],
+      "effects": [],
+      "range": "*",
+      "nodes": [
+        "node_modules/@circle-fin/swap-kit"
+      ],
+      "fixAvailable": true
+    },
+    "@circle-fin/unified-balance-kit": {
+      "name": "@circle-fin/unified-balance-kit",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@circle-fin/provider-cctp-v2",
+        "@circle-fin/provider-fee-v1",
+        "@circle-fin/provider-gateway-v1",
+        "@coral-xyz/anchor",
+        "@ethersproject/abi",
+        "@solana/web3.js"
+      ],
+      "effects": [],
+      "range": "*",
+      "nodes": [
+        "node_modules/@circle-fin/unified-balance-kit"
+      ],
+      "fixAvailable": true
+    },
+    "@circle-fin/w3s-pw-web-sdk": {
+      "name": "@circle-fin/w3s-pw-web-sdk",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "uuid"
+      ],
+      "effects": [],
+      "range": ">=1.0.19",
+      "nodes": [
+        "node_modules/@circle-fin/w3s-pw-web-sdk"
+      ],
+      "fixAvailable": {
+        "name": "@circle-fin/w3s-pw-web-sdk",
+        "version": "1.0.13",
+        "isSemVerMajor": true
+      }
+    },
+    "@coral-xyz/anchor": {
+      "name": "@coral-xyz/anchor",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@coral-xyz/borsh",
+        "@solana/web3.js",
+        "toml"
+      ],
+      "effects": [
+        "@circle-fin/app-kit",
+        "@circle-fin/provider-cctp-v2",
+        "@circle-fin/provider-gateway-v1",
+        "@circle-fin/provider-stablecoin-service-swap",
+        "@circle-fin/swap-kit",
+        "@circle-fin/unified-balance-kit"
+      ],
+      "range": "*",
+      "nodes": [
+        "node_modules/@coral-xyz/anchor"
+      ],
+      "fixAvailable": {
+        "name": "@circle-fin/app-kit",
+        "version": "1.8.1",
+        "isSemVerMajor": true
+      }
+    },
+    "@coral-xyz/borsh": {
+      "name": "@coral-xyz/borsh",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "@solana/web3.js"
+      ],
+      "effects": [],
+      "range": "*",
+      "nodes": [
+        "node_modules/@coral-xyz/borsh"
+      ],
+      "fixAvailable": true
+    },
+    "@ethersproject/abi": {
+      "name": "@ethersproject/abi",
+      "severity": "low",
+      "isDirect": false,
+      "via": [
+        "@ethersproject/hash"
+      ],
+      "effects": [
+        "@circle-fin/adapter-viem-v2",
+        "@circle-fin/bridge-kit",
+        "@circle-fin/earn-kit",
+        "@circle-fin/provider-cctp-v2",
+        "@circle-fin/provider-earn-service",
+        "@circle-fin/provider-fee-v1"
+      ],
+      "range": "5.0.10 - 5.8.0",
+      "nodes": [
+        "node_modules/@ethersproject/abi"
+      ],
+      "fixAvailable": {
+        "name": "@circle-fin/app-kit",
+        "version": "1.8.1",
+        "isSemVerMajor": true
+      }
+    },
+    "@ethersproject/abstract-provider": {
+      "name": "@ethersproject/abstract-provider",
+      "severity": "low",
+      "isDirect": false,
+      "via": [
+        "@ethersproject/transactions"
+      ],
+      "effects": [
+        "@ethersproject/abstract-signer"
+      ],
+      "range": "*",
+      "nodes": [
+        "node_modules/@ethersproject/abstract-provider"
+      ],
+      "fixAvailable": {
+        "name": "@circle-fin/app-kit",
+        "version": "1.8.1",
+        "isSemVerMajor": true
+      }
+    },
+    "@ethersproject/abstract-signer": {
+      "name": "@ethersproject/abstract-signer",
+      "severity": "low",
+      "isDirect": false,
+      "via": [
+        "@ethersproject/abstract-provider"
+      ],
+      "effects": [
+        "@ethersproject/hash"
+      ],
+      "range": "*",
+      "nodes": [
+        "node_modules/@ethersproject/abstract-signer"
+      ],
+      "fixAvailable": {
+        "name": "@circle-fin/app-kit",
+        "version": "1.8.1",
+        "isSemVerMajor": true
+      }
+    },
+    "@ethersproject/hash": {
+      "name": "@ethersproject/hash",
+      "severity": "low",
+      "isDirect": false,
+      "via": [
+        "@ethersproject/abstract-signer"
+      ],
+      "effects": [
+        "@ethersproject/abi"
+      ],
+      "range": "5.0.6 - 5.8.0",
+      "nodes": [
+        "node_modules/@ethersproject/hash"
+      ],
+      "fixAvailable": {
+        "name": "@circle-fin/app-kit",
+        "version": "1.8.1",
+        "isSemVerMajor": true
+      }
+    },
+    "@ethersproject/signing-key": {
+      "name": "@ethersproject/signing-key",
+      "severity": "low",
+      "isDirect": false,
+      "via": [
+        "elliptic"
+      ],
+      "effects": [
+        "@ethersproject/transactions"
+      ],
+      "range": "<=5.8.0",
+      "nodes": [
+        "node_modules/@ethersproject/signing-key"
+      ],
+      "fixAvailable": {
+        "name": "@circle-fin/app-kit",
+        "version": "1.8.1",
+        "isSemVerMajor": true
+      }
+    },
+    "@ethersproject/transactions": {
+      "name": "@ethersproject/transactions",
+      "severity": "low",
+      "isDirect": false,
+      "via": [
+        "@ethersproject/signing-key"
+      ],
+      "effects": [
+        "@ethersproject/abstract-provider"
+      ],
+      "range": "<=5.8.0",
+      "nodes": [
+        "node_modules/@ethersproject/transactions"
+      ],
+      "fixAvailable": {
+        "name": "@circle-fin/app-kit",
+        "version": "1.8.1",
+        "isSemVerMajor": true
+      }
+    },
+    "@solana/web3.js": {
+      "name": "@solana/web3.js",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "jayson"
+      ],
+      "effects": [
+        "@circle-fin/adapter-viem-v2",
+        "@circle-fin/app-kit",
+        "@circle-fin/borrow-kit",
+        "@circle-fin/bridge-kit",
+        "@circle-fin/earn-kit",
+        "@circle-fin/provider-borrow-service",
+        "@circle-fin/provider-cctpx",
+        "@circle-fin/provider-earn-service",
+        "@circle-fin/provider-gateway-v1",
+        "@circle-fin/provider-stablecoin-service-swap",
+        "@circle-fin/swap-kit",
+        "@circle-fin/unified-balance-kit",
+        "@coral-xyz/borsh"
+      ],
+      "range": "<=0.0.0-pr-29130 || 0.0.4 - 1.99.0",
+      "nodes": [
+        "node_modules/@solana/web3.js"
+      ],
+      "fixAvailable": {
+        "name": "@circle-fin/app-kit",
+        "version": "1.8.1",
+        "isSemVerMajor": true
+      }
+    },
+    "elliptic": {
+      "name": "elliptic",
+      "severity": "low",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1112030,
+          "name": "elliptic",
+          "dependency": "elliptic",
+          "title": "Elliptic Uses a Cryptographic Primitive with a Risky Implementation",
+          "url": "https://github.com/advisories/GHSA-848j-6mx2-7j84",
+          "severity": "low",
+          "cwe": [
+            "CWE-1240"
+          ],
+          "cvss": {
+            "score": 5.6,
+            "vectorString": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:L/A:L"
+          },
+          "range": "<=6.6.1"
+        }
+      ],
+      "effects": [
+        "@ethersproject/signing-key"
+      ],
+      "range": "*",
+      "nodes": [
+        "node_modules/elliptic"
+      ],
+      "fixAvailable": {
+        "name": "@circle-fin/app-kit",
+        "version": "1.8.1",
+        "isSemVerMajor": true
+      }
+    },
+    "jayson": {
+      "name": "jayson",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "stream-json",
+        "uuid"
+      ],
+      "effects": [
+        "@solana/web3.js"
+      ],
+      "range": "2.0.6 - 4.3.0",
+      "nodes": [
+        "node_modules/jayson"
+      ],
+      "fixAvailable": {
+        "name": "@circle-fin/app-kit",
+        "version": "1.8.1",
+        "isSemVerMajor": true
+      }
+    },
+    "stream-json": {
+      "name": "stream-json",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1164823,
+          "name": "stream-json",
+          "dependency": "stream-json",
+          "title": "stream-json: pick/ignore/filter/replace filters are O(depth\u00b2) on nested input \u2014 small crafted JSON blocks the event loop for seconds\u2192minutes (DoS)",
+          "url": "https://github.com/advisories/GHSA-528h-pc64-c93x",
+          "severity": "moderate",
+          "cwe": [
+            "CWE-407"
+          ],
+          "cvss": {
+            "score": 6.2,
+            "vectorString": "CVSS:3.1/AV:L/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": "<=3.4.0"
+        }
+      ],
+      "effects": [
+        "jayson"
+      ],
+      "range": "<=3.4.0",
+      "nodes": [
+        "node_modules/stream-json"
+      ],
+      "fixAvailable": {
+        "name": "@circle-fin/app-kit",
+        "version": "1.8.1",
+        "isSemVerMajor": true
+      }
+    },
+    "toml": {
+      "name": "toml",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1164824,
+          "name": "toml",
+          "dependency": "toml",
+          "title": "toml-node: Uncontrolled Recursion",
+          "url": "https://github.com/advisories/GHSA-82x6-q7mm-w9cf",
+          "severity": "high",
+          "cwe": [
+            "CWE-674"
+          ],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": "<4.2.0"
+        },
+        {
+          "source": 1164825,
+          "name": "toml",
+          "dependency": "toml",
+          "title": "toml-node: Prototype Pollution Leads to `Object.prototype` Corruption via `__proto__` Key-Path Desynchronization",
+          "url": "https://github.com/advisories/GHSA-v5mp-jgw5-2x6j",
+          "severity": "high",
+          "cwe": [
+            "CWE-1321"
+          ],
+          "cvss": {
+            "score": 8.2,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:L"
+          },
+          "range": "<4.1.2"
+        }
+      ],
+      "effects": [
+        "@coral-xyz/anchor"
+      ],
+      "range": "<=4.1.2",
+      "nodes": [
+        "node_modules/toml"
+      ],
+      "fixAvailable": {
+        "name": "@circle-fin/app-kit",
+        "version": "1.8.1",
+        "isSemVerMajor": true
+      }
+    },
+    "uuid": {
+      "name": "uuid",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1119441,
+          "name": "uuid",
+          "dependency": "uuid",
+          "title": "uuid: Missing buffer bounds check in v3/v5/v6 when buf is provided",
+          "url": "https://github.com/advisories/GHSA-w5hq-g745-h8pq",
+          "severity": "moderate",
+          "cwe": [
+            "CWE-787",
+            "CWE-1285"
+          ],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N"
+          },
+          "range": "<11.1.1"
+        }
+      ],
+      "effects": [
+        "@circle-fin/w3s-pw-web-sdk",
+        "jayson"
+      ],
+      "range": "<11.1.1",
+      "nodes": [
+        "node_modules/@circle-fin/w3s-pw-web-sdk/node_modules/uuid",
+        "node_modules/uuid"
+      ],
+      "fixAvailable": {
+        "name": "@circle-fin/app-kit",
+        "version": "1.8.1",
+        "isSemVerMajor": true
+      }
+    }
+  },
+  "metadata": {
+    "vulnerabilities": {
+      "info": 0,
+      "low": 8,
+      "moderate": 12,
+      "high": 9,
+      "critical": 0,
+      "total": 29
+    },
+    "dependencies": {
+      "prod": 398,
+      "dev": 625,
+      "optional": 134,
+      "peer": 0,
+      "peerOptional": 0,
+      "total": 1061
+    }
+  }
+}

@@ -62,5 +62,23 @@
     "tsx": "^4.23.15",
     "typescript": "^5.9.3",
     "vitest": "^4.1.10"
+  },
+  "overrides": {
+    "@firebase/auth": {
+      "undici": "6.28.1"
+    },
+    "@firebase/auth-compat": {
+      "undici": "6.28.1"
+    },
+    "@firebase/firestore": {
+      "undici": "6.28.1",
+      "@grpc/grpc-js": "1.13.6"
+    },
+    "@firebase/functions": {
+      "undici": "6.28.1"
+    },
+    "@firebase/storage": {
+      "undici": "6.28.1"
+    }
   }
 }
