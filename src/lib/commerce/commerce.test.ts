@@ -374,6 +374,28 @@ describe("company agent and signed background updates", () => {
     expect((await s.service.events(s.principal)).events).toHaveLength(1);
     expect(s.provider.prepare).toHaveBeenCalledTimes(1);
   });
+  it("keeps the acceptance order unpaid until deferred signed delivery is released, then verifies and settles once", async () => {
+    const s = await setup();
+    await s.payments.prepare(s.order.id, "session", walletId);
+    const event = { notificationId: randomUUID(), notificationType: "transactions.outbound",
+      notification: { id: txId, walletId, blockchain: IS_ARC_MAINNET ? "ARC" : "ARC-TESTNET", state: "COMPLETE", txHash: hash } };
+    try {
+      vi.stubEnv("VERCEL_PROJECT_PRODUCTION_URL", "arc-paylink-collections-pilot.vercel.app");
+      vi.stubEnv("ARCPAYLINK_ACCEPTANCE_HOLD_ORDER_ID", s.order.id);
+      vi.stubEnv("ARCPAYLINK_ACCEPTANCE_HOLD_UNTIL", new Date(Date.now() + 300_000).toISOString());
+      await expect(applyCircleNotification(event, s.payments)).rejects.toMatchObject({ status: 503 });
+      expect((await s.service.checkout(s.order.id)).value.status).toBe("processing");
+      expect((await s.service.checkout(s.order.id)).value.receipt).toBeUndefined();
+      expect(s.provider.verify).not.toHaveBeenCalled();
+      vi.stubEnv("ARCPAYLINK_ACCEPTANCE_HOLD_UNTIL", new Date(Date.now() - 1).toISOString());
+      await applyCircleNotification(event, s.payments);
+      await applyCircleNotification(event, s.payments);
+      expect((await s.service.checkout(s.order.id)).value.receipt?.confirmationSource).toBe("circle-webhook");
+      expect(s.provider.verify).toHaveBeenCalledTimes(1);
+      expect((await s.service.events(s.principal)).events).toHaveLength(1);
+      expect(s.provider.prepare).toHaveBeenCalledTimes(1);
+    } finally { vi.unstubAllEnvs(); }
+  });
 });
 
 describe("interrupted checkout recovery", () => {
