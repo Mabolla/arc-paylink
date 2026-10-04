@@ -1,0 +1,33 @@
+{
+  "date": "2026-10-04",
+  "testedCommit": "ddd300159d4727c6b05035a072f332ac8997e513",
+  "workspaceId": "cf08fc73-87df-4b5c-9b73-6ec3c2d71224",
+  "deployment": "Ready; Production; arc-paylink-collections-pilot",
+  "configuration": {
+    "persistentReaderRole": "reader",
+    "productionSecretsConfigured": [
+      "ARCPAYLINK_COLLECTIONS_READER_KEY",
+      "CRON_SECRET",
+      "ARCPAYLINK_COLLECTIONS_WORKSPACE_ID"
+    ],
+    "schedule": "0 9 * * *",
+    "enabled": true,
+    "maxPages": 5,
+    "deadlineSeconds": 45
+  },
+  "liveAcceptance": {
+    "invocation": "Vercel dashboard Run once",
+    "reportAsOfDisplayed": "04 Oct 2026, 09:04 UTC",
+    "lastBackgroundCheckDisplayed": "04 Oct 2026, 09:04 UTC",
+    "trackedReceipts": 3,
+    "paidUsdc": "0.03",
+    "outstandingUsdc": "0",
+    "scheduledConfigurationRecognized": true
+  },
+  "limitations": [
+    "Natural timed invocation has not yet been observed; Run was a manual trigger of the deployed cron job.",
+    "Current Blob quota-period headroom was not established; one live complete run succeeded.",
+    "Internal acceptance payments do not establish external customer adoption."
+  ],
+  "originalMain": "unchanged"
+}
