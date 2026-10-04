@@ -14,7 +14,7 @@ Updated 2026-10-04. This status supersedes older pending statements in the histo
 
 1. **Natural scheduler execution:** daily configuration exists, but the 4 October 09:04 UTC pass was manually started. Observe a natural pass after the 5 October 09–10 UTC window; confirm its timestamp, successful outcome and receipt summary. Do not use another manual run to close this gate.
 2. **Security release decision:** review remaining privacy/retention, operational recovery and dependency findings before claiming general production readiness. Current local boundary tests do not close all security gates.
-   The local dashboard disclosure now explicitly includes authorized reader agents and the absence of automatic/self-service deletion. No retention purge was implemented. The online dependency audit did not return a result in this environment and remains open; it must not be reported as clean.
+   The local dashboard disclosure now explicitly includes authorized reader agents and the absence of automatic/self-service deletion. No retention purge was implemented. Dependency review now completed a production audit after updating Next.js to 16.3.8 and compatible lockfile dependencies: 0 critical, 12 high, 20 moderate and 8 low package-level warnings remain. Application and contract tests, lint and production build passed; the security gate remains open pending advisory applicability review.
 3. **Final presentation:** align the demo and application text with the frozen release. Distinguish internal mainnet acceptance, simulated sandbox screens and independent customer adoption. Neither Microgrants revision nor Tameion submission has been completed.
 
 ## Hosting limits

@@ -1,0 +1,1183 @@
+{
+  "auditReportVersion": 2,
+  "vulnerabilities": {
+    "@circle-fin/adapter-viem-v2": {
+      "name": "@circle-fin/adapter-viem-v2",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "@ethersproject/abi",
+        "@solana/web3.js"
+      ],
+      "effects": [],
+      "range": "*",
+      "nodes": [
+        "node_modules/@circle-fin/adapter-viem-v2"
+      ],
+      "fixAvailable": false
+    },
+    "@circle-fin/app-kit": {
+      "name": "@circle-fin/app-kit",
+      "severity": "high",
+      "isDirect": true,
+      "via": [
+        "@circle-fin/borrow-kit",
+        "@circle-fin/bridge-kit",
+        "@circle-fin/earn-kit",
+        "@circle-fin/provider-gateway-v1",
+        "@circle-fin/swap-kit",
+        "@circle-fin/unified-balance-kit",
+        "@coral-xyz/anchor",
+        "@ethersproject/abi",
+        "@solana/web3.js"
+      ],
+      "effects": [],
+      "range": "*",
+      "nodes": [
+        "node_modules/@circle-fin/app-kit"
+      ],
+      "fixAvailable": {
+        "name": "@circle-fin/app-kit",
+        "version": "1.8.1",
+        "isSemVerMajor": true
+      }
+    },
+    "@circle-fin/borrow-kit": {
+      "name": "@circle-fin/borrow-kit",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "@circle-fin/provider-borrow-service",
+        "@ethersproject/abi",
+        "@solana/web3.js"
+      ],
+      "effects": [
+        "@circle-fin/app-kit"
+      ],
+      "range": "*",
+      "nodes": [
+        "node_modules/@circle-fin/borrow-kit"
+      ],
+      "fixAvailable": {
+        "name": "@circle-fin/app-kit",
+        "version": "1.8.1",
+        "isSemVerMajor": true
+      }
+    },
+    "@circle-fin/bridge-kit": {
+      "name": "@circle-fin/bridge-kit",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@circle-fin/provider-cctp-v2",
+        "@circle-fin/provider-cctpx",
+        "@circle-fin/provider-fee-v1",
+        "@ethersproject/abi",
+        "@solana/web3.js"
+      ],
+      "effects": [
+        "@circle-fin/app-kit"
+      ],
+      "range": "*",
+      "nodes": [
+        "node_modules/@circle-fin/bridge-kit"
+      ],
+      "fixAvailable": {
+        "name": "@circle-fin/app-kit",
+        "version": "1.8.1",
+        "isSemVerMajor": true
+      }
+    },
+    "@circle-fin/earn-kit": {
+      "name": "@circle-fin/earn-kit",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "@circle-fin/provider-earn-service",
+        "@ethersproject/abi",
+        "@solana/web3.js"
+      ],
+      "effects": [
+        "@circle-fin/app-kit"
+      ],
+      "range": "*",
+      "nodes": [
+        "node_modules/@circle-fin/earn-kit"
+      ],
+      "fixAvailable": {
+        "name": "@circle-fin/app-kit",
+        "version": "1.8.1",
+        "isSemVerMajor": true
+      }
+    },
+    "@circle-fin/provider-borrow-service": {
+      "name": "@circle-fin/provider-borrow-service",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "@ethersproject/abi",
+        "@solana/web3.js"
+      ],
+      "effects": [],
+      "range": "*",
+      "nodes": [
+        "node_modules/@circle-fin/provider-borrow-service"
+      ],
+      "fixAvailable": true
+    },
+    "@circle-fin/provider-cctp-v2": {
+      "name": "@circle-fin/provider-cctp-v2",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@coral-xyz/anchor",
+        "@ethersproject/abi",
+        "@solana/web3.js"
+      ],
+      "effects": [
+        "@circle-fin/unified-balance-kit"
+      ],
+      "range": "*",
+      "nodes": [
+        "node_modules/@circle-fin/provider-cctp-v2"
+      ],
+      "fixAvailable": true
+    },
+    "@circle-fin/provider-cctpx": {
+      "name": "@circle-fin/provider-cctpx",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "@ethersproject/abi",
+        "@solana/web3.js"
+      ],
+      "effects": [
+        "@circle-fin/bridge-kit"
+      ],
+      "range": "*",
+      "nodes": [
+        "node_modules/@circle-fin/provider-cctpx"
+      ],
+      "fixAvailable": {
+        "name": "@circle-fin/app-kit",
+        "version": "1.8.1",
+        "isSemVerMajor": true
+      }
+    },
+    "@circle-fin/provider-earn-service": {
+      "name": "@circle-fin/provider-earn-service",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "@ethersproject/abi",
+        "@solana/web3.js"
+      ],
+      "effects": [],
+      "range": "*",
+      "nodes": [
+        "node_modules/@circle-fin/provider-earn-service"
+      ],
+      "fixAvailable": true
+    },
+    "@circle-fin/provider-fee-v1": {
+      "name": "@circle-fin/provider-fee-v1",
+      "severity": "low",
+      "isDirect": false,
+      "via": [
+        "@ethersproject/abi"
+      ],
+      "effects": [
+        "@circle-fin/bridge-kit"
+      ],
+      "range": "*",
+      "nodes": [
+        "node_modules/@circle-fin/provider-fee-v1"
+      ],
+      "fixAvailable": {
+        "name": "@circle-fin/app-kit",
+        "version": "1.8.1",
+        "isSemVerMajor": true
+      }
+    },
+    "@circle-fin/provider-gateway-v1": {
+      "name": "@circle-fin/provider-gateway-v1",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@coral-xyz/anchor",
+        "@ethersproject/abi",
+        "@solana/web3.js"
+      ],
+      "effects": [],
+      "range": "*",
+      "nodes": [
+        "node_modules/@circle-fin/provider-gateway-v1"
+      ],
+      "fixAvailable": true
+    },
+    "@circle-fin/provider-stablecoin-service-swap": {
+      "name": "@circle-fin/provider-stablecoin-service-swap",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@coral-xyz/anchor",
+        "@solana/web3.js"
+      ],
+      "effects": [],
+      "range": "*",
+      "nodes": [
+        "node_modules/@circle-fin/provider-stablecoin-service-swap"
+      ],
+      "fixAvailable": true
+    },
+    "@circle-fin/swap-kit": {
+      "name": "@circle-fin/swap-kit",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@circle-fin/provider-stablecoin-service-swap",
+        "@coral-xyz/anchor",
+        "@ethersproject/abi",
+        "@solana/web3.js"
+      ],
+      "effects": [],
+      "range": "*",
+      "nodes": [
+        "node_modules/@circle-fin/swap-kit"
+      ],
+      "fixAvailable": true
+    },
+    "@circle-fin/unified-balance-kit": {
+      "name": "@circle-fin/unified-balance-kit",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@circle-fin/provider-cctp-v2",
+        "@circle-fin/provider-fee-v1",
+        "@circle-fin/provider-gateway-v1",
+        "@coral-xyz/anchor",
+        "@ethersproject/abi",
+        "@solana/web3.js"
+      ],
+      "effects": [],
+      "range": "*",
+      "nodes": [
+        "node_modules/@circle-fin/unified-balance-kit"
+      ],
+      "fixAvailable": true
+    },
+    "@circle-fin/w3s-pw-web-sdk": {
+      "name": "@circle-fin/w3s-pw-web-sdk",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "uuid"
+      ],
+      "effects": [],
+      "range": ">=1.0.19",
+      "nodes": [
+        "node_modules/@circle-fin/w3s-pw-web-sdk"
+      ],
+      "fixAvailable": {
+        "name": "@circle-fin/w3s-pw-web-sdk",
+        "version": "1.0.13",
+        "isSemVerMajor": true
+      }
+    },
+    "@coral-xyz/anchor": {
+      "name": "@coral-xyz/anchor",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@coral-xyz/borsh",
+        "@solana/web3.js",
+        "toml"
+      ],
+      "effects": [
+        "@circle-fin/app-kit",
+        "@circle-fin/provider-cctp-v2",
+        "@circle-fin/provider-gateway-v1",
+        "@circle-fin/provider-stablecoin-service-swap",
+        "@circle-fin/swap-kit",
+        "@circle-fin/unified-balance-kit"
+      ],
+      "range": "*",
+      "nodes": [
+        "node_modules/@coral-xyz/anchor"
+      ],
+      "fixAvailable": {
+        "name": "@circle-fin/app-kit",
+        "version": "1.8.1",
+        "isSemVerMajor": true
+      }
+    },
+    "@coral-xyz/borsh": {
+      "name": "@coral-xyz/borsh",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "@solana/web3.js"
+      ],
+      "effects": [],
+      "range": "*",
+      "nodes": [
+        "node_modules/@coral-xyz/borsh"
+      ],
+      "fixAvailable": true
+    },
+    "@ethersproject/abi": {
+      "name": "@ethersproject/abi",
+      "severity": "low",
+      "isDirect": false,
+      "via": [
+        "@ethersproject/hash"
+      ],
+      "effects": [
+        "@circle-fin/adapter-viem-v2",
+        "@circle-fin/bridge-kit",
+        "@circle-fin/earn-kit",
+        "@circle-fin/provider-cctp-v2",
+        "@circle-fin/provider-earn-service",
+        "@circle-fin/provider-fee-v1"
+      ],
+      "range": "5.0.10 - 5.8.0",
+      "nodes": [
+        "node_modules/@ethersproject/abi"
+      ],
+      "fixAvailable": {
+        "name": "@circle-fin/app-kit",
+        "version": "1.8.1",
+        "isSemVerMajor": true
+      }
+    },
+    "@ethersproject/abstract-provider": {
+      "name": "@ethersproject/abstract-provider",
+      "severity": "low",
+      "isDirect": false,
+      "via": [
+        "@ethersproject/transactions"
+      ],
+      "effects": [
+        "@ethersproject/abstract-signer"
+      ],
+      "range": "*",
+      "nodes": [
+        "node_modules/@ethersproject/abstract-provider"
+      ],
+      "fixAvailable": {
+        "name": "@circle-fin/app-kit",
+        "version": "1.8.1",
+        "isSemVerMajor": true
+      }
+    },
+    "@ethersproject/abstract-signer": {
+      "name": "@ethersproject/abstract-signer",
+      "severity": "low",
+      "isDirect": false,
+      "via": [
+        "@ethersproject/abstract-provider"
+      ],
+      "effects": [
+        "@ethersproject/hash"
+      ],
+      "range": "*",
+      "nodes": [
+        "node_modules/@ethersproject/abstract-signer"
+      ],
+      "fixAvailable": {
+        "name": "@circle-fin/app-kit",
+        "version": "1.8.1",
+        "isSemVerMajor": true
+      }
+    },
+    "@ethersproject/hash": {
+      "name": "@ethersproject/hash",
+      "severity": "low",
+      "isDirect": false,
+      "via": [
+        "@ethersproject/abstract-signer"
+      ],
+      "effects": [
+        "@ethersproject/abi"
+      ],
+      "range": "5.0.6 - 5.8.0",
+      "nodes": [
+        "node_modules/@ethersproject/hash"
+      ],
+      "fixAvailable": {
+        "name": "@circle-fin/app-kit",
+        "version": "1.8.1",
+        "isSemVerMajor": true
+      }
+    },
+    "@ethersproject/signing-key": {
+      "name": "@ethersproject/signing-key",
+      "severity": "low",
+      "isDirect": false,
+      "via": [
+        "elliptic"
+      ],
+      "effects": [
+        "@ethersproject/transactions"
+      ],
+      "range": "<=5.8.0",
+      "nodes": [
+        "node_modules/@ethersproject/signing-key"
+      ],
+      "fixAvailable": {
+        "name": "@circle-fin/app-kit",
+        "version": "1.8.1",
+        "isSemVerMajor": true
+      }
+    },
+    "@ethersproject/transactions": {
+      "name": "@ethersproject/transactions",
+      "severity": "low",
+      "isDirect": false,
+      "via": [
+        "@ethersproject/signing-key"
+      ],
+      "effects": [
+        "@ethersproject/abstract-provider"
+      ],
+      "range": "<=5.8.0",
+      "nodes": [
+        "node_modules/@ethersproject/transactions"
+      ],
+      "fixAvailable": {
+        "name": "@circle-fin/app-kit",
+        "version": "1.8.1",
+        "isSemVerMajor": true
+      }
+    },
+    "@firebase/auth": {
+      "name": "@firebase/auth",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "undici"
+      ],
+      "effects": [
+        "firebase"
+      ],
+      "range": "1.7.7-20240813205648 - 1.7.7-canary.1ff9661af || 1.7.8-20240827161511 - 1.7.9",
+      "nodes": [
+        "node_modules/@firebase/auth"
+      ],
+      "fixAvailable": true
+    },
+    "@firebase/auth-compat": {
+      "name": "@firebase/auth-compat",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "@firebase/auth",
+        "undici"
+      ],
+      "effects": [
+        "firebase"
+      ],
+      "range": "0.5.12-20240813205648 - 0.5.12-canary.fa0ed08fb || 0.5.13-20240827161511 - 0.5.14",
+      "nodes": [
+        "node_modules/@firebase/auth-compat"
+      ],
+      "fixAvailable": true
+    },
+    "@firebase/firestore": {
+      "name": "@firebase/firestore",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "@grpc/grpc-js",
+        "undici"
+      ],
+      "effects": [
+        "@firebase/firestore-compat",
+        "firebase"
+      ],
+      "range": "1.3.1-0 - 1.3.1-canary.df1b588 || 1.3.2-0 - 1.3.3-canary.bc4a844 || 1.13.1-0 - 1.13.1-canary.ce3addba || 1.14.0-0 - 1.15.1 || 3.7.3-20221108184443 - 3.7.3-canary.fde5adf63 || >=3.8.0-20221206221533",
+      "nodes": [
+        "node_modules/@firebase/firestore"
+      ],
+      "fixAvailable": true
+    },
+    "@firebase/firestore-compat": {
+      "name": "@firebase/firestore-compat",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "@firebase/firestore"
+      ],
+      "effects": [
+        "firebase"
+      ],
+      "range": "<=0.0.900-exp.520ca39d0 || 0.3.25-20240130223218 - 0.3.25-20240131233318 || 0.3.30-20240424141009 - 0.3.30-dataconnect-preview.f2ddc3d7b || 0.3.35-20240813205648 - 0.3.35-canary.fa0ed08fb || 0.3.36-20240827161511 - 0.3.38",
+      "nodes": [
+        "node_modules/@firebase/firestore-compat"
+      ],
+      "fixAvailable": true
+    },
+    "@firebase/functions": {
+      "name": "@firebase/functions",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "undici"
+      ],
+      "effects": [
+        "@firebase/functions-compat",
+        "firebase"
+      ],
+      "range": "0.11.7-20240827161511 - 0.11.8",
+      "nodes": [
+        "node_modules/@firebase/functions"
+      ],
+      "fixAvailable": true
+    },
+    "@firebase/functions-compat": {
+      "name": "@firebase/functions-compat",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "@firebase/functions"
+      ],
+      "effects": [
+        "firebase"
+      ],
+      "range": "0.3.13-20240827161511 - 0.3.14",
+      "nodes": [
+        "node_modules/@firebase/functions-compat"
+      ],
+      "fixAvailable": true
+    },
+    "@firebase/storage": {
+      "name": "@firebase/storage",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "undici"
+      ],
+      "effects": [
+        "@firebase/storage-compat",
+        "firebase"
+      ],
+      "range": "0.13.0-20240814182916 - 0.13.0-canary.fa0ed08fb || 0.13.1-20240827161511 - 0.13.2",
+      "nodes": [
+        "node_modules/@firebase/storage"
+      ],
+      "fixAvailable": true
+    },
+    "@firebase/storage-compat": {
+      "name": "@firebase/storage-compat",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "@firebase/storage"
+      ],
+      "effects": [
+        "firebase"
+      ],
+      "range": "<=0.0.900-exp.520ca39d0 || 0.1.4-202192711727 - 0.1.4-canary.f27fe4304 || 0.3.10-20240814182916 - 0.3.10-canary.fa0ed08fb || 0.3.11-20240827161511 - 0.3.12",
+      "nodes": [
+        "node_modules/@firebase/storage-compat"
+      ],
+      "fixAvailable": true
+    },
+    "@grpc/grpc-js": {
+      "name": "@grpc/grpc-js",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1240623,
+          "name": "@grpc/grpc-js",
+          "dependency": "@grpc/grpc-js",
+          "title": "@grpc/grpc-js: In certain configurations, getAuthContext can return unauthorized certificates as though they were authorized",
+          "url": "https://github.com/advisories/GHSA-m9gg-hp2v-232j",
+          "severity": "high",
+          "cwe": [
+            "CWE-295"
+          ],
+          "cvss": {
+            "score": 7.4,
+            "vectorString": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:N"
+          },
+          "range": "<1.13.6"
+        },
+        {
+          "source": 1240625,
+          "name": "@grpc/grpc-js",
+          "dependency": "@grpc/grpc-js",
+          "title": "@grpc/grpc-js: The server transmits some error messages thrown by method handlers to the client in status messages",
+          "url": "https://github.com/advisories/GHSA-f596-whhp-79r4",
+          "severity": "low",
+          "cwe": [
+            "CWE-550"
+          ],
+          "cvss": {
+            "score": 3.7,
+            "vectorString": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:N/A:N"
+          },
+          "range": "<1.13.6"
+        }
+      ],
+      "effects": [
+        "@firebase/firestore"
+      ],
+      "range": "<=1.13.5",
+      "nodes": [
+        "node_modules/@grpc/grpc-js"
+      ],
+      "fixAvailable": true
+    },
+    "@solana/web3.js": {
+      "name": "@solana/web3.js",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "jayson"
+      ],
+      "effects": [
+        "@circle-fin/adapter-viem-v2",
+        "@circle-fin/app-kit",
+        "@circle-fin/borrow-kit",
+        "@circle-fin/bridge-kit",
+        "@circle-fin/earn-kit",
+        "@circle-fin/provider-borrow-service",
+        "@circle-fin/provider-cctpx",
+        "@circle-fin/provider-earn-service",
+        "@circle-fin/provider-gateway-v1",
+        "@circle-fin/provider-stablecoin-service-swap",
+        "@circle-fin/swap-kit",
+        "@circle-fin/unified-balance-kit",
+        "@coral-xyz/borsh"
+      ],
+      "range": "<=0.0.0-pr-29130 || 0.0.4 - 1.99.0",
+      "nodes": [
+        "node_modules/@solana/web3.js"
+      ],
+      "fixAvailable": {
+        "name": "@circle-fin/app-kit",
+        "version": "1.8.1",
+        "isSemVerMajor": true
+      }
+    },
+    "elliptic": {
+      "name": "elliptic",
+      "severity": "low",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1112030,
+          "name": "elliptic",
+          "dependency": "elliptic",
+          "title": "Elliptic Uses a Cryptographic Primitive with a Risky Implementation",
+          "url": "https://github.com/advisories/GHSA-848j-6mx2-7j84",
+          "severity": "low",
+          "cwe": [
+            "CWE-1240"
+          ],
+          "cvss": {
+            "score": 5.6,
+            "vectorString": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:L/A:L"
+          },
+          "range": "<=6.6.1"
+        }
+      ],
+      "effects": [
+        "@ethersproject/signing-key"
+      ],
+      "range": "*",
+      "nodes": [
+        "node_modules/elliptic"
+      ],
+      "fixAvailable": {
+        "name": "@circle-fin/app-kit",
+        "version": "1.8.1",
+        "isSemVerMajor": true
+      }
+    },
+    "firebase": {
+      "name": "firebase",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "@firebase/auth",
+        "@firebase/auth-compat",
+        "@firebase/firestore",
+        "@firebase/firestore-compat",
+        "@firebase/functions",
+        "@firebase/functions-compat",
+        "@firebase/storage",
+        "@firebase/storage-compat"
+      ],
+      "effects": [],
+      "range": "0.900.22 || 7.9.1-0 - 7.9.1-canary.0396117e || 8.10.0-20217172214 - 8.10.0-canary.f40c0db53 || 9.0.0-20217250818 - 9.0.0-canary.d0d3acb10 || 9.0.1-2021727231341 - 9.0.1-canary.e039e1472 || 9.0.2-2021891633 - 9.0.2-canary.ff9baf70c || 9.0.3-202181503543 - 9.1.0-canary.f7d8324a1 || 9.1.1-2021830195733 - 9.1.1-canary.e70de6201 || 9.1.2-20219523556 - 9.1.2-canary.fc1d36497 || 9.22.1-20230524195328 || 10.12.2-20240523185724 - 10.12.2-canary.872e6f63e || 10.13.0-20240813205648 - 10.13.0-canary.fa0ed08fb || 10.13.1-20240827161511 - 10.14.1 || 11.9.0-20250603144652 - 11.9.0-canary.5871fd656",
+      "nodes": [
+        "node_modules/firebase"
+      ],
+      "fixAvailable": true
+    },
+    "jayson": {
+      "name": "jayson",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "stream-json",
+        "uuid"
+      ],
+      "effects": [
+        "@solana/web3.js"
+      ],
+      "range": "2.0.6 - 4.3.0",
+      "nodes": [
+        "node_modules/jayson"
+      ],
+      "fixAvailable": {
+        "name": "@circle-fin/app-kit",
+        "version": "1.8.1",
+        "isSemVerMajor": true
+      }
+    },
+    "stream-json": {
+      "name": "stream-json",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1164823,
+          "name": "stream-json",
+          "dependency": "stream-json",
+          "title": "stream-json: pick/ignore/filter/replace filters are O(depth\u00b2) on nested input \u2014 small crafted JSON blocks the event loop for seconds\u2192minutes (DoS)",
+          "url": "https://github.com/advisories/GHSA-528h-pc64-c93x",
+          "severity": "moderate",
+          "cwe": [
+            "CWE-407"
+          ],
+          "cvss": {
+            "score": 6.2,
+            "vectorString": "CVSS:3.1/AV:L/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": "<=3.4.0"
+        }
+      ],
+      "effects": [
+        "jayson"
+      ],
+      "range": "<=3.4.0",
+      "nodes": [
+        "node_modules/stream-json"
+      ],
+      "fixAvailable": {
+        "name": "@circle-fin/app-kit",
+        "version": "1.8.1",
+        "isSemVerMajor": true
+      }
+    },
+    "toml": {
+      "name": "toml",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1164824,
+          "name": "toml",
+          "dependency": "toml",
+          "title": "toml-node: Uncontrolled Recursion",
+          "url": "https://github.com/advisories/GHSA-82x6-q7mm-w9cf",
+          "severity": "high",
+          "cwe": [
+            "CWE-674"
+          ],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": "<4.2.0"
+        },
+        {
+          "source": 1164825,
+          "name": "toml",
+          "dependency": "toml",
+          "title": "toml-node: Prototype Pollution Leads to `Object.prototype` Corruption via `__proto__` Key-Path Desynchronization",
+          "url": "https://github.com/advisories/GHSA-v5mp-jgw5-2x6j",
+          "severity": "high",
+          "cwe": [
+            "CWE-1321"
+          ],
+          "cvss": {
+            "score": 8.2,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:L"
+          },
+          "range": "<4.1.2"
+        }
+      ],
+      "effects": [
+        "@coral-xyz/anchor"
+      ],
+      "range": "<=4.1.2",
+      "nodes": [
+        "node_modules/toml"
+      ],
+      "fixAvailable": {
+        "name": "@circle-fin/app-kit",
+        "version": "1.8.1",
+        "isSemVerMajor": true
+      }
+    },
+    "undici": {
+      "name": "undici",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1101609,
+          "name": "undici",
+          "dependency": "undici",
+          "title": "Use of Insufficiently Random Values in undici",
+          "url": "https://github.com/advisories/GHSA-c76h-2ccp-4975",
+          "severity": "moderate",
+          "cwe": [
+            "CWE-330"
+          ],
+          "cvss": {
+            "score": 6.8,
+            "vectorString": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:H/I:H/A:N"
+          },
+          "range": ">=6.0.0 <6.21.1"
+        },
+        {
+          "source": 1112496,
+          "name": "undici",
+          "dependency": "undici",
+          "title": "Undici has an unbounded decompression chain in HTTP responses on Node.js Fetch API via Content-Encoding leads to resource exhaustion",
+          "url": "https://github.com/advisories/GHSA-g9mf-h72j-4rw9",
+          "severity": "moderate",
+          "cwe": [
+            "CWE-770"
+          ],
+          "cvss": {
+            "score": 5.9,
+            "vectorString": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": "<6.23.0"
+        },
+        {
+          "source": 1113068,
+          "name": "undici",
+          "dependency": "undici",
+          "title": "undici Denial of Service attack via bad certificate data",
+          "url": "https://github.com/advisories/GHSA-cxrh-j4jr-qwg3",
+          "severity": "low",
+          "cwe": [
+            "CWE-401"
+          ],
+          "cvss": {
+            "score": 3.1,
+            "vectorString": "CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:U/C:N/I:N/A:L"
+          },
+          "range": ">=6.0.0 <6.21.2"
+        },
+        {
+          "source": 1114592,
+          "name": "undici",
+          "dependency": "undici",
+          "title": "Undici: Malicious WebSocket 64-bit length overflows parser and crashes the client",
+          "url": "https://github.com/advisories/GHSA-f269-vfmq-vjvj",
+          "severity": "high",
+          "cwe": [
+            "CWE-248",
+            "CWE-1284"
+          ],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": ">=6.0.0 <6.24.0"
+        },
+        {
+          "source": 1114594,
+          "name": "undici",
+          "dependency": "undici",
+          "title": "Undici has an HTTP Request/Response Smuggling issue",
+          "url": "https://github.com/advisories/GHSA-2mjp-6q6p-2qxm",
+          "severity": "moderate",
+          "cwe": [
+            "CWE-444"
+          ],
+          "cvss": {
+            "score": 6.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:L"
+          },
+          "range": "<6.24.0"
+        },
+        {
+          "source": 1114638,
+          "name": "undici",
+          "dependency": "undici",
+          "title": "Undici has Unbounded Memory Consumption in WebSocket permessage-deflate Decompression",
+          "url": "https://github.com/advisories/GHSA-vrm6-8vpv-qv8q",
+          "severity": "high",
+          "cwe": [
+            "CWE-409"
+          ],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": "<6.24.0"
+        },
+        {
+          "source": 1114640,
+          "name": "undici",
+          "dependency": "undici",
+          "title": "Undici has Unhandled Exception in WebSocket Client Due to Invalid server_max_window_bits Validation",
+          "url": "https://github.com/advisories/GHSA-v9p9-hfj2-hcw8",
+          "severity": "high",
+          "cwe": [
+            "CWE-248"
+          ],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": "<6.24.0"
+        },
+        {
+          "source": 1114642,
+          "name": "undici",
+          "dependency": "undici",
+          "title": "Undici has CRLF Injection in undici via `upgrade` option",
+          "url": "https://github.com/advisories/GHSA-4992-7rv2-5pvq",
+          "severity": "moderate",
+          "cwe": [
+            "CWE-93"
+          ],
+          "cvss": {
+            "score": 4.6,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:L/UI:R/S:U/C:L/I:L/A:N"
+          },
+          "range": "<6.24.0"
+        },
+        {
+          "source": 1121242,
+          "name": "undici",
+          "dependency": "undici",
+          "title": "undici vulnerable to HTTP header injection via Set-Cookie percent-decoding",
+          "url": "https://github.com/advisories/GHSA-p88m-4jfj-68fv",
+          "severity": "moderate",
+          "cwe": [
+            "CWE-93"
+          ],
+          "cvss": {
+            "score": 5.9,
+            "vectorString": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:H/A:N"
+          },
+          "range": "<6.27.0"
+        },
+        {
+          "source": 1121245,
+          "name": "undici",
+          "dependency": "undici",
+          "title": "undici WebSocket client vulnerable to denial of service via fragment count bypass",
+          "url": "https://github.com/advisories/GHSA-vxpw-j846-p89q",
+          "severity": "high",
+          "cwe": [
+            "CWE-400",
+            "CWE-770"
+          ],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": "<6.27.0"
+        },
+        {
+          "source": 1121255,
+          "name": "undici",
+          "dependency": "undici",
+          "title": "undici vulnerable to Set-Cookie SameSite attribute downgrade via permissive substring matching",
+          "url": "https://github.com/advisories/GHSA-g8m3-5g58-fq7m",
+          "severity": "low",
+          "cwe": [
+            "CWE-183"
+          ],
+          "cvss": {
+            "score": 3.7,
+            "vectorString": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:L/A:N"
+          },
+          "range": "<6.27.0"
+        },
+        {
+          "source": 1130716,
+          "name": "undici",
+          "dependency": "undici",
+          "title": "undici vulnerable to downstream response desynchronization via retry interceptor",
+          "url": "https://github.com/advisories/GHSA-8xcm-r25x-g524",
+          "severity": "moderate",
+          "cwe": [
+            "CWE-444"
+          ],
+          "cvss": {
+            "score": 4.8,
+            "vectorString": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:L/A:N"
+          },
+          "range": "<6.28.0"
+        },
+        {
+          "source": 1130727,
+          "name": "undici",
+          "dependency": "undici",
+          "title": "undici vulnerable to CRLF Injection via blob-like body 'type' property",
+          "url": "https://github.com/advisories/GHSA-m8rv-5g2x-5cg5",
+          "severity": "moderate",
+          "cwe": [
+            "CWE-93"
+          ],
+          "cvss": {
+            "score": 4.2,
+            "vectorString": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:L/I:L/A:N"
+          },
+          "range": "<6.28.0"
+        },
+        {
+          "source": 1130732,
+          "name": "undici",
+          "dependency": "undici",
+          "title": "undici vulnerable to cookie attribute injection via unsanitized domain and unparsed setCookie fields",
+          "url": "https://github.com/advisories/GHSA-v3r7-h72x-cjcm",
+          "severity": "moderate",
+          "cwe": [
+            "CWE-74"
+          ],
+          "cvss": {
+            "score": 4.8,
+            "vectorString": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:L/A:N"
+          },
+          "range": "<6.28.0"
+        },
+        {
+          "source": 1137243,
+          "name": "undici",
+          "dependency": "undici",
+          "title": "undici vulnerable to HTTP response queue poisoning via keep-alive socket reuse",
+          "url": "https://github.com/advisories/GHSA-35p6-xmwp-9g52",
+          "severity": "low",
+          "cwe": [
+            "CWE-367"
+          ],
+          "cvss": {
+            "score": 3.7,
+            "vectorString": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:L/A:N"
+          },
+          "range": "<6.27.0"
+        },
+        {
+          "source": 1240039,
+          "name": "undici",
+          "dependency": "undici",
+          "title": "undici vulnerable to downstream response splitting via retry interceptor",
+          "url": "https://github.com/advisories/GHSA-r53p-7pc4-xj5r",
+          "severity": "low",
+          "cwe": [
+            "CWE-444"
+          ],
+          "cvss": {
+            "score": 3.7,
+            "vectorString": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:L/A:N"
+          },
+          "range": "<6.28.1"
+        },
+        {
+          "source": 1240042,
+          "name": "undici",
+          "dependency": "undici",
+          "title": "undici vulnerable to Denial of Service via unrequested WebSocket subprotocol",
+          "url": "https://github.com/advisories/GHSA-rfgv-xxqx-mfg5",
+          "severity": "high",
+          "cwe": [
+            "CWE-248",
+            "CWE-252"
+          ],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": ">=6.7.0 <6.28.1"
+        }
+      ],
+      "effects": [
+        "@firebase/auth",
+        "@firebase/auth-compat",
+        "@firebase/firestore",
+        "@firebase/functions",
+        "@firebase/storage"
+      ],
+      "range": "<=6.28.0",
+      "nodes": [
+        "node_modules/@firebase/auth-compat/node_modules/undici",
+        "node_modules/@firebase/auth/node_modules/undici",
+        "node_modules/@firebase/firestore/node_modules/undici",
+        "node_modules/@firebase/functions/node_modules/undici",
+        "node_modules/@firebase/storage/node_modules/undici"
+      ],
+      "fixAvailable": true
+    },
+    "uuid": {
+      "name": "uuid",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1119441,
+          "name": "uuid",
+          "dependency": "uuid",
+          "title": "uuid: Missing buffer bounds check in v3/v5/v6 when buf is provided",
+          "url": "https://github.com/advisories/GHSA-w5hq-g745-h8pq",
+          "severity": "moderate",
+          "cwe": [
+            "CWE-787",
+            "CWE-1285"
+          ],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N"
+          },
+          "range": "<11.1.1"
+        }
+      ],
+      "effects": [
+        "@circle-fin/w3s-pw-web-sdk",
+        "jayson"
+      ],
+      "range": "<11.1.1",
+      "nodes": [
+        "node_modules/@circle-fin/w3s-pw-web-sdk/node_modules/uuid",
+        "node_modules/uuid"
+      ],
+      "fixAvailable": {
+        "name": "@circle-fin/app-kit",
+        "version": "1.8.1",
+        "isSemVerMajor": true
+      }
+    }
+  },
+  "metadata": {
+    "vulnerabilities": {
+      "info": 0,
+      "low": 8,
+      "moderate": 20,
+      "high": 12,
+      "critical": 0,
+      "total": 40
+    },
+    "dependencies": {
+      "prod": 397,
+      "dev": 625,
+      "optional": 134,
+      "peer": 0,
+      "peerOptional": 0,
+      "total": 1060
+    }
+  }
+}

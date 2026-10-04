@@ -1,0 +1,47 @@
+{
+  "checkedAt": "2026-10-04",
+  "status": "PATCH_VALIDATED_AUDIT_FINDINGS_REMAIN",
+  "lockedVersions": {
+    "next": "16.3.8",
+    "react": "19.2.8",
+    "@modelcontextprotocol/sdk": "1.31.0",
+    "@vercel/blob": "2.8.0"
+  },
+  "primarySources": [
+    "https://github.com/vercel/next.js/security/advisories/GHSA-vcvr-r3jv-pc5j",
+    "https://github.com/vercel/next.js/security/advisories/GHSA-mcj8-r9mp-w47p",
+    "https://github.com/vercel/next.js/releases/tag/v16.3.8"
+  ],
+  "findings": [
+    "Locked Next.js 16.3.0 falls in GHSA-vcvr-r3jv-pc5j's affected package range; the advisory lists 16.3.6 as patched and application impact depends on Node ImageResponse usage with untrusted SVG inputs.",
+    "Source search found no next/og or ImageResponse use, and no root-level catch-all page. This is a bounded source inspection, not proof of absence of all dependency risks.",
+    "GHSA-mcj8-r9mp-w47p's published patched version is incomplete (16.3.?). Do not infer that 16.3.8 closes this advisory without further confirmation.",
+    "npm audit completed after Next.js update; remaining transitive findings include Circle AppKit and Blob dependency trees. No force downgrade or major-version fix is authorized by this review.",
+    "Compatible audit fix updated the lockfile but did not remove all findings. Production audit now reports 40 package-level warnings (12 high, 20 moderate, 8 low, 0 critical); counts include dependency propagation and are not 40 distinct exploitable application flaws. No force fix was used."
+  ],
+  "nextAction": "Review remaining advisory applicability and upstream Circle dependency constraints before declaring the security gate closed.",
+  "originalProductChanged": false,
+  "exploitReproductionPerformed": false,
+  "validation": {
+    "applicationTestsPassed": 292,
+    "lintPassed": true,
+    "productionBuildPassed": true,
+    "scope": "After compatible audit fixes: 292 application tests, 13 contract tests, lint and production build including TypeScript passed",
+    "contractTestsPassed": 13
+  },
+  "auditBeforeFix": {
+    "critical": 0,
+    "high": 12,
+    "moderate": 17,
+    "low": 7,
+    "total": 36
+  },
+  "auditAfterCompatibleFix": {
+    "info": 0,
+    "low": 8,
+    "moderate": 20,
+    "high": 12,
+    "critical": 0,
+    "total": 40
+  }
+}
