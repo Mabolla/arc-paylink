@@ -1,0 +1,24 @@
+{
+  "date": "2026-10-04",
+  "changes": [
+    "Separate owner refresh from cron endpoint completion",
+    "Preserve last successful cron check across manual refresh",
+    "Do not mark partial cron scan successful"
+  ],
+  "validation": {
+    "appTests": 291,
+    "productionBuild": "passed",
+    "eslintAndTypecheck": "passed"
+  },
+  "liveScheduling": "not activated",
+  "quotaObservation": {
+    "window": "last 30 days",
+    "blobSimpleOperations": 12439,
+    "includedLimit": 10000,
+    "currentPeriodHeadroom": "not established"
+  },
+  "limits": [
+    "Cron endpoint completion does not alone prove a natural scheduled invocation",
+    "Persistent scoped reader and production cron configuration pending"
+  ]
+}

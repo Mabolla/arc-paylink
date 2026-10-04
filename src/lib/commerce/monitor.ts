@@ -44,12 +44,14 @@ const stateSchema = z.object({
   phase: z.enum(["events", "summary"]), cursor: z.string().max(2048).optional(),
   trackedReceiptCount: integer, completedScans: integer,
   lastReceiptScanAt: iso.optional(), lastSuccessfulAt: iso.optional(),
+  lastCronSuccessfulAt: iso.optional(),
   summary: summarySchema.optional(), aggregate: aggregateSchema.optional(),
   pending: pendingSchema.optional(),
   lease: z.object({ id: uuid, expiresAt: integer }).optional(),
   lastRun: z.object({
     id: uuid, startedAt: iso, finishedAt: iso.optional(),
     outcome: z.enum(["running", "complete", "partial", "failed"]),
+    trigger: z.enum(["owner", "cron"]).optional(),
     pages: integer, newReceipts: integer,
     failure: z.literal("monitor_operation_failed").optional(),
   }).optional(),
@@ -68,6 +70,7 @@ export type CollectionsMonitorOptions = {
   leaseMs?: number;
   now?: () => number;
   runId?: string;
+  trigger?: "owner" | "cron";
 };
 export type CollectionsMonitorResult = {
   outcome: "complete" | "partial" | "busy";
@@ -165,7 +168,7 @@ export async function runCollectionsMonitor(
   };
   if (state.lease && state.lease.expiresAt > now()) return { outcome: "busy", state };
   state = { ...state, lease: { id: runId, expiresAt: now() + leaseMs },
-    lastRun: { id: runId, startedAt: new Date(start).toISOString(), outcome: "running", pages: 0, newReceipts: 0 } };
+    lastRun: { id: runId, startedAt: new Date(start).toISOString(), outcome: "running", trigger: options.trigger, pages: 0, newReceipts: 0 } };
   await authorize();
   try { await service.store.write(path, state, saved?.version); }
   catch (error) {
@@ -230,7 +233,8 @@ export async function runCollectionsMonitor(
   const finish = async (outcome: "complete" | "partial") => {
     const at = new Date(now()).toISOString();
     await checkpoint({ ...state,
-      ...(outcome === "complete" ? { lastSuccessfulAt: at, completedScans: state.completedScans + 1 } : {}),
+      ...(outcome === "complete" ? { lastSuccessfulAt: at, completedScans: state.completedScans + 1,
+        ...(options.trigger === "cron" ? { lastCronSuccessfulAt: at } : {}) } : {}),
       lastRun: { ...state.lastRun!, finishedAt: at, outcome },
     }, true);
     return { outcome, state };

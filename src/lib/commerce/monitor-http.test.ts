@@ -206,3 +206,32 @@ describe("hosted collections monitor HTTP boundaries", () => {
     expect(scan).not.toHaveBeenCalled();
   });
 });
+
+describe("background run evidence", () => {
+  it("does not count Check now as a completed cron run", async () => {
+    const f = await fixture();
+    const result = await runOwnerMonitorRefresh(f.service, f.owner, { readerToken: f.reader.token });
+    expect(result.outcome).toBe("complete");
+    expect(result.monitor?.lastRunTrigger).toBe("owner");
+    expect(result.monitor).not.toHaveProperty("lastCronCompletedAt");
+  });
+  it("records a completed cron endpoint run and keeps that evidence after a later owner refresh", async () => {
+    const f = await fixture();
+    const cron = await runCronCollectionsMonitor(f.service, request(f.env.CRON_SECRET), f.env);
+    expect(cron.outcome).toBe("complete");
+    expect(cron.monitor?.lastRunTrigger).toBe("cron");
+    expect(cron.monitor?.lastCronCompletedAt).toBeDefined();
+    const manual = await runOwnerMonitorRefresh(f.service, f.owner, { readerToken: f.reader.token });
+    expect(manual.monitor?.lastRunTrigger).toBe("owner");
+    expect(manual.monitor?.lastCronCompletedAt).toBe(cron.monitor?.lastCronCompletedAt);
+  });
+  it("does not mark a partial cron scan as a successful background check", async () => {
+    const f = await fixture();
+    const result = await monitoring.runCollectionsMonitor(f.service, {
+      readerToken: f.reader.token, workspaceId: f.owner.workspace.id, chainId: ARC_CHAIN_ID,
+      maxPages: 1, trigger: "cron",
+    });
+    expect(result.outcome).toBe("partial");
+    expect(monitorReport(result.state)).not.toHaveProperty("lastCronCompletedAt");
+  });
+});

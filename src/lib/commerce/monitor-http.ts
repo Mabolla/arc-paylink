@@ -47,6 +47,8 @@ export function monitorReport(state: CollectionsMonitorState | undefined, now = 
     trackedReceipts: state.trackedReceiptCount,
     completedScans: state.completedScans,
     ...(state.lastSuccessfulAt ? { lastCompletedAt: state.lastSuccessfulAt } : {}),
+    ...(state.lastCronSuccessfulAt ? { lastCronCompletedAt: state.lastCronSuccessfulAt } : {}),
+    ...(last?.trigger ? { lastRunTrigger: last.trigger } : {}),
     ...(last ? { lastStartedAt: last.startedAt, newReceipts: last.newReceipts } : {}),
     ...(state.summary ? {
       summaryAsOf: state.summary.asOf,
@@ -80,10 +82,10 @@ export async function monitorStatus(service: CommerceService, principal: Princip
   return { monitor, schedulingConfigured };
 }
 
-async function execute(service: CommerceService, readerToken: string, workspaceId: string) {
+async function execute(service: CommerceService, readerToken: string, workspaceId: string, trigger: "owner" | "cron") {
   const result = await runCollectionsMonitor(service, {
     readerToken, workspaceId, chainId: ARC_CHAIN_ID,
-    maxPages: 5, deadlineMs: Date.now() + 45_000, leaseMs: 120_000,
+    maxPages: 5, deadlineMs: Date.now() + 45_000, leaseMs: 120_000, trigger,
   });
   return {
     outcome: result.outcome,
@@ -101,10 +103,10 @@ export async function runOwnerMonitorRefresh(service: CommerceService, owner: Pr
   sameBusiness(reader, owner.workspace.id);
   if (reader.key.role !== "reader")
     throw new CommerceError("Collection monitor requires a read-only agent key.", 403);
-  return execute(service, input.readerToken, owner.workspace.id);
+  return execute(service, input.readerToken, owner.workspace.id, "owner");
 }
 
 export async function runCronCollectionsMonitor(service: CommerceService, request: Request, env: NodeJS.ProcessEnv = process.env) {
   const config = authorizeCronRequest(request, env);
-  return execute(service, config.readerToken, config.workspaceId);
+  return execute(service, config.readerToken, config.workspaceId, "cron");
 }

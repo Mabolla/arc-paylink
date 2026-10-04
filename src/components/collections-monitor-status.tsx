@@ -7,6 +7,8 @@ type MonitorStatus = {
   monitor?: {
     lastCompletedAt?: string;
     lastStartedAt?: string;
+    lastCronCompletedAt?: string;
+    lastRunTrigger?: "owner" | "cron";
     summaryAsOf?: string;
     outcome: "never" | "complete" | "partial" | "busy" | "failed";
     trackedReceipts: number;
@@ -438,7 +440,9 @@ export function CollectionsMonitorStatus({
           )}
           <p className={styles.note}>
             {current.schedulingConfigured
-              ? "Automatic checks are configured. A completed report confirms a server check ran."
+              ? monitor?.lastCronCompletedAt
+                ? "Automatic checks are configured. A background check has completed."
+                : "Automatic checks are configured. No completed background check is recorded yet."
               : "Automatic checks are not active."}
             {!demo && !current.schedulingConfigured && outcome === "complete" &&
               " This report came from a server check."}
@@ -470,6 +474,12 @@ export function CollectionsMonitorStatus({
                         {reportTime(monitor.lastCompletedAt)}
                       </time>
                     </dd>
+                  </div>
+                )}
+                {monitor.lastCronCompletedAt && (
+                  <div>
+                    <dt>Last background check</dt>
+                    <dd><time dateTime={monitor.lastCronCompletedAt}>{reportTime(monitor.lastCronCompletedAt)}</time></dd>
                   </div>
                 )}
                 {outcome === "busy" && monitor.lastStartedAt && (
