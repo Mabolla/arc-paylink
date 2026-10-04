@@ -5,7 +5,6 @@ import { IS_ARC_MAINNET } from "../arc";
 import { CommerceError } from "./store";
 import { uuid } from "./service";
 import type { CheckoutPayments } from "./payments";
-import { assertAcceptanceDeliveryReady } from "./webhook-acceptance";
 
 export function verifyCircleSignature(
   raw: string,
@@ -77,7 +76,6 @@ export async function applyCircleNotification(
       409,
     );
   // A valid Circle signature is only a trigger. Arc receipt verification remains mandatory.
-  assertAcceptanceDeliveryReady(orderId);
   await payments.confirm(orderId, tx.txHash, "circle-webhook");
   return { accepted: true };
 }

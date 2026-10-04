@@ -1,0 +1,19 @@
+{
+  "scenario": "Customer tab closed before first payment confirmation; controlled single-order signed notification delay",
+  "orderId": "cc265ae5-df8a-4536-ab2d-356434c74ced",
+  "reference": "TIMED-CLOSED-TAB-20261004",
+  "amount": "0.01",
+  "network": "Arc mainnet",
+  "customerTabAbsentObservedAt": "2026-10-04T10:07:14.712Z",
+  "processingWithoutReceiptObservedAt": "2026-10-04T10:07:24.606Z",
+  "temporaryHoldExpiresAt": "2026-10-04T10:13:01.073Z",
+  "receipt": {
+    "transactionHash": "0x40c4b1029b175da4f63b380190b2d4172e83ac55cb95d4f4dc9c00efc76f07cd",
+    "blockNumber": "24203301",
+    "confirmedAt": "2026-10-04T10:23:41.170Z",
+    "confirmationSource": "circle-webhook"
+  },
+  "result": "PASS",
+  "scope": "Controlled deferred-notification recovery, not normal payment latency. No second payment or client reconciliation was used. Circle console delivery attempt details not independently collected in this final inspection.",
+  "cleanup": "Temporary production fault injection removed after successful receipt observation."
+}
