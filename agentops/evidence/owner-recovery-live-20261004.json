@@ -1,0 +1,21 @@
+{
+  "date": "2026-10-04",
+  "testedCommit": "4b7f2a7b93d0d944a129dce0d83ccd4a4c123abb",
+  "pilot": "arc-paylink-collections-pilot",
+  "workspaceId": "cf08fc73-87df-4b5c-9b73-6ec3c2d71224",
+  "liveObserved": {
+    "userActivatedReplacement": true,
+    "replacementFileSavedAndUserConfirmed": true,
+    "signedOut": true,
+    "signedInUsingSavedRecoveryKey": true,
+    "sameWorkspaceRecovered": true,
+    "orderPreserved": "e6679899-b04a-4f81-af8d-ad252e43fb17",
+    "paidUsdc": "0.01",
+    "savedReportPreserved": true
+  },
+  "limitations": [
+    "Recovery was tested after logout in the same browser, not a distinct browser profile.",
+    "Old key rejection and revoked MCP credentials were checked in automated tests, not repeated against production.",
+    "The browser download event timed out; the displayed replacement was saved privately to a file before user activation."
+  ]
+}
