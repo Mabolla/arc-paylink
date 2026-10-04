@@ -1,0 +1,20 @@
+{
+  "checkedAt": "2026-10-04",
+  "status": "VALIDATED_NO_HIGH_OR_CRITICAL_PRODUCTION_AUDIT_FINDINGS",
+  "change": "Parent-scoped override replaces Anchor's TOML 3.0.0 dependency with TOML 4.2.0. This is a deliberate transitive major-version override, not npm audit fix --force.",
+  "compatibility": {
+    "anchorResolvesToml": "4.2.0",
+    "bufferParsingSignaturePassed": true,
+    "sample": "Normal provider/programs Anchor configuration, parsed from Buffer and compared with expected values",
+    "anchorNodeModuleLoadPassed": true,
+    "applicationTestsPassed": 294,
+    "productionBuildAndTypeScriptPassed": true
+  },
+  "audit": { "critical": 0, "high": 0, "moderate": 20, "low": 8, "total": 28 },
+  "limitations": [
+    "This is not a clean audit, independent security review or full SDK functional acceptance.",
+    "The override is outside Anchor's declared TOML major range; retain this evidence and review compatibility on future parent upgrades.",
+    "No malicious input or exploit reproduction was performed. No mainnet transaction was made.",
+    "Original main and original production deployment were not changed."
+  ]
+}

@@ -79,6 +79,9 @@
     },
     "@firebase/storage": {
       "undici": "6.28.1"
+    },
+    "@coral-xyz/anchor": {
+      "toml": "4.2.0"
     }
   }
 }
