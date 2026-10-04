@@ -1,0 +1,24 @@
+{
+  "date": "2026-10-04",
+  "testedCommit": "452163caad3f969e69fb24785aa59be134064733",
+  "orderId": "631453dc-62d5-43ed-ad33-8a5f5217713f",
+  "reference": "WEBHOOK-ONLY-20261004",
+  "amountUsdc": "0.01",
+  "transactionHash": "0xd24a4e21c3f3ed2ac5b314914bae19d54d0031bee53bbdf4cf4b73336d8f55cb",
+  "blockNumber": "24193191",
+  "confirmedAt": "2026-10-04T08:41:15.518Z",
+  "confirmationSource": "circle-webhook",
+  "liveObserved": {
+    "customerAutomaticStatusChecksDisabledBeforePreparation": true,
+    "userApprovedCirclePayment": true,
+    "businessOrderPaid": true,
+    "freshCheckoutReadReturnedPaid": true,
+    "receiptFirstWriterWasCircleWebhook": true
+  },
+  "meaning": "Server-side settlement was triggered by the signed Circle notification without customer reconciliation.",
+  "limits": [
+    "Exact browser-close time was not established or required to attribute the first confirmation source.",
+    "This verifies one live internal acceptance payment, not continuous scheduling or external customer adoption.",
+    "Failure injection remains covered by automated tests rather than live provider outages."
+  ]
+}
