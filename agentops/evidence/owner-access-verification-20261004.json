@@ -1,0 +1,29 @@
+{
+  "date": "2026-10-04",
+  "scope": "deploy/collections-pilot only",
+  "verification": {
+    "applicationTests": 277,
+    "applicationTestFiles": 50,
+    "ownerRotationAndHttpTests": 10,
+    "eslint": "passed",
+    "typescript": "passed",
+    "productionBuild": "passed",
+    "scenarios": [
+      "Owner recovery login with saved key",
+      "Staged key cannot authenticate until activation",
+      "Old credential and cookie invalidated after activation",
+      "Existing orders and reader access preserved",
+      "Revoked reader denied at API and MCP",
+      "Expired and superseded replacements rejected",
+      "Storage failure preserves current owner credential",
+      "Concurrent activation uses conditional writes",
+      "Lost activation response can be retried",
+      "Cross-origin activation rejected"
+    ]
+  },
+  "limitations": [
+    "Production browser key-rotation acceptance not yet performed.",
+    "Quota headroom and billing reset date remain unverified.",
+    "This does not close the remaining product roadmap."
+  ]
+}

@@ -132,6 +132,50 @@ export class CommerceService {
     this.owner(p);
     return this.newKey(p.workspace.id, "reader", text(60).parse(name));
   }
+  async prepareOwnerRotation(p: Principal) {
+    this.owner(p);
+    const path = keyPath(p.workspace.id, p.key.id);
+    const saved = await this.store.read<AccessKey>(path);
+    if (!saved || saved.value.revokedAt || saved.value.hash !== p.key.hash)
+      throw new CommerceError("Sign in again before renewing your key.", 401);
+    const token = `apm_${p.workspace.id}.${p.key.id}.${randomBytes(32).toString("base64url")}`;
+    const expiresAt = new Date(Date.parse(this.now()) + 30 * 60_000).toISOString();
+    // One conditional update: the active credential remains valid until activation.
+    await this.store.write(path, {
+      ...saved.value,
+      pendingOwnerHash: digest(token),
+      pendingOwnerExpiresAt: expiresAt,
+    }, saved.version);
+    return { token, expiresAt };
+  }
+
+  async activateOwnerRotation(token: string) {
+    const match = token.match(/^apm_([0-9a-f-]{36})\.([0-9a-f-]{36})\.([A-Za-z0-9_-]{43})$/);
+    if (!match || !uuid.safeParse(match[1]).success || !uuid.safeParse(match[2]).success)
+      throw new CommerceError("Invalid replacement key.", 401);
+    const path = keyPath(match[1], match[2]);
+    const saved = await this.store.read<AccessKey>(path);
+    if (!saved || saved.value.role !== "owner" || saved.value.revokedAt)
+      throw new CommerceError("Invalid replacement key.", 401);
+    const hash = digest(token);
+    // A response may be lost after the commit. Repeating activation is safe.
+    if (saved.value.hash === hash && saved.value.rotatedAt)
+      return this.authorize(token);
+    if (!saved.value.pendingOwnerHash ||
+        !timingSafeEqual(Buffer.from(saved.value.pendingOwnerHash, "hex"), Buffer.from(hash, "hex")) ||
+        !saved.value.pendingOwnerExpiresAt ||
+        Date.parse(saved.value.pendingOwnerExpiresAt) <= Date.parse(this.now()))
+      throw new CommerceError("Replacement key expired or superseded. Prepare a new key with your current owner key.", 401);
+    const workspace = await this.store.read<Workspace>(`merchants/${match[1]}/workspace.json`);
+    if (!workspace || workspace.value.chainId !== ARC_CHAIN_ID)
+      throw new CommerceError("Workspace unavailable.", 401);
+    const key = { ...saved.value, hash, rotatedAt: this.now() };
+    delete key.pendingOwnerHash;
+    delete key.pendingOwnerExpiresAt;
+    // Atomic replacement invalidates the old key and its sessions at the same time.
+    await this.store.write(path, key, saved.version);
+    return { workspace: workspace.value, key };
+  }
   async keys(p: Principal) {
     this.owner(p);
     const paths: string[] = [];

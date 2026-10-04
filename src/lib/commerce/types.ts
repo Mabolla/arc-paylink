@@ -13,6 +13,9 @@ export type AccessKey = {
   name: string;
   createdAt: string;
   revokedAt?: string;
+  pendingOwnerHash?: string;
+  pendingOwnerExpiresAt?: string;
+  rotatedAt?: string;
 };
 export type Principal = { workspace: Workspace; key: AccessKey };
 export type Order = {

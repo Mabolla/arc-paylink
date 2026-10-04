@@ -82,6 +82,8 @@ export function BusinessDashboard({ demo = false }: { demo?: boolean }) {
   const [keys, setKeys] = useState<Key[]>([]);
   const [secret, setSecret] = useState("");
   const [secretKind, setSecretKind] = useState("Owner recovery key");
+  const [replacement, setReplacement] = useState<{ token: string; expiresAt: string }>();
+  const [replacementSaved, setReplacementSaved] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [loading, setLoading] = useState(true);
@@ -552,7 +554,7 @@ export function BusinessDashboard({ demo = false }: { demo?: boolean }) {
                   <div>
                     <h2>Customer orders</h2>
                     <p className={styles.muted}>
-                      Refreshes every 30 seconds while this tab is active.
+                      Refresh to load the latest orders and payment status.
                     </p>
                   </div>
                   <div className={styles.actions}>
@@ -823,6 +825,54 @@ export function BusinessDashboard({ demo = false }: { demo?: boolean }) {
                     <pre className={styles.code}>{agentResult}</pre>
                   )}
                 </section>
+                {!demo && (
+                  <section className={styles.card}>
+                    <h3>Owner access</h3>
+                    <p className={styles.muted}>
+                      Your recovery key restores this workspace in another browser.
+                      Save the replacement before activating it. Activation signs
+                      out browsers using the old key; orders and agent keys remain available.
+                    </p>
+                    <button className={styles.link} disabled={busy}
+                      onClick={() => void act(async () => {
+                        const next = await call<{ token: string; expiresAt: string }>("owner-key/prepare", {});
+                        setReplacement(next);
+                        setReplacementSaved(false);
+                      })}>
+                      Prepare replacement key
+                    </button>
+                    {replacement && (
+                      <>
+                        <p className={styles.muted}>
+                          Your current key still works. Activate this replacement
+                          before {new Date(replacement.expiresAt).toLocaleString()}.
+                          Keep it private.
+                        </p>
+                        <pre className={styles.code}>{replacement.token}</pre>
+                        <button className={styles.link} disabled={busy}
+                          onClick={() => download("arcpaylink-owner-recovery.txt", replacement.token)}>
+                          Download replacement key
+                        </button>
+                        <label>
+                          <input type="checkbox" checked={replacementSaved}
+                            onChange={(event) => setReplacementSaved(event.target.checked)} />
+                          I saved the replacement key securely
+                        </label>
+                        <button className={styles.link} disabled={busy || !replacementSaved}
+                          onClick={() => void act(async () => {
+                            await call("owner-key/activate", { token: replacement.token });
+                            setReplacement(undefined);
+                            setReplacementSaved(false);
+                            setSecret("");
+                            setNotice("Owner key renewed. Use your saved replacement to recover this workspace. The old key no longer works.");
+                            await refresh();
+                          })}>
+                          Activate replacement key
+                        </button>
+                      </>
+                    )}
+                  </section>
+                )}
                 <section className={styles.card}>
                   <h3>Direct to your business</h3>
                   <p className={styles.muted}>
@@ -840,6 +890,8 @@ export function BusinessDashboard({ demo = false }: { demo?: boolean }) {
                             method: "DELETE",
                           });
                           setSecret("");
+                          setReplacement(undefined);
+                          setReplacementSaved(false);
                           setWorkspace(undefined);
                         })
                       }

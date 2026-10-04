@@ -30,6 +30,42 @@ beforeEach(() => {
 });
 
 describe("business HTTP and remote agent boundaries", () => {
+  it("recovers in another browser and atomically replaces the owner session with CSRF protection", async () => {
+    const owner = await context.service!.createWorkspace({ name: "Recovery HTTP", recipient });
+    const recovered = await POST(request("session", { token: owner.token }), route(["session"]));
+    expect(recovered.status).toBe(200);
+    const oldCookie = recovered.headers.get("set-cookie")!;
+    const prep = request("owner-key/prepare", {});
+    prep.headers.set("cookie", oldCookie);
+    const prepared = await POST(prep, route(["owner-key", "prepare"]));
+    expect(prepared.status).toBe(200);
+    const { token } = await prepared.json();
+    const crossOrigin = request("owner-key/activate", { token });
+    crossOrigin.headers.set("origin", "https://evil.example");
+    expect((await POST(crossOrigin, route(["owner-key", "activate"]))).status).toBeGreaterThanOrEqual(400);
+    expect((await GET(request("session", undefined, owner.token), route(["session"]))).status).toBe(200);
+    const activated = await POST(request("owner-key/activate", { token }), route(["owner-key", "activate"]));
+    expect(activated.status).toBe(200);
+    const cookie = activated.headers.get("set-cookie")!;
+    expect(cookie).toMatch(/HttpOnly/i);
+    expect(cookie).toMatch(/Secure/i);
+    expect(cookie).toMatch(/SameSite=strict/i);
+    const stale = new Request("https://example.com/api/business/session", { headers: { cookie: oldCookie } });
+    expect((await GET(stale, route(["session"]))).status).toBe(401);
+    expect((await POST(request("session", { token: owner.token }), route(["session"]))).status).toBe(401);
+    expect((await POST(request("session", { token }), route(["session"]))).status).toBe(200);
+    expect((await POST(request("owner-key/activate", { token }), route(["owner-key", "activate"]))).status).toBe(200);
+  });
+  it("rejects revoked agents at the HTTP and MCP entry points", async () => {
+    const owner = await context.service!.createWorkspace({ name: "Revocation HTTP", recipient });
+    const principal = await context.service!.authorize(owner.token);
+    const agent = await context.service!.issueReader(principal, "Revoked agent");
+    expect((await POST(request("owner-key/prepare", {}, agent.token), route(["owner-key", "prepare"]))).status).toBe(403);
+    await context.service!.revokeKey(principal, agent.key.id);
+    expect((await GET(request("orders", undefined, agent.token), route(["orders"]))).status).toBe(401);
+    expect((await mcpPost(request("mcp", { jsonrpc: "2.0", id: 1, method: "tools/list" }, agent.token))).status).toBe(401);
+  });
+
   it("creates an HttpOnly session, authenticates it and rejects cross-origin mutation", async () => {
     const res = await POST(
       request("workspaces", { name: "Test", recipient }),

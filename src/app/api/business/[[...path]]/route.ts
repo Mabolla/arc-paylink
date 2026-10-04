@@ -89,7 +89,14 @@ export async function POST(request: Request, context: Context) {
         token,
       );
     }
+    if (path.join("/") === "owner-key/activate") {
+      const token = typeof body.token === "string" ? body.token : "";
+      const activated = await service.activateOwnerRotation(token);
+      return withSession(json({ workspace: activated.workspace }), request, token);
+    }
     const principal = await service.authorize(credential(request));
+    if (path.join("/") === "owner-key/prepare")
+      return json(await service.prepareOwnerRotation(principal));
     if (path.length === 2 && path[0] === "monitor" && path[1] === "refresh")
       return json(await runOwnerMonitorRefresh(service, principal, body));
     if (path[0] === "orders" && !path[1])
