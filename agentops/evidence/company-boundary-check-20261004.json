@@ -1,0 +1,15 @@
+{
+  "checkedAt": "2026-10-04",
+  "scope": "Company isolation through HTTP and remote MCP",
+  "result": "PASS",
+  "validation": "6 HTTP tests passed, including new cross-company isolation test",
+  "verified": [
+    "Other owner and reader cannot read a foreign order; HTTP 404 without private customer data",
+    "Other workspace order list remains empty",
+    "Other owner cannot cancel foreign order or revoke foreign reader key",
+    "Remote MCP foreign order lookup returns tool error without private customer data",
+    "Original order remains pending and original reader remains authorized"
+  ],
+  "limitation": "Local HTTP Request/Response and MCP integration test using MemoryStore; not a live multi-tenant production test",
+  "step5": "OPEN: natural daily scheduled run not observed; reminder created for 2026-10-05 afternoon Europe/Istanbul"
+}

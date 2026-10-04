@@ -66,6 +66,40 @@ describe("business HTTP and remote agent boundaries", () => {
     expect((await mcpPost(request("mcp", { jsonrpc: "2.0", id: 1, method: "tools/list" }, agent.token))).status).toBe(401);
   });
 
+  it("isolates another company's orders and keys through HTTP and remote MCP", async () => {
+    const service = context.service!;
+    const companyA = await service.createWorkspace({ name: "Company A", recipient });
+    const companyB = await service.createWorkspace({ name: "Company B", recipient });
+    const ownerA = await service.authorize(companyA.token);
+    const ownerB = await service.authorize(companyB.token);
+    const order = await service.createOrder(ownerA, {
+      reference: "PRIVATE-A", title: "Company A only", amount: "1",
+      customerReference: "CUSTOMER-A-PRIVATE", idempotencyKey: randomUUID(),
+    });
+    const readerA = await service.issueReader(ownerA, "A reader");
+    const readerB = await service.issueReader(ownerB, "B reader");
+    for (const token of [companyB.token, readerB.token]) {
+      const response = await GET(request(`orders/${order.id}`, undefined, token), route(["orders", order.id]));
+      expect(response.status).toBe(404);
+      expect(await response.text()).not.toContain("CUSTOMER-A-PRIVATE");
+      const listed = await GET(request("orders", undefined, token), route(["orders"]));
+      expect((await listed.json()).orders).toEqual([]);
+    }
+    expect((await POST(request(`orders/${order.id}/cancel`, {}, companyB.token), route(["orders", order.id, "cancel"]))).status).toBe(404);
+    expect((await POST(request(`keys/${readerA.key.id}/revoke`, {}, companyB.token), route(["keys", readerA.key.id, "revoke"]))).status).toBe(404);
+    const rpc = request("mcp", { jsonrpc: "2.0", id: 1, method: "tools/call",
+      params: { name: "get_customer_order", arguments: { orderId: order.id } } }, readerB.token);
+    rpc.headers.set("accept", "application/json, text/event-stream");
+    rpc.headers.set("mcp-protocol-version", "2025-03-26");
+    const response = await mcpPost(rpc);
+    expect(response.status).toBe(200);
+    const body = await response.json();
+    expect(body.result.isError).toBe(true);
+    expect(JSON.stringify(body)).not.toContain("CUSTOMER-A-PRIVATE");
+    expect((await service.order(ownerA, order.id)).status).toBe("pending");
+    expect((await service.authorize(readerA.token)).workspace.id).toBe(companyA.workspace.id);
+  });
+
   it("creates an HttpOnly session, authenticates it and rejects cross-origin mutation", async () => {
     const res = await POST(
       request("workspaces", { name: "Test", recipient }),
