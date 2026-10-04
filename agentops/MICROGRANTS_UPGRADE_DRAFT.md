@@ -20,7 +20,7 @@ The existing payment-link product now has persistent company workspaces, fixed-a
 
 On 3 October 2026, an internal customer completed Google sign-in and explicitly approved a **0.01-USDC Arc mainnet payment through Circle**. The company order became paid, with a verified receipt from the embedded account. The scoped reader then returned one paid order, collected **0.01 USDC**, outstanding **0**, and one payment event. A repeated hosted scan discovered **zero additional receipts**.
 
-The Circle webhook endpoint received four signed notifications with HTTP 200 during this payment. This proves signed delivery in the payment window; the individual notification payloads were not captured, and settlement with the customer browser already closed has not yet been independently demonstrated.
+The earlier payment window included signed Circle notifications. On 4 October, a separate strict closed-tab acceptance recorded the customer tab absent while the order remained Processing, followed by a Paid receipt sourced from `circle-webhook`. The real 0.01-USDC mainnet transfer is `0x40c4b1029b175da4f63b380190b2d4172e83ac55cb95d4f4dc9c00efc76f07cd`, block 24203301. A temporary single-order notification delay made the timing observable and was then removed; this is recovery evidence, not a normal-latency measurement.
 
 The actual company dashboard **Check now** action succeeded and its temporary reader key was revoked. An isolated production monitor is deployed, with a production-only reader credential and cron secret. Its daily schedule is enabled; a Vercel-triggered run returned HTTP 200 and wrote a durable report. The first naturally scheduled daily invocation remains to be observed.
 
@@ -29,20 +29,20 @@ The actual company dashboard **Check now** action succeeded and its temporary re
 ## Proposed use of support
 
 1. Recruit and support a first external business pilot, with measured checkout completion and collections reporting.
-2. Complete browser-closed settlement acceptance and observe recurring daily operation over time.
+2. Observe natural recurring daily operation over time and complete the remaining privacy/retention controls.
 3. Improve business onboarding, recovery-key retention and the product walkthrough using pilot feedback.
 
 ## Reviewer links
 
 - [Original live product](https://arc-paylink-two.vercel.app)
-- [New product and evidence tour](https://arc-paylink-git-feat-tameion-agentops-mabolla1.vercel.app/collections-demo/index.html)
-- [Public extension source](https://github.com/Mabolla/arc-paylink/tree/feat/tameion-agentops) · [draft PR #14](https://github.com/Mabolla/arc-paylink/pull/14)
-- [Google/Circle paid checkout and agent report](https://github.com/Mabolla/arc-paylink/blob/feat/tameion-agentops/agentops/evidence/collections-circle-payment-20261003.json)
-- [Activated isolated monitor](https://github.com/Mabolla/arc-paylink/blob/feat/tameion-agentops/agentops/evidence/collections-monitor-activation-20261003.json)
-- [Mainnet acceptance](https://github.com/Mabolla/arc-paylink/blob/feat/tameion-agentops/agentops/evidence/collections-mainnet.json) · [hosted monitor](https://github.com/Mabolla/arc-paylink/blob/feat/tameion-agentops/agentops/evidence/collections-monitor.json) · [Google/Circle sign-in](https://github.com/Mabolla/arc-paylink/blob/feat/tameion-agentops/agentops/evidence/collections-google-auth.json)
+- [New product and evidence tour](https://arc-paylink-collections-pilot.vercel.app/collections-demo/index.html)
+- [Public extension source](https://github.com/Mabolla/arc-paylink/tree/deploy/collections-pilot) · [draft PR #14](https://github.com/Mabolla/arc-paylink/pull/14)
+- [Google/Circle paid checkout and agent report](https://github.com/Mabolla/arc-paylink/blob/deploy/collections-pilot/agentops/evidence/collections-circle-payment-20261003.json)
+- [Activated isolated monitor](https://github.com/Mabolla/arc-paylink/blob/deploy/collections-pilot/agentops/evidence/collections-monitor-activation-20261003.json)
+- [Mainnet acceptance](https://github.com/Mabolla/arc-paylink/blob/deploy/collections-pilot/agentops/evidence/collections-mainnet.json) · [hosted monitor](https://github.com/Mabolla/arc-paylink/blob/deploy/collections-pilot/agentops/evidence/collections-monitor.json) · [Google/Circle sign-in](https://github.com/Mabolla/arc-paylink/blob/deploy/collections-pilot/agentops/evidence/collections-google-auth.json)
 
 Release context: original production and `main` remain unchanged.
 
 ## Türkçe durum
 
-3 Ekim gerçek Google/Circle ödemesi, şirketin paid kaydı, salt-okuma agent raporu, tekrar taramada çift kayıt oluşmaması ve imzalı Circle bildirim teslimleri doğrulandı. Günlük görev ayrı üretim projesinde etkin; Vercel üzerinden gerçek çalıştırması başarılı. İlk doğal günlük çalıştırma ve ödeme sonuçlanmadan tarayıcının kapatıldığı senaryo ayrıca gözlenmedi. Dış müşteri yok. Mevcut Microgrants başvurusunun güncellenmesi DoraHacks insan doğrulaması nedeniyle henüz tamamlanmadı.
+3 Ekim gerçek Google/Circle ödemesi ve agent raporu doğrulandı. 4 Ekim, müşteri sekmesi kapanmış ve sipariş henüz Processing durumundayken başlayan gözlem, sonradan circle-webhook kaynaklı Paid makbuzuyla tamamlandı. İlk doğal günlük zamanlayıcı çalışması hâlâ bekleniyor. Dış müşteri yok. Mevcut başvuruya bu taslak gönderilmedi; kullanıcı kararı doğrultusunda kalan sürüm kapıları kapanmadan başvuru güncellenmeyecek.
