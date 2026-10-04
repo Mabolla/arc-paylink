@@ -1,0 +1,24 @@
+{
+  "date": "2026-10-04",
+  "testedCommit": "b4acd8035c713552c22ec058e9ce23438a54d23d",
+  "orderId": "30859c65-b606-4a3b-afef-b616cb44a329",
+  "reference": "RECOVERY-VALIDATION-20261004",
+  "amountUsdc": "0.01",
+  "transactionHash": "0xba63f08308170e98c42b5ec6989d767d02472b3cd448e888b0b32fac1f21546c",
+  "blockNumber": "24191100",
+  "confirmedAt": "2026-10-04T08:23:34.690Z",
+  "liveObserved": {
+    "userApprovedCirclePayment": true,
+    "checkoutPaid": true,
+    "businessOrderPaid": true,
+    "customerCheckoutClosedAfterPaid": true,
+    "reopenedInNewTab": true,
+    "sameReceiptRestored": true,
+    "noAdditionalPaymentControls": true
+  },
+  "limits": [
+    "Checkout was already paid before its tab was closed.",
+    "This does not establish browser-closed initial settlement or webhook-only causality.",
+    "Provider/storage failure scenarios were tested with a simulated provider, not injected into live services."
+  ]
+}
