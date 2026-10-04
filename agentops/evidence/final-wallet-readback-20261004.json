@@ -1,0 +1,15 @@
+{
+  "date": "2026-10-04",
+  "sourceCommit": "d8453be5f51674b628d8dcc711fa888fffbb2d62",
+  "url": "https://arc-paylink-collections-pilot.vercel.app/wallet",
+  "method": "Live browser: Google sign-in followed by visible Circle wallet connected status and Arc balance",
+  "wallet": "0xcffc8fee9d782497fdb74909a3843948df34df31",
+  "balanceUSDC": "0.45",
+  "paymentSent": false,
+  "transferFormSubmitted": false,
+  "result": "passed",
+  "limitations": [
+    "Returning-wallet read-back only; no new payment",
+    "Internal acceptance; no external customer validation"
+  ]
+}

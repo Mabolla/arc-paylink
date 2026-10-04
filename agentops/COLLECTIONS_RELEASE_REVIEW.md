@@ -34,7 +34,10 @@ Primary advisories: GHSA-w5hq-g745-h8pq, GHSA-528h-pc64-c93x, GHSA-848j-6mx2-7j8
 ## Remaining acceptance gates
 
 1. Observe the natural daily scheduler invocation after 5 October 09–10 UTC. The earlier manual Run does not close this gate.
-2. Confirm returning Google/Circle wallet read-back on the final dependency release without sending another payment; if fresh authentication is required, report that boundary.
-3. Freeze demo/application wording around this exact release and its limitations after those checks. Existing Microgrants submission stays unchanged; neither revision nor Tameion submission is authorized for immediate sending by this review.
+2. Freeze demo/application wording around this exact release and its limitations after those checks. Existing Microgrants submission stays unchanged; neither revision nor Tameion submission is authorized for immediate sending by this review.
 
 There is no basis to label this broad production readiness. The completed engineering review can support a controlled pilot presentation with these limits, once the remaining acceptance evidence is collected.
+
+## Final-release wallet read-back — 4 October
+
+Google sign-in returned to the final pilot wallet screen. The connected Circle wallet was `0xcffc8fee9d782497fdb74909a3843948df34df31`, and the Arc balance read-back was `0.45 USDC`. No transfer form was filled or submitted and no payment was sent. This closes returning-wallet access for the final dependency release; it does not establish a new-payment proof. Sanitized evidence: `agentops/evidence/final-wallet-readback-20261004.json`.
