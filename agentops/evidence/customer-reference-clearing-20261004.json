@@ -2,7 +2,7 @@
   "checkedAt": "2026-10-04",
   "scope": "Owner-only internal customer-reference clearing",
   "validation": {
-    "httpTestsPassed": 7,
+    "httpTestsPassed": 8,
     "changedFilesLintPassed": true,
     "productionBuildPassed": true
   },
@@ -11,7 +11,8 @@
     "Owner clears only customerReference while paid receipt, amount, status, destination and original retry fingerprint remain identical",
     "Repeated clearing succeeds without restoring the reference",
     "Original create-order retry does not restore cleared customerReference",
-    "Subsequent scoped reader response omits the cleared value"
+    "Subsequent scoped reader response omits the cleared value",
+    "Concurrent settlement causes clearing to return 409 without overwriting the new Paid receipt; retry clears the reference while preserving that receipt"
   ],
   "concurrency": "Uses existing storage version/ETag compare-and-swap; a conflicting payment update is not overwritten.",
   "limitations": [
@@ -20,5 +21,6 @@
     "Does not erase onchain records, prior exports, agent-saved copies, provider data or historical storage versions.",
     "No automatic retention purge or full-workspace deletion is implemented."
   ],
-  "liveRecordsChanged": 0
+  "liveRecordsChanged": 0,
+  "liveUiObservation": "Published company form displays the updated reference access and clearing disclosure; existing workspace still shows 5 Paid orders totaling 0.05 USDC. No live clear action was invoked."
 }

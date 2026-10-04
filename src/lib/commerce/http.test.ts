@@ -31,6 +31,27 @@ beforeEach(() => {
 });
 
 describe("business HTTP and remote agent boundaries", () => {
+  it("preserves a concurrent payment update when customer-reference clearing conflicts", async () => {
+    const service = context.service!;
+    const owner = await service.createWorkspace({ name: "Concurrent privacy", recipient });
+    const principal = await service.authorize(owner.token);
+    const order = await service.createOrder(principal, { reference: "PRIVACY-RACE", title: "Delivery", customerReference: "CUSTOMER-RACE", amount: "0.01", idempotencyKey: randomUUID() });
+    const path = orderPath(principal.workspace.id, order.id);
+    const originalWrite = service.store.write.bind(service.store);
+    const receipt: Order["receipt"] = { transactionHash: `0x${"2".repeat(64)}`, sender: recipient, blockNumber: "43", confirmedAt: new Date().toISOString() };
+    const intercept = vi.spyOn(service.store, "write").mockImplementationOnce(async (target, value, version) => {
+      const latest = (await service.store.read<Order>(path))!;
+      await originalWrite(path, { ...latest.value, status: "paid", receipt }, latest.version);
+      return originalWrite(target, value, version);
+    });
+    const endpoint = `orders/${order.id}/clear-customer-reference`;
+    const response = await POST(request(endpoint, {}, owner.token), route(endpoint.split("/")));
+    expect(response.status).toBe(409);
+    intercept.mockRestore();
+    expect(await service.order(principal, order.id)).toEqual({ ...order, status: "paid", receipt });
+    expect((await POST(request(endpoint, {}, owner.token), route(endpoint.split("/")))).status).toBe(200);
+    expect(await service.order(principal, order.id)).toEqual({ ...order, customerReference: "", status: "paid", receipt });
+  });
   it("lets only the owning company clear a customer reference while preserving paid evidence and retry identity", async () => {
     const service = context.service!;
     const owner = await service.createWorkspace({ name: "Privacy owner", recipient });
