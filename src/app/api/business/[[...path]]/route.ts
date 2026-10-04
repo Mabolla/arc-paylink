@@ -104,6 +104,8 @@ export async function POST(request: Request, context: Context) {
         { order: merchantOrder(await service.createOrder(principal, body)) },
         201,
       );
+    if (path.length === 3 && path[0] === "orders" && path[2] === "clear-customer-reference")
+      return json({ order: merchantOrder(await service.clearCustomerReference(principal, path[1])) });
     if (path[0] === "orders" && path[2] === "cancel")
       return json({
         order: merchantOrder(await service.cancel(principal, path[1])),

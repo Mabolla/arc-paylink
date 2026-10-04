@@ -511,8 +511,9 @@ export function BusinessDashboard({ demo = false }: { demo?: boolean }) {
                   <p className={styles.note}>
                     Use a customer code instead of personal details. Your business
                     and its authorized read-only agents can read this reference.
-                    Order records remain stored in this pilot; automatic deletion
-                    and a self-service deletion flow are not available yet.
+                    You can clear this reference later while keeping the payment
+                    record. Order records remain stored; automatic deletion and
+                    full workspace deletion are not available in this pilot.
                   </p>
                   <p className={styles.note}>
                     Receiving address: {workspace.recipient}. The customer
@@ -656,6 +657,19 @@ export function BusinessDashboard({ demo = false }: { demo?: boolean }) {
                             >
                               Copy link
                             </button>
+                            {o.customerReference && !demo && (
+                              <button className={styles.link} disabled={busy}
+                                onClick={() => {
+                                  if (!window.confirm("Clear this internal customer reference? This cannot be undone. The order and payment receipt remain. Previously exported or agent-saved copies are not removed.")) return;
+                                  void act(async () => {
+                                    await call(`orders/${o.id}/clear-customer-reference`, {});
+                                    setNotice("Customer reference cleared. Order and payment receipt preserved.");
+                                    await refresh();
+                                  });
+                                }}>
+                                Clear customer reference
+                              </button>
+                            )}
                             {o.receipt && !demo && (
                               <a
                                 className={styles.link}

@@ -1,0 +1,24 @@
+{
+  "checkedAt": "2026-10-04",
+  "scope": "Owner-only internal customer-reference clearing",
+  "validation": {
+    "httpTestsPassed": 7,
+    "changedFilesLintPassed": true,
+    "productionBuildPassed": true
+  },
+  "verified": [
+    "Reader denied with 403 and foreign company denied with 404 before reference mutation",
+    "Owner clears only customerReference while paid receipt, amount, status, destination and original retry fingerprint remain identical",
+    "Repeated clearing succeeds without restoring the reference",
+    "Original create-order retry does not restore cleared customerReference",
+    "Subsequent scoped reader response omits the cleared value"
+  ],
+  "concurrency": "Uses existing storage version/ETag compare-and-swap; a conflicting payment update is not overwritten.",
+  "limitations": [
+    "Local integration acceptance, not a live deletion test",
+    "Only customerReference is cleared. Title, invoice reference, financial receipt and retry fingerprint remain.",
+    "Does not erase onchain records, prior exports, agent-saved copies, provider data or historical storage versions.",
+    "No automatic retention purge or full-workspace deletion is implemented."
+  ],
+  "liveRecordsChanged": 0
+}

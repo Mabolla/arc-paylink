@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { randomUUID } from "node:crypto";
-import { CommerceService } from "./service";
+import { CommerceService, orderPath } from "./service";
+import type { Order } from "./types";
 import { MemoryStore } from "./test-store";
 import { credential } from "./http";
 
@@ -30,6 +31,30 @@ beforeEach(() => {
 });
 
 describe("business HTTP and remote agent boundaries", () => {
+  it("lets only the owning company clear a customer reference while preserving paid evidence and retry identity", async () => {
+    const service = context.service!;
+    const owner = await service.createWorkspace({ name: "Privacy owner", recipient });
+    const principal = await service.authorize(owner.token);
+    const reader = await service.issueReader(principal, "Privacy reader");
+    const foreign = await service.createWorkspace({ name: "Foreign company", recipient });
+    const input = { reference: "PRIVACY-1", title: "Delivery", customerReference: "CUSTOMER-042", amount: "0.01", idempotencyKey: randomUUID() };
+    const order = await service.createOrder(principal, input);
+    const path = orderPath(principal.workspace.id, order.id);
+    const saved = (await service.store.read<Order>(path))!;
+    const paid: Order = { ...saved.value, status: "paid", receipt: { transactionHash: `0x${"1".repeat(64)}`, sender: recipient, blockNumber: "42", confirmedAt: new Date().toISOString() } };
+    await service.store.write(path, paid, saved.version);
+    const endpoint = `orders/${order.id}/clear-customer-reference`;
+    const params = route(endpoint.split("/"));
+    expect((await POST(request(endpoint, {}, reader.token), params)).status).toBe(403);
+    expect((await POST(request(endpoint, {}, foreign.token), params)).status).toBe(404);
+    expect((await service.order(principal, order.id)).customerReference).toBe("CUSTOMER-042");
+    expect((await POST(request(endpoint, {}, owner.token), params)).status).toBe(200);
+    expect(await service.order(principal, order.id)).toEqual({ ...paid, customerReference: "" });
+    expect((await POST(request(endpoint, {}, owner.token), params)).status).toBe(200);
+    expect((await service.createOrder(principal, input)).customerReference).toBe("");
+    const readback = await GET(request(`orders/${order.id}`, undefined, reader.token), route(["orders", order.id]));
+    expect(JSON.stringify(await readback.json())).not.toContain("CUSTOMER-042");
+  });
   it("recovers in another browser and atomically replaces the owner session with CSRF protection", async () => {
     const owner = await context.service!.createWorkspace({ name: "Recovery HTTP", recipient });
     const recovered = await POST(request("session", { token: owner.token }), route(["session"]));

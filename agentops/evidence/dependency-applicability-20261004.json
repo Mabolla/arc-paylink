@@ -1,0 +1,36 @@
+{
+  "checkedAt": "2026-10-04",
+  "scope": "Bounded source and production API trace inspection after Next.js 16.3.8 upgrade",
+  "status": "REVIEWED_BOUNDARIES_NOT_A_CLEAN_AUDIT",
+  "auditHighPackageWarnings": 12,
+  "groups": [
+    {
+      "root": "toml",
+      "propagation": "Anchor and Circle AppKit/bridge/provider packages",
+      "observation": "Installed Anchor workspace helper parses a local Anchor.toml file and explicitly rejects browser workspace access. Application source does not call Anchor workspace or parse TOML.",
+      "limitation": "This does not clear every transitive SDK path or future use."
+    },
+    {
+      "root": "@grpc/grpc-js",
+      "propagation": "Firebase Firestore",
+      "observation": "Application source does not start a gRPC server or call getAuthContext. Circle SDK is dynamically loaded from client components. Collections server integration uses native fetch to a fixed Circle origin.",
+      "limitation": "Client SDK internals are not fully audited."
+    },
+    {
+      "root": "undici",
+      "propagation": "Pinned nested Firebase Node dependencies",
+      "observation": "Remaining production-audit nodes are nested under Firebase. No application source imports these nested modules directly.",
+      "limitation": "The Node runtime's built-in fetch is separate and was not audited through this npm dependency report."
+    }
+  ],
+  "productionTraceInspection": {
+    "apiTraceFilesChecked": 17,
+    "matchingFirebaseGrpcTomlPaths": 0,
+    "scope": ".next/server/app/api/**/*.nft.json",
+    "limitation": "Trace absence is supporting evidence for the inspected API bundles, not a formal reachability proof for browser code, pages or SDK internals."
+  },
+  "releaseDecision": "Keep the controlled pilot separate. Do not advertise a clean dependency audit or general production readiness. Review upstream-compatible remediation before increasing exposure.",
+  "forceDowngradeOrMajorOverrideApplied": false,
+  "liveExploitTestPerformed": false,
+  "newPayments": 0
+}

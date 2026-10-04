@@ -316,6 +316,16 @@ export class CommerceService {
       .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
     return { orders, cursor: page.cursor };
   }
+  async clearCustomerReference(p: Principal, id: string) {
+    this.owner(p);
+    const path = orderPath(p.workspace.id, id);
+    const saved = await this.store.read<Order>(path);
+    if (!saved) throw new CommerceError("Order not found.", 404);
+    if (!saved.value.customerReference) return saved.value;
+    const value: Order = { ...saved.value, customerReference: "" };
+    await this.store.write(path, value, saved.version);
+    return value;
+  }
   async cancel(p: Principal, id: string) {
     this.owner(p);
     const path = orderPath(p.workspace.id, id);
