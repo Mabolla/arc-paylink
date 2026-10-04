@@ -1,0 +1,25 @@
+{
+  "date": "2026-10-04",
+  "orderId": "90c0777f-dff6-498d-ac44-37a2531aac9f",
+  "reference": "CLOSED-TAB-20261004",
+  "amountUsdc": "0.01",
+  "transactionHash": "0x17328887083113d64a8af63be270b7f46f06a31ac0ae3f3912c30bdbb6793082",
+  "blockNumber": "24199415",
+  "confirmedAt": "2026-10-04T09:33:53.185Z",
+  "confirmationSource": "circle-webhook",
+  "observations": {
+    "automaticCustomerStatusChecksDisabledBeforeApproval": true,
+    "userReportedApprovalAndImmediateTabClosure": true,
+    "originalCustomerTab15AbsentFromBrowserInventory": true,
+    "businessPaidObservedBeforeOpeningNewCustomerTab": true,
+    "newCustomerTab17ShowsSamePaidReceipt": true,
+    "noSecondPaymentRequested": true,
+    "businessPaidOrders": 4,
+    "businessCollectedUsdc": "0.04"
+  },
+  "limitations": [
+    "The exact tab-close timestamp was not instrumented; closure-before-first-confirmation ordering is not independently established.",
+    "The user reported immediate closure after final approval, and actual closure was independently observed afterwards.",
+    "This is an internal live acceptance test, not external customer adoption."
+  ]
+}
