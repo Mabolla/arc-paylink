@@ -1,0 +1,22 @@
+{
+  "date": "2026-10-05",
+  "observedAtLocal": "17:37 Europe/Istanbul",
+  "project": "arc-paylink-collections-pilot",
+  "schedule": "0 9 * * *",
+  "enabled": true,
+  "reportAsOfUTC": "2026-10-05 09:11",
+  "lastCompletedUTC": "2026-10-05 09:11",
+  "lastBackgroundCheckUTC": "2026-10-05 09:11",
+  "receiptsTracked": 5,
+  "collectedUSDC": "0.05",
+  "outstandingUSDC": "0",
+  "manualRunPerformedByAgentToday": false,
+  "newPaymentSent": false,
+  "result": "Operational scheduled-background acceptance passed by persisted report within configured window",
+  "limits": [
+    "Vercel Hobby log UI exposes at most last hour; invocation headers and exact request ID unavailable at inspection",
+    "UI background marker alone also permits manually started runs; natural-trigger attribution is inferred from configured window and no manual run in this workflow, not independently authenticated trigger logs",
+    "One observed daily run, not long-term reliability"
+  ],
+  "businessURL": "https://arc-paylink-collections-pilot.vercel.app/business"
+}
