@@ -112,12 +112,19 @@ async function main() {
   </nav></header>
   <main class="wrap">
     <section class="section" aria-labelledby="current-status-title">
-      <span class="tag">Update · 4 October 2026</span>
-      <h2 id="current-status-title">Embedded checkout and closed-tab settlement verified.</h2>
-      <p>Internal mainnet acceptance now includes Google/Circle payment approval and a later signed webhook receipt after the customer tab closed while the order was still Processing. A temporary single-order notification delay was removed after this timing test. This is not independent customer adoption or a latency benchmark.</p>
-      <p>A daily pilot schedule is configured. Natural scheduled execution remains unverified; the recorded background run was started manually. External customers: zero. Automatic data deletion and self-service deletion are not implemented.</p>
-      <p><a href="https://github.com/Mabolla/arc-paylink/blob/deploy/collections-pilot/agentops/evidence/timed-closed-tab-payment-20261004.json">Closed-tab mainnet evidence</a> · <a href="https://github.com/Mabolla/arc-paylink/blob/deploy/collections-pilot/agentops/COLLECTIONS_CURRENT_STATUS.md">Current release gates</a></p>
-      <p><strong>Historical walkthrough below:</strong> screenshots, saved totals, video captions and pending labels describe the 1 October recording. They are not the current release checklist. The current pilot is separate from the original product.</p>
+      <span class="tag">Current product · 5 October 2026</span>
+      <h2 id="current-status-title">Walletless USDC claiming, now with company and agent collections.</h2>
+      <h3>The original PayLink</h3>
+      <p>A sender funds an isolated Arc USDC escrow and shares a private, single-use claim link. The recipient signs in with Google, creates or recovers a user-controlled Circle smart account and explicitly approves receipt of the funded payment. No prior crypto-wallet setup is required. The recipient can return to view or send received USDC.</p>
+      <p>The original product includes exact funding and settlement checks, request tracking, address-bound EIP-1271 claims and encrypted creator recovery. Payment verification identifies partial, duplicate and mismatched settlement; recovery does not automatically move funds. <a href="https://arc-paylink-two.vercel.app/create">Open the original sender flow</a> · <a href="https://github.com/Mabolla/arc-paylink/blob/main/docs/mainnet-microgrants-evidence.md">Original mainnet evidence</a>.</p>
+      <h3>The added company workflow</h3>
+      <p>Businesses create customer checkout links and track orders, due dates and verified receipts. Revocable, scoped read-only MCP tools let their agents inspect the same evidence without authority to move funds. Purchase checkout is distinct from receiving a funded claim: customers must have USDC and approve payment. Card/fiat checkout is not included.</p>
+      <h3>Current acceptance evidence</h3>
+      <p>Five internal mainnet payments total 0.05 USDC. Google/Circle checkout and later signed webhook settlement after customer-tab closure were verified. A temporary single-order notification delay was removed after the closed-tab test; this is recovery evidence, not a latency benchmark. Final-release returning wallet access was also verified without another payment.</p>
+      <p>The enabled daily pilot schedule recorded a completed report on 5 October at 09:11 UTC: five receipts, 0.05 USDC collected and zero outstanding. No manual Run occurred in our workflow that day. Provider invocation logs were outside retention, so exact trigger provenance remains inferred. One run does not establish long-term reliability.</p>
+      <p>294 application tests and the final production build passed. External customers: zero. This is an internally validated pilot, not an independent audit. Remaining dependency and privacy/retention limits are documented; customer-reference clearing is not full financial/onchain data erasure.</p>
+      <p><a href="https://github.com/Mabolla/arc-paylink/blob/review/collections-release-20261004/agentops/COLLECTIONS_RELEASE_REVIEW.md">Current release review</a> · <a href="https://github.com/Mabolla/arc-paylink/blob/review/collections-release-20261004/agentops/evidence/daily-background-acceptance-20261005.json">Daily report evidence</a> · <a href="https://github.com/Mabolla/arc-paylink/blob/deploy/collections-pilot/agentops/evidence/timed-closed-tab-payment-20261004.json">Closed-tab evidence</a></p>
+      <p><strong>Historical archive below — 1 October:</strong> screenshots, saved totals, video captions and pending labels are preserved records of that earlier acceptance. They do not describe current completion. Read the current evidence above for the 5 October status. Original production/main remain separate.</p>
     </section>
     <section class="hero" aria-labelledby="hero-title"><div class="hero-grid">
       <div>
