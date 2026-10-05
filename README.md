@@ -4,13 +4,30 @@ Arc PayLink lets a sender fund an isolated USDC escrow on Arc and deliver a priv
 
 Business collections are available at `/business`, with an interactive sandbox at `/business/demo`. Companies create customer payment links, customers use existing Arc wallets or the Google / Circle embedded checkout path, and scoped read-only agents follow orders and chain-verified receipts over remote MCP. See [integration and acceptance details](agentops/COLLECTIONS.md). No real customer purchase is claimed by the sandbox.
 
-The [collections watcher](agentops/COLLECTIONS_WATCH.md) also reads receipts without a browser, with a durable ledger and duplicate suppression. A daily pilot schedule is configured; natural scheduled execution remains unverified. See the [current release gates](agentops/COLLECTIONS_CURRENT_STATUS.md) for the latest mainnet checkout, webhook and monitor status. The product/evidence tour is at `/collections-demo/index.html`; its sandbox screens remain simulated.
+The [collections watcher](agentops/COLLECTIONS_WATCH.md) also reads receipts without a browser, with a durable ledger and duplicate suppression. A daily pilot schedule is configured. A saved report completed on 5 October at 09:11 UTC within its window, without a manual Run in our workflow; provider trigger logs were outside retention, so exact provenance remains inferred. See the [current release gates](agentops/COLLECTIONS_CURRENT_STATUS.md) for the latest mainnet checkout, webhook and monitor status. The product/evidence tour is at `/collections-demo/index.html`; its sandbox screens remain simulated.
 
 The [hosted collections monitor](agentops/COLLECTIONS_MONITOR.md) adds private server checkpoints, interrupted-run recovery and a recorded report in the business dashboard. The fifth read-only merchant tool, `get_collections_monitor`, exposes that report without starting work. A separate cron endpoint and isolated-deployment template are ready; automatic scheduling requires independent provider activation and acceptance.
 
 An isolated invoice-agent prototype is available in [`agentops/`](agentops/README.md). Its five MCP tools inspect PayLinks, evaluate invoice policy, request exact approval, verify Circle Agent Wallet payments, and reconcile recorded transactions without resending funds. Run `npm run agentops:demo` for the explicitly simulated local rehearsal. Real AgentOps wallet/business acceptance is still pending; the existing escrow and walletless claim flow are unchanged.
 
 **Live mainnet pilot:** [arc-paylink-two.vercel.app](https://arc-paylink-two.vercel.app)
+
+## Full product and upgrade — reviewer route
+
+The original product and the new collections workflow solve different sides of USDC payments:
+
+| Original PayLink | Added collections pilot |
+| --- | --- |
+| Sender funds an isolated escrow; recipient receives USDC through a private claim link. | Company creates a customer purchase link and receives USDC after customer approval. |
+| Recipient signs in with Google and creates/recovers a Circle wallet; no prior wallet setup is required. | Customer uses an existing wallet or Google/Circle access; purchase payment requires an available USDC balance. |
+| Request tracking, settlement verification, encrypted creator recovery and address-bound claim authorization. | Company orders, due dates, verified receipts, recovery, revocable read-only MCP access and saved daily reports. |
+
+1. Read the original [mainnet acceptance](docs/mainnet-microgrants-evidence.md) and the original flow below.
+2. Inspect the [pilot source](https://github.com/Mabolla/arc-paylink/tree/deploy/collections-pilot) and [collections integration](agentops/COLLECTIONS.md).
+3. Review the [current acceptance and limits](agentops/COLLECTIONS_RELEASE_REVIEW.md), including the [5 October daily report](agentops/evidence/daily-background-acceptance-20261005.json).
+4. Read the [complete Microgrants revision](agentops/MICROGRANTS_UPGRADE_DRAFT.md). Neither a merged release nor an application submission is implied.
+
+The public collections tour contains historical 1 October screenshots and labels. Its top update must be read separately from those recordings; final live-tour alignment is still pending. Original production/main are preserved.
 
 ## Reviewer quick check
 
